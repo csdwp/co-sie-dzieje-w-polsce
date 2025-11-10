@@ -81,10 +81,7 @@ def analyze_text_with_openai(
 def summarize_fragment(text: str) -> str:
     prompt = "Podsumuj ten fragment dokumentu prawnego w języku polskim w 2-3 zwięzłych zdaniach, wychwytując kluczowe zmiany lub przepisy. Skup się na istocie, unikając zbędnych szczegółów."
     result = analyze_text_with_openai(text, prompt, max_tokens=200)
-    if isinstance(result, dict):
-        content = result.get("content", "")
-        return str(content) if content else ""
-    return str(result)
+    return str(result.get("content", ""))
 
 
 def split_and_analyze_text(
