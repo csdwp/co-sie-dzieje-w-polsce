@@ -1,7 +1,7 @@
 import os
 from typing import Optional
 
-import fitz
+import fitz  # type: ignore[import-untyped]
 import requests
 
 from ..core.config import PDF_DOWNLOAD_TIMEOUT

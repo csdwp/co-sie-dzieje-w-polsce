@@ -88,7 +88,7 @@ class VotesCalculator:
         Returns:
             Dictionary of party votes
         """
-        party_votes = defaultdict(
+        party_votes: Dict[str, Dict[str, int]] = defaultdict(
             lambda: {"yes": 0, "no": 0, "abstain": 0, "absent": 0, "total": 0}
         )
 

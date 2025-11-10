@@ -2,7 +2,7 @@
 
 import json
 import os
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, cast
 
 from dotenv import load_dotenv
 from openai import OpenAI
@@ -65,7 +65,7 @@ class OpenAIClient:
 
             if expect_json or "json" in prompt.lower():
                 try:
-                    return json.loads(content)
+                    return cast(Dict[str, Any], json.loads(content if content is not None else "{}"))
                 except json.JSONDecodeError:
                     logger.error(f"Invalid JSON format: {content}")
                     return {"error": "Invalid response format", "raw_content": content}

@@ -3,10 +3,10 @@ import logging
 import os
 import time
 from contextlib import contextmanager
-from typing import Any, Dict, Generator, List, Optional
+from typing import Any, Dict, Generator, List, Optional, cast
 
 from dotenv import load_dotenv
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.text_splitter import RecursiveCharacterTextSplitter  # type: ignore
 from openai import APIError, OpenAI
 from tenacity import (
     retry,
@@ -66,11 +66,11 @@ def analyze_text_with_openai(
 
             if "json" in prompt.lower():
                 try:
-                    return json.loads(content)
+                    return cast(Dict[str, Any], json.loads(content if content is not None else "{}"))
                 except json.JSONDecodeError:
                     logger.error(f"Invalid JSON format: {content}")
                     return {"error": "Invalid response format", "raw_content": content}
-            return {"content": content}
+            return {"content": content or ""}
     except APIError as e:
         logger.error(f"API error: {e}")
         raise
@@ -80,7 +80,8 @@ def analyze_text_with_openai(
 
 def summarize_fragment(text: str) -> str:
     prompt = "Podsumuj ten fragment dokumentu prawnego w języku polskim w 2-3 zwięzłych zdaniach, wychwytując kluczowe zmiany lub przepisy. Skup się na istocie, unikając zbędnych szczegółów."
-    return analyze_text_with_openai(text, prompt, max_tokens=200)
+    result = analyze_text_with_openai(text, prompt, max_tokens=200)
+    return str(result.get("content", ""))
 
 
 def split_and_analyze_text(
@@ -196,12 +197,18 @@ def find_or_create_category_with_ai(
                     return None
 
             elif action == "extend":
-                return extend_category_keywords(
-                    category_name, new_keywords, all_categories
-                )
+                if category_name and new_keywords:
+                    return extend_category_keywords(
+                        category_name, new_keywords, all_categories
+                    )
 
             elif action == "create":
-                return create_new_category(category_name, new_keywords + act_keywords)
+                if category_name and new_keywords:
+                    return create_new_category(
+                        category_name, new_keywords + act_keywords
+                    )
+
+            return None
 
         else:
             logger.error(f"Invalid AI response format: {ai_decision}")

@@ -111,13 +111,31 @@ class Categorizer:
 
             # Execute action based on AI decision
             if action == "match":
-                return self._handle_match(category_name, all_categories)
+                if category_name:
+                    return self._handle_match(category_name, all_categories)
+                else:
+                    logger.error("Missing category_name for match action")
+                    return None
 
             elif action == "extend":
-                return self._handle_extend(category_name, new_keywords)
+                if category_name and new_keywords:
+                    return self._handle_extend(category_name, new_keywords)
+                else:
+                    logger.error(
+                        "Missing category_name or new_keywords for extend action"
+                    )
+                    return None
 
             elif action == "create":
-                return self._handle_create(category_name, new_keywords, act_keywords)
+                if category_name and new_keywords:
+                    return self._handle_create(
+                        category_name, new_keywords, act_keywords
+                    )
+                else:
+                    logger.error(
+                        "Missing category_name or new_keywords for create action"
+                    )
+                    return None
 
             else:
                 logger.error(f"Unknown action: {action}")

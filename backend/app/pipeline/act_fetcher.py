@@ -38,7 +38,7 @@ class ActFetcher:
             List of filtered acts sorted by promulgation date
         """
         logger.info("Fetching acts from API...")
-        items: List[Dict[str, Any]] = self.sejm_api.fetch_acts_for_year()
+        items = self.sejm_api.fetch_acts_for_year()
 
         if not items:
             logger.error("Failed to fetch data from API")

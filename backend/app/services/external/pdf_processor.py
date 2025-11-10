@@ -3,7 +3,7 @@
 import os
 from typing import Optional
 
-import fitz  # PyMuPDF
+import fitz  # type: ignore[import-untyped]  # PyMuPDF
 import requests
 
 from ...core.config import PDF_DOWNLOAD_TIMEOUT

@@ -1,6 +1,6 @@
 """Main pipeline orchestrator."""
 
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from ..core.config import (
     ELI_FOR_LATER,
@@ -22,10 +22,10 @@ class PipelineOrchestrator:
 
     def __init__(
         self,
-        fetcher: ActFetcher = None,
-        processor: ActProcessor = None,
-        sejm_api: SejmAPIClient = None,
-        file_handler: FileHandler = None,
+        fetcher: Optional[ActFetcher] = None,
+        processor: Optional[ActProcessor] = None,
+        sejm_api: Optional[SejmAPIClient] = None,
+        file_handler: Optional[FileHandler] = None,
     ):
         """
         Initialize pipeline orchestrator.

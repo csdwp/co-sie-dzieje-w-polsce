@@ -9,6 +9,7 @@ langchain-openai
 tiktoken
 PyMuPDF
 types-requests
+types-psycopg2
 mypy
 pytest
 black

@@ -2,9 +2,9 @@
 
 import os
 from contextlib import contextmanager
-from typing import Any, Optional, Tuple
+from typing import Any, Generator, Optional, Tuple
 
-import psycopg2
+import psycopg2  # type: ignore[import-untyped]
 from dotenv import load_dotenv
 
 from ..core.exceptions import DatabaseError
@@ -29,7 +29,7 @@ class BaseRepository:
             raise DatabaseError("DATABASE_URL is not set in environment variables")
 
     @contextmanager
-    def get_connection(self) -> Tuple[Any, Any]:
+    def get_connection(self) -> Generator[Tuple[Any, Any], None, None]:
         """
         Get database connection and cursor.
 

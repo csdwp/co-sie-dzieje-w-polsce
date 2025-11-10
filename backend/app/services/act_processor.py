@@ -66,6 +66,10 @@ class ActProcessor:
         eli = act_data.get("ELI")
         title = act_data.get("title", "unknown")
 
+        if not eli:
+            logger.error(f"No ELI provided for act: {title}")
+            return False
+
         logger.info(f"Processing act: {title}")
 
         try:

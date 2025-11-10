@@ -1,6 +1,6 @@
 """Client for Sejm API interactions."""
 
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union, cast
 
 import requests
 
@@ -45,7 +45,7 @@ class SejmAPIClient:
         try:
             response = requests.get(url, timeout=10)
             response.raise_for_status()
-            return response.json()
+            return cast(Union[Dict[str, Any], List[Any]], response.json())
         except requests.exceptions.HTTPError as e:
             logger.error(f"HTTP error {response.status_code}: {e}")
             raise ExternalAPIError(f"HTTP error: {response.status_code}")
@@ -72,7 +72,8 @@ class SejmAPIClient:
         data = self._fetch_json(url)
 
         if isinstance(data, dict):
-            return data.get("items", [])
+            items = data.get("items", [])
+            return cast(List[Dict[str, Any]], items) if items else []
 
         return None
 
@@ -121,7 +122,8 @@ class SejmAPIClient:
             Process data or None
         """
         logger.info(f"Fetching voting process from: {process_url}")
-        return self._fetch_json(process_url)
+        data = self._fetch_json(process_url)
+        return cast(Optional[Dict[str, Any]], data) if isinstance(data, dict) else None
 
     def fetch_sejm_voting(
         self, term: int, sitting: int, voting_number: int
@@ -143,7 +145,8 @@ class SejmAPIClient:
         logger.info(
             f"Fetching Sejm voting: term={term}, sitting={sitting}, voting={voting_number}"
         )
-        return self._fetch_json(url)
+        data = self._fetch_json(url)
+        return cast(Optional[Dict[str, Any]], data) if isinstance(data, dict) else None
 
     def get_pdf_url(self, eli: str) -> str:
         """
