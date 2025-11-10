@@ -26,3 +26,6 @@ install-dev:
 
 type-check-file:
 	$(MYPY) $(FILE)
+
+test:
+	cd backend && python -m pytest
