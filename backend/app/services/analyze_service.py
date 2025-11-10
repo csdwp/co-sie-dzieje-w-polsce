@@ -66,7 +66,7 @@ def analyze_text_with_openai(
 
             if "json" in prompt.lower():
                 try:
-                    return cast(Dict[str, Any], json.loads(content or "{}"))
+                    return cast(Dict[str, Any], json.loads(content if content is not None else "{}"))
                 except json.JSONDecodeError:
                     logger.error(f"Invalid JSON format: {content}")
                     return {"error": "Invalid response format", "raw_content": content}
