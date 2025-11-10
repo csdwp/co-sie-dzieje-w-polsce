@@ -14,8 +14,10 @@ class TestSejmAPIClientFetchActsForYear:
 
     @pytest.fixture
     def sejm_client(self):
-        """Create real SejmAPIClient (uses env variables)"""
-        return SejmAPIClient()
+        """Create SejmAPIClient with mocked environment variables"""
+        with patch("app.core.config.BASIC_URL", "https://api.sejm.gov.pl/eli"):
+            with patch("app.core.config.API_URL", "https://api.sejm.gov.pl/sejm/term10/acts"):
+                yield SejmAPIClient()
 
     def test_fetch_acts_for_year_missing_env_variables_raises_exception(self):
         """Test initialization fails when env vars missing"""
