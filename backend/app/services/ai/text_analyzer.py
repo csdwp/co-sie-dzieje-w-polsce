@@ -42,9 +42,7 @@ class TextAnalyzer:
         result = self.openai_client.analyze_with_prompt(
             text=text, prompt=prompt, max_tokens=200, expect_json=False
         )
-        if isinstance(result, dict):
-            return str(result.get("content", ""))
-        return str(result)
+        return str(result.get("content", ""))
 
     def analyze_full_text(
         self, text: str, chunk_size: int = 3000, chunk_overlap: int = 200
