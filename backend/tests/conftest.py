@@ -4,6 +4,15 @@ import pytest
 from unittest.mock import patch
 
 
+def pytest_configure(config):
+    """Register custom pytest markers."""
+    config.addinivalue_line("markers", "unit: Unit tests")
+    config.addinivalue_line("markers", "integration: Integration tests")
+    config.addinivalue_line("markers", "e2e: End-to-end tests")
+    config.addinivalue_line("markers", "external_api: Tests requiring external API access (may be slow)")
+    config.addinivalue_line("markers", "slow: Slow running tests")
+
+
 @pytest.fixture(autouse=True)
 def mock_logger():
     """Auto-mock logger for all tests to reduce noise in test output."""

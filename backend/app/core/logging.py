@@ -11,6 +11,7 @@ def setup_logger(
     log_file: Optional[Path] = None,
     level: int = logging.INFO,
     format_string: Optional[str] = None,
+    force: bool = False,
 ) -> logging.Logger:
     """
     Create and configure a logger.
@@ -20,15 +21,20 @@ def setup_logger(
         log_file: Optional file path for logging
         level: Logging level (default: INFO)
         format_string: Custom format string
+        force: If True, recreate handlers even if logger already exists
 
     Returns:
         Configured logger instance
     """
     logger = logging.getLogger(name)
 
-    # Avoid adding handlers multiple times
-    if logger.handlers:
+    # Avoid adding handlers multiple times (unless forced)
+    if logger.handlers and not force:
         return logger
+
+    # Clear existing handlers if forcing recreation
+    if force:
+        logger.handlers.clear()
 
     logger.setLevel(level)
 
