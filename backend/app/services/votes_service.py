@@ -66,7 +66,7 @@ def process_voting_data(data: Dict[str, Any], term: int) -> Dict[str, Any]:
 
 
 def collect_votes_by_party(votes: List[Dict[str, Any]]) -> Dict[str, Dict[str, int]]:
-    party_votes = defaultdict(
+    party_votes: Dict[str, Dict[str, int]] = defaultdict(
         lambda: {"yes": 0, "no": 0, "abstain": 0, "absent": 0, "total": 0}
     )
 

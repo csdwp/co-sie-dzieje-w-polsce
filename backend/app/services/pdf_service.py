@@ -1,5 +1,9 @@
 import os
 from typing import Optional
+
+import fitz  # type: ignore[import-untyped]
+import requests
+
 from ..core.config import PDF_DOWNLOAD_TIMEOUT
 
 
@@ -22,14 +26,14 @@ def download_pdf(url: str, filename: str = "temp.pdf") -> Optional[str]:
         return None
 
 
-def pdf_to_text(url: str) -> str:
+def pdf_to_text(url: str) -> Optional[str]:
     temp_file = None
     text = ""
     try:
         temp_file = download_pdf(url)
         if not temp_file or not os.path.exists(temp_file):
             print(f"Error: PDF file not downloaded correctly from {url}")
-            return text
+            return None
 
         doc = fitz.open(temp_file)
         for page in doc:
@@ -43,7 +47,7 @@ def pdf_to_text(url: str) -> str:
                 os.remove(temp_file)
             except OSError as e:
                 print(f"Warning: Unable to remove temporary file: {e}")
-    return text
+    return text if text else None
 
 
 def save_text_to_file(text: str, filename: str) -> bool:

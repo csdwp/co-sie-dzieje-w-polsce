@@ -44,3 +44,7 @@ backend/**/__pycache__/
 backend/app/act_analysis.json
 backend/app/act_content.txt
 backend/app/eli_for_later.json
+backend/app/logs/app.log
+backend/.coverage
+backend/app/logs/app.log
+backend/test.env

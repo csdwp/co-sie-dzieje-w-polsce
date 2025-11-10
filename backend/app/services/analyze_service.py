@@ -1,10 +1,12 @@
 import json
 import logging
-from typing import Dict, Any, List, Optional, Union
-from ..db.database import create_new_category, extend_category_keywords
-from openai import OpenAI, APIError
+import os
+import time
+from contextlib import contextmanager
+from typing import Any, Dict, Generator, List, Optional, cast
+
 from dotenv import load_dotenv
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from openai import APIError, OpenAI
 from tenacity import (
     retry,
@@ -12,6 +14,9 @@ from tenacity import (
     stop_after_attempt,
     wait_exponential,
 )
+
+from ..db.database import create_new_category, extend_category_keywords
+from ..models.act import CategoryData
 
 logging.basicConfig(
     filename="app.log",
@@ -25,7 +30,7 @@ load_dotenv()
 
 
 @contextmanager
-def get_openai_client():
+def get_openai_client() -> Generator[OpenAI, None, None]:
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         raise ValueError("OpenAI API key missing.")
@@ -44,7 +49,7 @@ def get_openai_client():
 )
 def analyze_text_with_openai(
     text: str, prompt: str, max_tokens: int = 1000
-) -> Union[Dict[str, Any], str]:
+) -> Dict[str, Any]:
     logger.info(f"Processing text, length: {len(text)} characters")
 
     try:
@@ -61,11 +66,14 @@ def analyze_text_with_openai(
 
             if "json" in prompt.lower():
                 try:
-                    return json.loads(content)
+                    return cast(
+                        Dict[str, Any],
+                        json.loads(content if content is not None else "{}"),
+                    )
                 except json.JSONDecodeError:
                     logger.error(f"Invalid JSON format: {content}")
                     return {"error": "Invalid response format", "raw_content": content}
-            return content
+            return {"content": content or ""}
     except APIError as e:
         logger.error(f"API error: {e}")
         raise
@@ -75,7 +83,8 @@ def analyze_text_with_openai(
 
 def summarize_fragment(text: str) -> str:
     prompt = "Podsumuj ten fragment dokumentu prawnego w języku polskim w 2-3 zwięzłych zdaniach, wychwytując kluczowe zmiany lub przepisy. Skup się na istocie, unikając zbędnych szczegółów."
-    return analyze_text_with_openai(text, prompt, max_tokens=200)
+    result = analyze_text_with_openai(text, prompt, max_tokens=200)
+    return str(result.get("content", ""))
 
 
 def split_and_analyze_text(
@@ -109,7 +118,7 @@ def split_and_analyze_text(
     return analyze_text_with_openai(combined_summary, analysis_prompt, max_tokens=1000)
 
 
-def save_analysis_to_file(analysis: Union[Dict[str, Any], str], filename: str) -> None:
+def save_analysis_to_file(analysis: Dict[str, Any], filename: str) -> None:
     try:
         with open(filename, "w", encoding="utf-8") as f:
             json.dump(analysis, f, ensure_ascii=False, indent=2)
@@ -120,30 +129,19 @@ def save_analysis_to_file(analysis: Union[Dict[str, Any], str], filename: str) -
 
 def find_or_create_category_with_ai(
     act_keywords: List[str],
-    all_categories: List[Dict[str, Any]],
+    all_categories: List[CategoryData],
     act_title: str = "",
     act_content: str = "",
 ) -> Optional[str]:
-
     if not act_keywords or not all_categories:
         return None
 
     categories_info = []
     for category_data in all_categories:
-        category_name = category_data.get("category")
-        category_keywords = category_data.get("keywords", [])
-
-        if isinstance(category_keywords, str):
-            try:
-                keywords_list = json.loads(category_keywords)
-            except json.JSONDecodeError:
-                keywords_list = [category_keywords]
-        elif isinstance(category_keywords, list):
-            keywords_list = category_keywords
-        else:
-            keywords_list = []
-
-        categories_info.append({"category": category_name, "keywords": keywords_list})
+        # CategoryData już ma prawidłowy format - keywords są listą stringów
+        categories_info.append(
+            {"category": category_data.category, "keywords": category_data.keywords}
+        )
 
     act_info = {
         "keywords": act_keywords,
@@ -193,7 +191,7 @@ def find_or_create_category_with_ai(
             )
 
             if action == "match":
-                if any(cat.get("category") == category_name for cat in all_categories):
+                if any(cat.category == category_name for cat in all_categories):
                     return category_name
                 else:
                     logger.warning(
@@ -202,12 +200,18 @@ def find_or_create_category_with_ai(
                     return None
 
             elif action == "extend":
-                return extend_category_keywords(
-                    category_name, new_keywords, all_categories
-                )
+                if category_name and new_keywords:
+                    return extend_category_keywords(
+                        category_name, new_keywords, all_categories
+                    )
 
             elif action == "create":
-                return create_new_category(category_name, new_keywords + act_keywords)
+                if category_name and new_keywords:
+                    return create_new_category(
+                        category_name, new_keywords + act_keywords
+                    )
+
+            return None
 
         else:
             logger.error(f"Invalid AI response format: {ai_decision}")

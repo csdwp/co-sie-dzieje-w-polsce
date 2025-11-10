@@ -1,11 +1,14 @@
 """Base repository with database connection management."""
+
 import os
-import pg8000
 from contextlib import contextmanager
-from typing import Tuple, Any
+from typing import Any, Generator, Optional, Tuple
+
+import psycopg2
 from dotenv import load_dotenv
-from ..core.logging import get_logger
+
 from ..core.exceptions import DatabaseError
+from ..core.logging import get_logger
 
 logger = get_logger(__name__)
 load_dotenv()
@@ -13,33 +16,33 @@ load_dotenv()
 
 class BaseRepository:
     """Base repository class for database operations."""
-    
-    def __init__(self, connection_string: str = None):
+
+    def __init__(self, connection_string: Optional[str] = None):
         """
         Initialize repository.
-        
+
         Args:
             connection_string: Database connection string (default: from env)
         """
         self.connection_string = connection_string or os.getenv("DATABASE_URL")
         if not self.connection_string:
             raise DatabaseError("DATABASE_URL is not set in environment variables")
-    
+
     @contextmanager
-    def get_connection(self) -> Tuple[Any, Any]:
+    def get_connection(self) -> Generator[Tuple[Any, Any], None, None]:
         """
         Get database connection and cursor.
-        
+
         Yields:
             Tuple of (connection, cursor)
-            
+
         Raises:
             DatabaseError: If connection fails
         """
         conn = None
         cursor = None
         try:
-            conn = pg8000.connect(self.connection_string)
+            conn = psycopg2.connect(self.connection_string)
             cursor = conn.cursor()
             yield conn, cursor
         except Exception as e:
@@ -52,4 +55,3 @@ class BaseRepository:
                 cursor.close()
             if conn:
                 conn.close()
-

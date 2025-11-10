@@ -4,5 +4,5 @@
 source app/venv/bin/activate
 
 # Run the pipeline
-python -m app.pipeline.run_pipeline_new
+python -m app.pipeline.run_pipeline
 

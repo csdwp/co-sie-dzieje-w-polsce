@@ -23,3 +23,6 @@ check: format lint type-check
 
 install-dev:
 	$(PIP) install black isort flake8 mypy pylint pre-commit
+
+type-check-file:
+	$(MYPY) $(FILE)
