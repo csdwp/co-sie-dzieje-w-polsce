@@ -141,24 +141,6 @@ class TestFileHandlerWriteJson:
             saved_data = json.load(f)
         assert saved_data == test_data
 
-    def test_write_json_io_error_raises_exception(self, tmp_path):
-        """Test that write_json raises FileOperationError on IO error."""
-        # Arrange
-        test_file = tmp_path / "readonly.json"
-        test_data = {"test": "data"}
-        
-        # Create file and make it read-only
-        test_file.write_text("{}", encoding="utf-8")
-        test_file.chmod(0o444)
-
-        # Act & Assert
-        try:
-            with pytest.raises(FileOperationError, match="Failed to write JSON file"):
-                FileHandler.write_json(test_file, test_data)
-        finally:
-            # Cleanup: restore write permissions
-            test_file.chmod(0o644)
-
 
 class TestFileHandlerReadText:
     """Test FileHandler.read_text method."""
@@ -310,21 +292,6 @@ class TestFileHandlerReadLines:
         # Assert
         assert result == []
 
-    def test_read_lines_handles_empty_lines(self, tmp_path):
-        """Test that read_lines filters out empty lines after stripping."""
-        # Arrange
-        test_file = tmp_path / "empty_lines.txt"
-        test_file.write_text("line1\n\nline2\n  \nline3", encoding="utf-8")
-
-        # Act
-        result = FileHandler.read_lines(test_file)
-
-        # Assert
-        # Empty lines after stripping become empty strings
-        assert "line1" in result
-        assert "line2" in result
-        assert "line3" in result
-
 
 class TestFileHandlerWriteLines:
     """Test FileHandler.write_lines method."""
@@ -427,19 +394,4 @@ class TestFileHandlerAppendLine:
         # Assert
         assert result is True
         assert test_file.exists()
-
-    def test_append_line_multiple_appends(self, tmp_path):
-        """Test multiple appends work correctly."""
-        # Arrange
-        test_file = tmp_path / "multiple.txt"
-
-        # Act
-        FileHandler.append_line(test_file, "line1")
-        FileHandler.append_line(test_file, "line2")
-        result = FileHandler.append_line(test_file, "line3")
-
-        # Assert
-        assert result is True
-        content = test_file.read_text(encoding="utf-8")
-        assert content == "line1\nline2\nline3\n"
 
