@@ -4,7 +4,7 @@ import os
 from contextlib import contextmanager
 from typing import Any, Dict, Generator, List, Optional, Tuple
 
-import psycopg2  # type: ignore[import-untyped]
+import psycopg2
 from dotenv import load_dotenv
 
 from ..models.act import CategoryData
