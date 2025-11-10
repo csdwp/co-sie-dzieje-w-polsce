@@ -307,6 +307,7 @@ class TestSejmAPIClient:
             assert result is None
 
     @patch('app.services.external.sejm_api.requests.get')
+    @pytest.mark.slow
     def test_fetch_json_http_error_raises_external_api_error(self, mock_get):
         """Test that _fetch_json raises ExternalAPIError on HTTP error."""
         # Arrange
@@ -326,6 +327,7 @@ class TestSejmAPIClient:
                 client._fetch_json("https://api.sejm.gov.pl/test")
 
     @patch('app.services.external.sejm_api.requests.get')
+    @pytest.mark.slow
     def test_fetch_json_request_error_raises_external_api_error(self, mock_get):
         """Test that _fetch_json raises ExternalAPIError on request error."""
         # Arrange
