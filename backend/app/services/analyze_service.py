@@ -6,7 +6,7 @@ from contextlib import contextmanager
 from typing import Any, Dict, Generator, List, Optional, cast
 
 from dotenv import load_dotenv
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from openai import APIError, OpenAI
 from tenacity import (
     retry,

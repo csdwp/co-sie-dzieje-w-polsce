@@ -2,7 +2,7 @@
 
 from typing import Optional
 
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from ...core.exceptions import AIServiceError
 from ...core.logging import get_logger
