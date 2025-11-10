@@ -119,8 +119,8 @@ class TestGetLogger:
     """Test get_logger function."""
 
     @patch('app.core.logging.setup_logger')
-    def test_get_logger_calls_setup_logger_with_correct_params_and_returns_logger(self, mock_setup_logger):
-        """Test that get_logger calls setup_logger with correct parameters and returns logger instance."""
+    def test_get_logger_calls_setup_logger_with_correct_params(self, mock_setup_logger):
+        """Test that get_logger calls setup_logger with correct parameters."""
         # Arrange
         mock_logger = MagicMock()
         mock_setup_logger.return_value = mock_logger
@@ -136,7 +136,11 @@ class TestGetLogger:
         assert str(kwargs['log_file']).endswith("logs/app.log")
         assert result is mock_logger
 
-        # Also test actual functionality without mock
-        actual_logger = get_logger("another_module_get_logger")
-        assert isinstance(actual_logger, logging.Logger)
-        assert actual_logger.name == "another_module_get_logger"
+    def test_get_logger_returns_logger_instance(self):
+        """Test that get_logger returns a logger instance."""
+        # Act
+        logger = get_logger("another_module_get_logger")
+
+        # Assert
+        assert isinstance(logger, logging.Logger)
+        assert logger.name == "another_module_get_logger"
