@@ -35,3 +35,4 @@ class TestCategory:
         # Assert
         expected = {"category": "Edukacja", "keywords": []}
         assert result == expected
+
