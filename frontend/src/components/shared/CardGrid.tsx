@@ -11,12 +11,32 @@ import { ActsAndKeywordsResponse, Act } from '@/app/lib/types';
 import { useModalLimit } from '@/app/hooks/useModalLimit';
 import { useUser } from '@clerk/nextjs';
 import SubscriptionModal from './SubscriptionModal';
+import SubscriptionCard from './SubscriptionCard';
 
 type CardGridProps = {
   searchQuery: string;
   selectedTypes: string[];
   data: ActsAndKeywordsResponse;
 };
+
+const subscriptionCards = [
+  {
+    isBest: false,
+    options: [
+      { option: 'Dostęp do wszystkich artykułów', active: true },
+      { option: 'Cotygodniowy newsletter', active: true },
+      { option: 'Dostęp do ekskluzywnych treści', active: false },
+    ],
+  },
+  {
+    isBest: true,
+    options: [
+      { option: 'Dostęp do wszystkich artykułów', active: true },
+      { option: 'Cotygodniowy newsletter', active: true },
+      { option: 'Dostęp do ekskluzywnych treści', active: true },
+    ],
+  },
+];
 
 const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
   const [selectedCard, setSelectedCard] = useState<Act | null>(null);
@@ -354,7 +374,24 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
             onClick={() => openModal(card)}
           />
         ))}
+        {filteredAndSortedCards.length === 0 && (
+          <>
+            <p className="text-center w-full col-span-full text-gradient-gloss">
+              Brak wyników wyszukiwania.
+            </p>
+          </>
+        )}
       </Masonry>
+      <div className="flex gap-4">
+        {/* {subscriptionCards.map((card, index) => (
+          <SubscriptionCard
+            key={index}
+            isBest={card.isBest}
+            options={card.options}
+            maxWidth={300}
+          />
+        ))} */}
+      </div>
 
       {selectedCard && (
         <DialogModal
