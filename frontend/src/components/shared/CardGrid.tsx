@@ -391,7 +391,8 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
           </>
         )}
       </Masonry>
-      <div className="flex gap-4">
+      {/* <div className="flex gap-4">
+        Zakomentowane żeby móc odkomentować i podejrzeć
         {subscriptionCards.map((card, index) => (
           <SubscriptionCard
             key={index}
@@ -402,7 +403,7 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
             maxWidth={300}
           />
         ))}
-      </div>
+      </div> */}
 
       {selectedCard && (
         <DialogModal
