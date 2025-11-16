@@ -383,14 +383,14 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
         )}
       </Masonry>
       <div className="flex gap-4">
-        {/* {subscriptionCards.map((card, index) => (
+        {subscriptionCards.map((card, index) => (
           <SubscriptionCard
             key={index}
             isBest={card.isBest}
             options={card.options}
             maxWidth={300}
           />
-        ))} */}
+        ))}
       </div>
 
       {selectedCard && (

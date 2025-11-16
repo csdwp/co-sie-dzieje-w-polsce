@@ -37,7 +37,10 @@ const SubscriptionCard = ({
           </span>
         </div>
       </div>
-      <button className="w-ffull flex justify-center text-lg px-6 py-3 red-background-gloss font-semibold text-white rounded-lg shadow-none hover:shadow-2xl hover:shadow-red-500/60 focus:shadow-none active:shadow-none transition-shadow duration-300 cursor-pointer">
+      <button
+        className={`w-full flex justify-center text-lg px-6 py-3  font-semibold text-white rounded-lg shadow-none hover:shadow-2xl hover:shadow-red-500/60 focus:shadow-none active:shadow-none transition-shadow duration-300 cursor-pointer
+            ${isBest ? 'red-background-gloss' : 'bg-[#b91c1c]'}`}
+      >
         <div className="description Box-root text-start">
           <h5>Subskrybuj</h5>
         </div>
