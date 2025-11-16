@@ -42,7 +42,7 @@ const SubscriptionCard = ({
         </div>
       </div>
       <button
-        className={`w-full flex justify-center text-lg px-6 py-3  font-semibold text-white rounded-lg shadow-none hover:shadow-2xl hover:shadow-red-500/60 focus:shadow-none active:shadow-none transition-shadow duration-300 cursor-pointer
+        className={`w-full flex justify-center text-lg px-6 py-3  font-semibold text-white rounded-lg hover:shadow-2xl active:opacity-90 active:shadow-none hover:shadow-red-500/60 transition-shadow duration-300 cursor-pointer
             ${isBest ? 'red-background-gloss' : 'bg-[#b91c1c]'}`}
       >
         <div className="description Box-root text-start">
