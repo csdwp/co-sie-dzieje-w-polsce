@@ -2,19 +2,23 @@ import React from 'react';
 import SubscriptionCardOption from './SubscriptionCardOption';
 
 interface SubscriptionCardProps {
+  title: string;
   isBest: boolean;
   options: { option: string; active: boolean }[];
   maxWidth?: number;
+  price: number;
 }
 
 const SubscriptionCard = ({
+  title,
   isBest,
   options,
   maxWidth,
+  price,
 }: SubscriptionCardProps) => {
   return (
     <div
-      className={`flex flex-col gap-y-3 rounded-3xl p-5 shadow-xl border-2
+      className={`flex flex-col gap-y-3 rounded-3xl p-5 shadow-xl border-2 h-fit
         ${
           isBest ? ' border-red-500/70 shadow-red-500/10' : 'border-neutral-600'
         }`}
@@ -24,14 +28,14 @@ const SubscriptionCard = ({
         <span className="dark:text-neutral-600 text-neutral-500 text-xs">
           Nazwa
         </span>
-        <h4 className="text-xl font-semibold">Subscription plan</h4>
+        <h4 className="text-xl font-semibold">{title}</h4>
       </div>
       <div className="flex flex-col gap-1">
         <span className="dark:text-neutral-600 text-neutral-500 text-xs">
           Cena
         </span>
         <div className="space-x-2">
-          <span className="text-3xl font-bold">19.99</span>
+          <span className="text-3xl font-bold">{price}</span>
           <span className="dark:text-neutral-100/50 text-neutral-900/50">
             PLN / miesiąc
           </span>
