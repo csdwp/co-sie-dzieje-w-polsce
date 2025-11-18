@@ -11,41 +11,12 @@ import { ActsAndKeywordsResponse, Act } from '@/app/lib/types';
 import { useModalLimit } from '@/app/hooks/useModalLimit';
 import { useUser } from '@clerk/nextjs';
 import SubscriptionModal from './SubscriptionModal';
-import SubscriptionCard from './SubscriptionCard';
-import { title } from 'process';
 
 type CardGridProps = {
   searchQuery: string;
   selectedTypes: string[];
   data: ActsAndKeywordsResponse;
 };
-
-const subscriptionCards = [
-  {
-    title: 'Podstawowy plan',
-    isBest: false,
-    price: 19.99,
-    options: [
-      { option: 'Dostęp do wszystkich artykułów', active: true },
-      { option: 'Cotygodniowy newsletter', active: true },
-      { option: 'Dostęp do ekskluzywnych treści', active: false },
-    ],
-  },
-  {
-    title: 'Plan premium',
-    isBest: true,
-    price: 49.99,
-    options: [
-      { option: 'Dostęp do wszystkich artykułów', active: true },
-      { option: 'Cotygodniowy newsletter', active: true },
-      { option: 'Dostęp do wszystkich artykułów', active: true },
-      { option: 'Dostęp do ekskluzywnych treści', active: true },
-      { option: 'Cotygodniowy newsletter', active: true },
-      { option: 'Dostęp do ekskluzywnych treści', active: true },
-      { option: 'Dostęp do ekskluzywnych treści', active: true },
-    ],
-  },
-];
 
 const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
   const [selectedCard, setSelectedCard] = useState<Act | null>(null);
@@ -391,19 +362,6 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
           </>
         )}
       </Masonry>
-      {/* <div className="flex gap-4">
-        Zakomentowane żeby móc odkomentować i podejrzeć
-        {subscriptionCards.map((card, index) => (
-          <SubscriptionCard
-            key={index}
-            title={card.title}
-            isBest={card.isBest}
-            price={card.price}
-            options={card.options}
-            maxWidth={300}
-          />
-        ))}
-      </div> */}
 
       {selectedCard && (
         <DialogModal
