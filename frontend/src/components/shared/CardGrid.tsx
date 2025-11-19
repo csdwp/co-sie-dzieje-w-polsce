@@ -358,6 +358,13 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
             onClick={() => openModal(card)}
           />
         ))}
+        {filteredAndSortedCards.length === 0 && (
+          <>
+            <p className="text-center w-full col-span-full text-gradient-gloss">
+              Brak wyników wyszukiwania.
+            </p>
+          </>
+        )}
       </Masonry>
 
       {selectedCard && (

@@ -82,23 +82,29 @@ const SubscriptionModal = ({ onClose }: { onClose: () => void }) => {
   );
 };
 
-const ProductsWrapper = ({
-  plans,
-  handleSubscribe,
-}: {
+const ProductsWrapper = ({}: // plans,
+// handleSubscribe,
+{
   plans: SubscriptionPlan[];
   handleSubscribe: (priceId: string) => void;
 }) => {
   return (
     <div className="flex flex-col gap-4 text-left text-sm">
       <div className="flex gap-4">
-        {plans.map(plan => (
+        {/* {plans.map(plan => (
           <Product
             key={plan.id}
             plan={plan}
             handleSubscribe={handleSubscribe}
           />
-        ))}
+        ))} */}
+        <button className="w-fit text-lg px-6 py-3 red-background-gloss font-semibold text-white rounded-lg shadow-none hover:shadow-2xl hover:shadow-red-500/60 focus:shadow-none active:shadow-none transition-shadow duration-300 cursor-pointer">
+          <div className="description Box-root text-start">
+            <h3>Subskrybuj</h3>
+            <p>Subskrypcja odnawia się automatycznie co miesiąc</p>
+            <p>Cena: 20 zł / miesiąc</p>
+          </div>
+        </button>
       </div>
 
       <label className="flex items-start gap-2 cursor-pointer group">
@@ -138,28 +144,30 @@ const ProductsWrapper = ({
   );
 };
 
-const Product = ({
-  plan,
-  handleSubscribe,
-}: {
-  plan: SubscriptionPlan;
-  handleSubscribe: (priceId: string) => void;
-}) => {
-  return (
-    <button
-      key={plan.id}
-      className="w-fit text-lg px-6 py-3 red-background-gloss font-semibold text-white rounded-lg shadow-none hover:shadow-2xl hover:shadow-red-500/60 focus:shadow-none active:shadow-none transition-shadow duration-300 cursor-pointer"
-      onClick={() => handleSubscribe(plan.price_id)}
-    >
-      <div className="description Box-root text-start">
-        <h3>{plan.name}</h3>
-        <p>{plan.description}</p>
-        <p>
-          Cena: ${plan.price / 100} / {plan.interval}
-        </p>
-      </div>
-    </button>
-  );
-};
+// Im leaving this because we gonna use it later
+
+// const Product = ({
+//   plan,
+//   handleSubscribe,
+// }: {
+//   plan: SubscriptionPlan;
+//   handleSubscribe: (priceId: string) => void;
+// }) => {
+//   return (
+//     <button
+//       key={plan.id}
+//       className="w-fit text-lg px-6 py-3 red-background-gloss font-semibold text-white rounded-lg shadow-none hover:shadow-2xl hover:shadow-red-500/60 focus:shadow-none active:shadow-none transition-shadow duration-300 cursor-pointer"
+//       onClick={() => handleSubscribe(plan.price_id)}
+//     >
+//       <div className="description Box-root text-start">
+//         <h3>{plan.name}</h3>
+//         <p>{plan.description}</p>
+//         <p>
+//           Cena: ${plan.price / 100} / {plan.interval}
+//         </p>
+//       </div>
+//     </button>
+//   );
+// };
 
 export default SubscriptionModal;
