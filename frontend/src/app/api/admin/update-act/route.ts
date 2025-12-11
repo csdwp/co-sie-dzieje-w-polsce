@@ -3,6 +3,7 @@ import { auth } from '@clerk/nextjs/server';
 import { createClerkClient } from '@clerk/backend';
 import { z } from 'zod';
 import { PrismaClient, Prisma } from '@prisma/client';
+import sanitizeHtml from 'sanitize-html';
 
 const prisma = new PrismaClient();
 const clerkClient = createClerkClient({
@@ -63,6 +64,18 @@ export const POST = async (
       );
     }
 
+    const sanitizeOptions = {
+      allowedTags: ['p', 'ul', 'li', 'strong', 'em', 'br'],
+      allowedAttributes: {},
+    };
+
+    if (validatedData.content !== undefined) {
+      validatedData.content = sanitizeHtml(
+        validatedData.content,
+        sanitizeOptions
+      );
+    }
+
     try {
       const existingAct = await prisma.acts.findUnique({
         where: { id: validatedData.actId },
@@ -76,7 +89,8 @@ export const POST = async (
       }
 
       const updateData: Record<string, unknown> = {
-        confidence_score: new Prisma.Decimal(9.99),
+        confidence_score: new Prisma.Decimal(0.99),
+        updated_at: new Date(),
       };
 
       if (validatedData.content !== undefined) {
@@ -124,10 +138,22 @@ export const POST = async (
           updatedAt: updatedAct.updated_at.toISOString(),
         },
       });
-    } catch (dbError) {
-      console.error('Database error:', dbError);
+    } catch (dbError: any) {
+      console.error('Database error details:', {
+        message: dbError.message,
+        code: dbError.code,
+        meta: dbError.meta,
+        stack: dbError.stack,
+      });
       return NextResponse.json(
-        { success: false, message: 'Database error' },
+        {
+          success: false,
+          message: 'Database error',
+          details:
+            process.env.NODE_ENV === 'development'
+              ? dbError.message
+              : undefined,
+        },
         { status: 500 }
       );
     }
