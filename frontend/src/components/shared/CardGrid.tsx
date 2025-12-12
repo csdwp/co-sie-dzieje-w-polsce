@@ -372,6 +372,7 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
           isOpen={selectedCard !== null}
           onClose={closeModal}
           card={{
+            id: selectedCard.id,
             title: selectedCard.title,
             content: selectedCard.content ?? '',
             announcement_date: selectedCard.announcement_date,

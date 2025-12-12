@@ -28,6 +28,7 @@ import {
 import { DialogModalProps } from '@/types';
 import { Badge } from '@/components/ui/badge';
 import { useIsAdmin, isLowConfidence } from '@/lib/authHelpers';
+import InlineEditableContent from './InlineEditableContent';
 
 const chartConfig = {
   percentageNo: {
@@ -153,10 +154,6 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
   const formattedDate = formatDate(card?.announcement_date ?? '');
   const formattedPromulgationDate = formatDate(card?.promulgation ?? '');
 
-  const stripHtml = (html: string) => {
-    return html.replace(/<[^>]*>/g, '');
-  };
-
   const isAdmin = useIsAdmin();
   const needsVerification = isLowConfidence(card?.confidence_score);
 
@@ -180,8 +177,13 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
                 </Badge>
               )}
             </div>
-            <DialogDescription className="text-base tracking-wide text-neutral-900 font-light dark:text-neutral-100 md:max-w-4/5 text-left">
-              {stripHtml(card?.content ?? '')}
+            <DialogDescription>
+              <InlineEditableContent
+                content={card?.content ?? ''}
+                field="content"
+                actId={card?.id ?? ''}
+                isAdmin={isAdmin}
+              />
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col">

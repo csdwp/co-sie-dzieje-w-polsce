@@ -106,6 +106,7 @@ export interface DialogModalProps {
   isOpen: boolean;
   onClose: () => void;
   card: {
+    id: string | number;
     title: string;
     content: string;
     announcement_date: string;
