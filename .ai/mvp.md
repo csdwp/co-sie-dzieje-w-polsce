@@ -22,8 +22,7 @@ Każda publikacja zawiera:
 
 - Możliwość rejestracji i logowania użytkownika.
 - Dostęp do listy ustaw i rozporządzeń z krótkimi podsumowaniami.
-- Limit dostępu: użytkownik może przeczytać 3 podsumowania, po czym zostaje
-  zablokowany.
+- Limit dostępu: anonimowy użytkownik może przeczytać 3 podsumowania (w localStorage), po czym zostaje zablokowany. Zalogowani użytkownicy mają zwiększony limit (5).
 - Konto **admina** z uprawnieniami do edycji treści ustaw.
 
 ## Co NIE wchodzi w zakres MVP
