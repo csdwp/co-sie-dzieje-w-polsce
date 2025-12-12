@@ -91,6 +91,7 @@ export interface ActsAndKeywordsResponse {
 }
 
 export interface CardProps {
+  id: string | number;
   title: string;
   content?: string;
   summary?: string;
@@ -100,6 +101,7 @@ export interface CardProps {
   categories?: string[];
   governmentPercentage: number;
   confidenceScore?: number | null;
+  onDelete?: (id: string | number) => void;
 }
 
 export interface DialogModalProps {
@@ -179,6 +181,7 @@ export interface DatabaseAct {
   created_at: Date;
   updated_at: Date;
   ingested_at: Date | null;
+  deleted_at: Date | null;
 }
 
 export interface DatabaseCategory {
