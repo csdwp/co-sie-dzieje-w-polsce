@@ -20,6 +20,7 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [sortByTitle, setSortByTitle] = useState<'asc' | 'desc' | null>(null);
   const [subscriptionModal, setSubscriptionModal] = useState<boolean>(false);
+  const [deletedIds, setDeletedIds] = useState<Set<string | number>>(new Set());
   const { user } = useUser();
   const { canOpen, registerOpen } = useModalLimit(user ? 5 : 3);
 
@@ -131,6 +132,10 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
 
   const handleCloseSubscriptionModal = () => {
     setSubscriptionModal(false);
+  };
+
+  const handleCardDelete = (id: string | number) => {
+    setDeletedIds(prev => new Set(prev).add(id));
   };
 
   return (
@@ -340,24 +345,28 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
         className="flex w-fit justify-center relative max-w-full min-w-full"
         columnClassName="flex flex-col gap-y-5 sm:px-2.5 max-[1201px]:!w-fit"
       >
-        {filteredAndSortedCards.map((card: Act) => (
-          <Card
-            key={card.id}
-            title={card.title}
-            content={card.content}
-            summary={card.simple_title}
-            date={card.announcement_date}
-            categories={card.category ? [card.category] : []}
-            isImportant={
-              !!card.votes?.votesSupportByGroup?.government.yesPercentage
-            }
-            governmentPercentage={
-              card.votes?.votesSupportByGroup?.government.yesPercentage || 0
-            }
-            confidenceScore={card.confidence_score}
-            onClick={() => openModal(card)}
-          />
-        ))}
+        {filteredAndSortedCards
+          .filter((card: Act) => !deletedIds.has(card.id))
+          .map((card: Act) => (
+            <Card
+              key={card.id}
+              id={card.id}
+              title={card.title}
+              content={card.content}
+              summary={card.simple_title}
+              date={card.announcement_date}
+              categories={card.category ? [card.category] : []}
+              isImportant={
+                !!card.votes?.votesSupportByGroup?.government.yesPercentage
+              }
+              governmentPercentage={
+                card.votes?.votesSupportByGroup?.government.yesPercentage || 0
+              }
+              confidenceScore={card.confidence_score}
+              onClick={() => openModal(card)}
+              onDelete={handleCardDelete}
+            />
+          ))}
         {filteredAndSortedCards.length === 0 && (
           <>
             <p className="text-center w-full col-span-full text-gradient-gloss">
