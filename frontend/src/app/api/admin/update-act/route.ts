@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { createClerkClient } from '@clerk/backend';
 import { z } from 'zod';
-import { PrismaClient, Prisma } from '@prisma/client';
+import { PrismaClient, Prisma, acts } from '@prisma/client';
 import sanitizeHtml from 'sanitize-html';
 
 const prisma = new PrismaClient();
@@ -88,7 +88,7 @@ export const POST = async (
         );
       }
 
-      const updateData: Record<string, unknown> = {
+      const updateData: Prisma.actsUpdateInput = {
         confidence_score: new Prisma.Decimal(0.99),
         updated_at: new Date(),
       };
@@ -103,11 +103,9 @@ export const POST = async (
         updateData.impact_section = validatedData.impactSection;
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const updatedAct: any = await prisma.acts.update({
+      const updatedAct: acts = await prisma.acts.update({
         where: { id: validatedData.actId },
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        data: updateData as any,
+        data: updateData,
       });
 
       try {
@@ -138,22 +136,29 @@ export const POST = async (
           updatedAt: updatedAct.updated_at.toISOString(),
         },
       });
-    } catch (dbError: any) {
-      console.error('Database error details:', {
-        message: dbError.message,
-        code: dbError.code,
-        meta: dbError.meta,
-        stack: dbError.stack,
-      });
+    } catch (dbError) {
+      if (dbError instanceof Prisma.PrismaClientKnownRequestError) {
+        console.error('Database error details:', {
+          message: dbError.message,
+          code: dbError.code,
+          meta: dbError.meta,
+        });
+        return NextResponse.json(
+          {
+            success: false,
+            message: 'Database error',
+            details:
+              process.env.NODE_ENV === 'development'
+                ? dbError.message
+                : undefined,
+          },
+          { status: 500 }
+        );
+      }
+
+      console.error('Unexpected database error:', dbError);
       return NextResponse.json(
-        {
-          success: false,
-          message: 'Database error',
-          details:
-            process.env.NODE_ENV === 'development'
-              ? dbError.message
-              : undefined,
-        },
+        { success: false, message: 'Database error' },
         { status: 500 }
       );
     }
