@@ -10,6 +10,7 @@ import {
 import { useEffect, useState } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { useUser } from '@clerk/nextjs';
+import { STRIPE_CONFIG } from '@/lib/config';
 
 interface CheckoutSessionResponse {
   sessionId: string;
@@ -24,9 +25,7 @@ interface SubscriptionPlan {
   price_id: string;
 }
 
-const stripePromise = loadStripe(
-  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
-);
+const stripePromise = loadStripe(STRIPE_CONFIG.publishableKey!);
 
 const SubscriptionModal = ({ onClose }: { onClose: () => void }) => {
   const [plans, setPlans] = useState([]);

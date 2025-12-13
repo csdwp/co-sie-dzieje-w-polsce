@@ -4,10 +4,11 @@ import { createClerkClient } from '@clerk/backend';
 import { z } from 'zod';
 import { PrismaClient, Prisma, acts } from '@prisma/client';
 import sanitizeHtml from 'sanitize-html';
+import { CLERK_CONFIG, DEPLOYMENT_CONFIG } from '@/lib/config';
 
 const prisma = new PrismaClient();
 const clerkClient = createClerkClient({
-  secretKey: process.env.CLERK_SECRET_KEY,
+  secretKey: CLERK_CONFIG.secretKey,
 });
 
 const updateActSchema = z.object({
@@ -109,7 +110,7 @@ export const POST = async (
       });
 
       try {
-        const deployHookUrl = process.env.VERCEL_DEPLOY_HOOK_URL;
+        const deployHookUrl = DEPLOYMENT_CONFIG.vercelDeployHookUrl;
 
         if (deployHookUrl) {
           fetch(deployHookUrl, {
@@ -148,7 +149,7 @@ export const POST = async (
             success: false,
             message: 'Database error',
             details:
-              process.env.NODE_ENV === 'development'
+              DEPLOYMENT_CONFIG.nodeEnv === 'development'
                 ? dbError.message
                 : undefined,
           },

@@ -3,10 +3,11 @@ import { auth } from '@clerk/nextjs/server';
 import { createClerkClient } from '@clerk/backend';
 import { z } from 'zod';
 import { PrismaClient, Prisma, acts } from '@prisma/client';
+import { CLERK_CONFIG } from '@/lib/config';
 
 const prisma = new PrismaClient();
 const clerkClient = createClerkClient({
-  secretKey: process.env.CLERK_SECRET_KEY,
+  secretKey: CLERK_CONFIG.secretKey,
 });
 
 const deleteActSchema = z.object({
@@ -90,7 +91,7 @@ export const POST = async (
 
       /* TODO: Uncomment when we have a deploy hook */
       // try {
-      //   const deployHookUrl = process.env.VERCEL_DEPLOY_HOOK_URL;
+      //   const deployHookUrl = DEPLOYMENT_CONFIG.vercelDeployHookUrl;
 
       //   if (deployHookUrl) {
       //     fetch(deployHookUrl, {

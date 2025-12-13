@@ -28,3 +28,40 @@ export const ANONYMOUS_DAILY_LIMIT = 3;
  * @default 5
  */
 export const AUTHENTICATED_DAILY_LIMIT = 5;
+
+/**
+ * =================================================================
+ * ENVIRONMENT VARIABLES CONFIGURATION
+ * =================================================================
+ */
+
+/**
+ * Clerk Authentication Configuration
+ */
+export const CLERK_CONFIG = {
+  secretKey: process.env.CLERK_SECRET_KEY,
+} as const;
+
+/**
+ * Stripe Payment Configuration
+ */
+export const STRIPE_CONFIG = {
+  secretKey: process.env.STRIPE_SECRET_KEY,
+  publishableKey: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
+  webhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
+} as const;
+
+/**
+ * Database Configuration
+ */
+export const DATABASE_CONFIG = {
+  url: process.env.DATABASE_URL,
+} as const;
+
+/**
+ * Deployment Configuration
+ */
+export const DEPLOYMENT_CONFIG = {
+  vercelDeployHookUrl: process.env.VERCEL_DEPLOY_HOOK_URL,
+  nodeEnv: process.env.NODE_ENV,
+} as const;

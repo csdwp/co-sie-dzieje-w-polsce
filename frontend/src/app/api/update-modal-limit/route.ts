@@ -1,6 +1,8 @@
 import { createClerkClient } from '@clerk/backend';
+import { CLERK_CONFIG } from '@/lib/config';
+
 const clerkClient = createClerkClient({
-  secretKey: process.env.CLERK_SECRET_KEY,
+  secretKey: CLERK_CONFIG.secretKey,
 });
 
 export const POST = async (req: Request) => {
