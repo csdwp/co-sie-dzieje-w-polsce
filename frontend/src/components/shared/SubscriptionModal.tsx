@@ -83,8 +83,7 @@ const SubscriptionModal = ({ onClose }: { onClose: () => void }) => {
   );
 };
 
-const ProductsWrapper = ({}: // plans,
-// handleSubscribe,
+const ProductsWrapper = ({}:
 {
   plans: SubscriptionPlan[];
   handleSubscribe: (priceId: string) => void;
