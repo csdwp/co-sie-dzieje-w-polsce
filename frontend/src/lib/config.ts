@@ -12,7 +12,7 @@ export const CONFIDENCE_THRESHOLD = 0.5;
 /**
  * Feature flag to enable/disable subscriptions system
  * When false, shows daily limit modal instead of subscription modal
- * @default true
+ * @default false
  */
 export const SUBSCRIPTIONS_ENABLED =
   process.env.NEXT_PUBLIC_ENABLE_SUBSCRIPTIONS === 'true';

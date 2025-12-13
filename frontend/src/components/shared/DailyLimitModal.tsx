@@ -8,6 +8,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
+import { ANONYMOUS_DAILY_LIMIT, AUTHENTICATED_DAILY_LIMIT } from '@/lib/config';
 import { useUser } from '@clerk/nextjs';
 import { SignInButton } from '@clerk/nextjs';
 
@@ -29,14 +30,17 @@ const DailyLimitModal = ({ onClose }: DailyLimitModalProps) => {
             {isSignedIn ? (
               <>
                 Wykorzystałeś swój dzienny limit{' '}
-                <strong>5 aktów prawnych</strong>. Wróć jutro, aby kontynuować
-                przeglądanie najnowszych zmian w prawie.
+                <strong>{AUTHENTICATED_DAILY_LIMIT} aktów prawnych</strong>.
+                Wróć jutro, aby kontynuować przeglądanie najnowszych zmian w
+                prawie.
               </>
             ) : (
               <>
                 Wykorzystałeś swój dzienny limit{' '}
-                <strong>3 aktów prawnych</strong>. Zaloguj się, aby zwiększyć
-                limit do <strong>5 aktów dziennie</strong>, lub wróć jutro!
+                <strong>{ANONYMOUS_DAILY_LIMIT} aktów prawnych</strong>. Zaloguj
+                się, aby zwiększyć limit do{' '}
+                <strong>{AUTHENTICATED_DAILY_LIMIT} aktów dziennie</strong>, lub
+                wróć jutro!
               </>
             )}
           </DialogDescription>
@@ -59,7 +63,7 @@ const DailyLimitModal = ({ onClose }: DailyLimitModalProps) => {
           {!isSignedIn && (
             <SignInButton mode="modal">
               <button className="w-full sm:w-auto px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors duration-200">
-                Zaloguj się (5 aktów/dzień)
+                Zaloguj się ({AUTHENTICATED_DAILY_LIMIT} aktów/dzień)
               </button>
             </SignInButton>
           )}
