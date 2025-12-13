@@ -11,7 +11,13 @@ import { Act, CardGridProps } from '@/types';
 import { useModalLimit } from '@/app/hooks/useModalLimit';
 import { useUser } from '@clerk/nextjs';
 import SubscriptionModal from './SubscriptionModal';
-import { CONFIDENCE_THRESHOLD } from '@/lib/config';
+import DailyLimitModal from './DailyLimitModal';
+import {
+  CONFIDENCE_THRESHOLD,
+  SUBSCRIPTIONS_ENABLED,
+  ANONYMOUS_DAILY_LIMIT,
+  AUTHENTICATED_DAILY_LIMIT,
+} from '@/lib/config';
 
 const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
   const [selectedCard, setSelectedCard] = useState<Act | null>(null);
@@ -19,10 +25,12 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
   const [isFilterOptionsOpen, setIsFilterOptionsOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [sortByTitle, setSortByTitle] = useState<'asc' | 'desc' | null>(null);
-  const [subscriptionModal, setSubscriptionModal] = useState<boolean>(false);
+  const [limitModal, setLimitModal] = useState<boolean>(false);
   const [deletedIds, setDeletedIds] = useState<Set<string | number>>(new Set());
   const { user } = useUser();
-  const { canOpen, registerOpen } = useModalLimit(user ? 5 : 3);
+  const { canOpen, registerOpen } = useModalLimit(
+    user ? AUTHENTICATED_DAILY_LIMIT : ANONYMOUS_DAILY_LIMIT
+  );
 
   const { acts } = data || {};
 
@@ -118,7 +126,7 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
 
   const openModal = (card: Act) => {
     if (!canOpen) {
-      setSubscriptionModal(true);
+      setLimitModal(true);
       return;
     }
 
@@ -130,8 +138,8 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
     setSelectedCard(null);
   };
 
-  const handleCloseSubscriptionModal = () => {
-    setSubscriptionModal(false);
+  const handleCloseLimitModal = () => {
+    setLimitModal(false);
   };
 
   const handleCardDelete = (id: string | number) => {
@@ -394,9 +402,12 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
           }}
         />
       )}
-      {subscriptionModal && (
-        <SubscriptionModal onClose={handleCloseSubscriptionModal} />
-      )}
+      {limitModal &&
+        (SUBSCRIPTIONS_ENABLED ? (
+          <SubscriptionModal onClose={handleCloseLimitModal} />
+        ) : (
+          <DailyLimitModal onClose={handleCloseLimitModal} />
+        ))}
     </div>
   );
 };
