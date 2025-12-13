@@ -43,21 +43,8 @@ const DailyLimitModal = ({ onClose }: DailyLimitModalProps) => {
         </DialogHeader>
 
         <div className="flex flex-col gap-4 text-left text-sm text-neutral-700 dark:text-neutral-300">
-          <div className="bg-neutral-100 dark:bg-neutral-800 p-4 rounded-lg">
-            <h3 className="font-semibold mb-2 text-neutral-900 dark:text-neutral-100">
-              💡 Dlaczego wprowadziliśmy limity?
-            </h3>
-            <ul className="list-disc list-inside space-y-1">
-              <li>
-                Chronimy jakość naszej usługi przed nadmiernym obciążeniem
-              </li>
-              <li>Zapewniamy równy dostęp wszystkim obywatelom</li>
-              <li>Utrzymujemy infrastrukturę i koszty przetwarzania AI</li>
-            </ul>
-          </div>
-
-          <div className="bg-blue-50 dark:bg-blue-950/30 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
-            <h3 className="font-semibold mb-2 text-blue-900 dark:text-blue-100">
+          <div className="bg-red-50 dark:bg-red-950/30 p-4 rounded-lg border border-red-200 dark:border-red-800">
+            <h3 className="font-semibold mb-2 text-red-900 dark:text-red-100">
               ℹ️ Dobre wiadomości!
             </h3>
             <p>
@@ -71,7 +58,7 @@ const DailyLimitModal = ({ onClose }: DailyLimitModalProps) => {
         <DialogFooter className="flex flex-col sm:flex-row gap-3 w-full">
           {!isSignedIn && (
             <SignInButton mode="modal">
-              <button className="w-full sm:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors duration-200">
+              <button className="w-full sm:w-auto px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors duration-200">
                 Zaloguj się (5 aktów/dzień)
               </button>
             </SignInButton>
