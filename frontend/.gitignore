@@ -47,3 +47,8 @@ backend/app/act_content.txt
 
 # clerk configuration (can include secrets)
 /.clerk/
+
+# Playwright artifacts
+test-results/
+playwright-report/
+playwright/.cache/
