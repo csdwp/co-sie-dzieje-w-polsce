@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Strona główna', () => {
-  test('wyświetla listę kart aktów', async ({ page }) => {
+test.describe('Home page', () => {
+  test('displays list of act cards', async ({ page }) => {
     await page.goto('/');
     await expect(page).toHaveTitle(/Co się dzieje w Polsce/);
 
@@ -15,7 +15,7 @@ test.describe('Strona główna', () => {
     expect(await firstCardTitle.textContent()).toBeTruthy();
   });
 
-  test('otwiera modal po kliknięciu na kartę', async ({ page }) => {
+  test('opens modal when clicking on card', async ({ page }) => {
     await page.goto('/');
 
     const actCards = page.locator('[data-testid="act-card"]');
@@ -24,7 +24,7 @@ test.describe('Strona główna', () => {
     await expect(page.locator('[data-testid="act-modal"]')).toBeVisible();
   });
 
-  test('zamyka modal po kliknięciu przycisku zamknij', async ({ page }) => {
+  test('closes modal when clicking close button', async ({ page }) => {
     await page.goto('/');
 
     const actCards = page.locator('[data-testid="act-card"]');
@@ -36,4 +36,3 @@ test.describe('Strona główna', () => {
     await expect(page.locator('[data-testid="act-modal"]')).not.toBeVisible();
   });
 });
-

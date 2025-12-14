@@ -1,13 +1,13 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Dzienny limit odczytów', () => {
+test.describe('Daily reading limit', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
     await page.evaluate(() => localStorage.clear());
     await page.reload();
   });
 
-  test('anonim może otworzyć tylko 3 akty', async ({ page }) => {
+  test('anonymous user can only open 3 acts', async ({ page }) => {
     const firstCard = page.locator('[data-testid="act-card"]').first();
 
     for (let i = 0; i < 3; i++) {
@@ -20,7 +20,7 @@ test.describe('Dzienny limit odczytów', () => {
     await firstCard.click();
     await expect(page.locator('[data-testid="limit-modal"]')).toBeVisible();
     await expect(page.locator('[data-testid="limit-message"]')).toContainText(
-      '3 aktów prawnych'
+      '3 legal acts'
     );
   });
 });
