@@ -99,6 +99,7 @@ const Card = ({
   return (
     <div
       onClick={onClick}
+      data-testid="act-card"
       className={`bg-neutral-700/10 dark:bg-neutral-800/40 mx-auto max-w-11/12 sm:max-w-80 flex flex-col gap-3 p-5 rounded-3xl shadow-xl cursor-pointer hover:ring-2 
       dark:hover:ring-neutral-100 hover:ring-neutral-300 hover:!border-transparent transition-all duration-300 h-fit w-full
       ${isImportant && 'border-2 border-red-500/70 shadow-red-500/10'}
@@ -132,7 +133,10 @@ const Card = ({
           )}
         </div>
       </div>
-      <h3 className="text-lg leading-snug font-semibold tracking-tight line-clamp-3 -mt-2.5">
+      <h3
+        data-testid="act-title"
+        className="text-lg leading-snug font-semibold tracking-tight line-clamp-3 -mt-2.5"
+      >
         {stripDateFromTitle(title)}
       </h3>
       <div className="dark:text-neutral-600 text-neutral-500 text-xs">

@@ -21,12 +21,18 @@ const DailyLimitModal = ({ onClose }: DailyLimitModalProps) => {
 
   return (
     <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className="overflow-auto w-11/12 h-fit lg:w-5/12 lg:h-fit !max-w-[600px] rounded-3xl flex flex-col gap-6 border-none">
+      <DialogContent
+        data-testid="limit-modal"
+        className="overflow-auto w-11/12 h-fit lg:w-5/12 lg:h-fit !max-w-[600px] rounded-3xl flex flex-col gap-6 border-none"
+      >
         <DialogHeader className="h-fit">
           <DialogTitle className="text-2xl font-bold leading-tight tracking-tighter text-left">
             🕐 Osiągnięto dzienny limit przeglądania
           </DialogTitle>
-          <DialogDescription className="text-base font-light dark:text-neutral-100 md:max-w-4/5 text-left">
+          <DialogDescription
+            data-testid="limit-message"
+            className="text-base font-light dark:text-neutral-100 md:max-w-4/5 text-left"
+          >
             {isSignedIn ? (
               <>
                 Wykorzystałeś swój dzienny limit{' '}

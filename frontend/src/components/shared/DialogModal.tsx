@@ -160,6 +160,7 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent
+        data-testid="act-modal"
         className={`overflow-auto w-11/12 h-11/12 sm:w-4/5 sm:h-4/5 !max-w-[1000px] !max-h-[800px] rounded-3xl flex flex-col gap-6 border-none`}
       >
         <>
