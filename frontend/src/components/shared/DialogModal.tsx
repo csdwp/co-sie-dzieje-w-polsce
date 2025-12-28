@@ -188,7 +188,7 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col">
-            <div className="font-semibold tracking-tight text-xl">
+            <div className="font-semibold text-xl">
               Odnośnik do pełnej treści aktu
             </div>
             <div className="flex flex-wrap gap-1.5 mt-1 h-fit"></div>
@@ -207,9 +207,7 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
           </div>
           {card?.categories && card.categories.length > 0 && (
             <div className="flex flex-col space-y-1.5">
-              <div className="font-semibold tracking-tight text-xl">
-                Akt dotyczy
-              </div>
+              <div className="font-semibold text-xl">Akt dotyczy</div>
               <div className="flex flex-wrap gap-1.5 mt-1 h-fit">
                 {card.categories.map((category: string, index: number) => (
                   <span
@@ -224,16 +222,14 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
           )}
           <div className="flex flex-col md:flex-row gap-6 md:gap-10">
             <div className="flex flex-col">
-              <div className="font-semibold tracking-tight text-xl">
-                Data ogłoszenia aktu
-              </div>
+              <div className="font-semibold text-xl">Data ogłoszenia aktu</div>
               <div className="flex flex-wrap gap-1.5 mt-1 h-fit"></div>
               <span className="text-sm text-muted-foreground">
                 {formattedDate}
               </span>
             </div>
             <div className="flex flex-col">
-              <div className="font-semibold tracking-tight text-xl">
+              <div className="font-semibold text-xl">
                 Data wejścia aktu w życie
               </div>
               <div className="flex flex-wrap gap-1.5 mt-1 h-fit"></div>
@@ -245,7 +241,7 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
           {votes?.government && (
             <>
               <div className="flex flex-col space-y-1.5">
-                <div className="font-semibold tracking-tight text-xl">
+                <div className="font-semibold text-xl">
                   Wykresy głosów &quot;za&quot; i &quot;przeciw&quot;
                 </div>
                 <div className="text-sm text-muted-foreground">
@@ -345,7 +341,7 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
                   </ChartContainer>
                 </div>
                 {/* Wykresy "za" */}
-                <div className="font-semibold tracking-tight text-xl">
+                <div className="font-semibold text-xl">
                   Rozkład głosów &quot;za&quot; przyjęciem ustawy
                 </div>
                 <div className="text-sm text-muted-foreground">
@@ -424,7 +420,7 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
                   </ChartContainer>
                 </div>
                 {/* Wykresy "przeciw" */}
-                <div className="font-semibold tracking-tight text-xl">
+                <div className="font-semibold text-xl">
                   Rozkład głosów &quot;przeciw&quot; przyjęciem ustawy
                 </div>
                 <div className="text-sm text-muted-foreground">
