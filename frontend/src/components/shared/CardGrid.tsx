@@ -161,10 +161,10 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
         {
           opacity: 1,
           y: 0,
-          duration: 1,
+          duration: 1.2,
           ease: 'power3.out',
           stagger: {
-            amount: 1,
+            amount: 1.2,
             from: 'start',
           },
           delay: 0.6,
