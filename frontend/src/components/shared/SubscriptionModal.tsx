@@ -66,7 +66,7 @@ const SubscriptionModal = ({ onClose }: { onClose: () => void }) => {
     <Dialog open={true} onOpenChange={onClose}>
       <DialogContent className="overflow-auto w-11/12 h-fit lg:w-5/12 lg:h-fit !max-w-[1000px] !max-h-[800px] rounded-3xl flex flex-col gap-6 border-none">
         <DialogHeader className="h-fit">
-          <DialogTitle className="text-2xl font-bold leading-tight tracking-tighter text-left">
+          <DialogTitle className="text-2xl font-bold leading-tight text-left">
             Odblokuj pełny dostęp do aktów prawnych – bez ograniczeń!
           </DialogTitle>
           <DialogDescription className="text-base font-light dark:text-neutral-100 md:max-w-4/5 text-left">
