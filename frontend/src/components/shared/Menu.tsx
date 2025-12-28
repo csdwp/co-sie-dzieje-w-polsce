@@ -23,7 +23,7 @@ const Menu = ({
   return (
     <>
       <div
-        className={`cursor-pointer absolute top-5 left-4 text-neutral-400 dark:text-neutral-500 max-sm:dark:text-neutral-400 transition-colors duration-300 ${
+        className={`cursor-pointer absolute top-3.5 left-4 text-neutral-400 dark:text-neutral-500 max-sm:dark:text-neutral-400 transition-colors duration-300 ${
           isOpen ? 'dark:!text-neutral-100 !text-neutral-600' : ''
         }`}
         onClick={toggleMenu}
@@ -36,39 +36,37 @@ const Menu = ({
         >
           <line
             x1="50"
-            y1="190"
-            x2={isOpen ? '350' : '400'}
-            y2="190"
+            y1="170"
+            x2={isOpen ? '400' : '450'}
+            y2="170"
             stroke="currentColor"
             strokeWidth="30"
             strokeLinecap="round"
             style={{
-              transform: isOpen ? 'translate(0px, 30px) rotate(45deg)' : 'none',
-              transformOrigin: '200px 260px',
-              transition: 'transform 300ms, x2 300ms',
+              transform: isOpen ? 'translateY(85px) rotate(45deg)' : 'none',
+              transformOrigin: 'center',
+              transition: 'transform 300ms ease-out, x2 300ms ease-out',
             }}
           />
           <line
             x1="50"
-            y1="330"
-            x2={isOpen ? '350' : '350'}
-            y2="330"
+            y1="340"
+            x2={isOpen ? '400' : '250'}
+            y2="340"
             stroke="currentColor"
             strokeWidth="30"
             strokeLinecap="round"
             style={{
-              transform: isOpen
-                ? 'translate(0px, -70px) rotate(-45deg)'
-                : 'none',
-              transformOrigin: '200px 260px',
-              transition: 'transform 300ms',
+              transform: isOpen ? 'translateY(-85px) rotate(-45deg)' : 'none',
+              transformOrigin: 'center',
+              transition: 'transform 300ms ease-out, x2 300ms ease-out',
             }}
           />
         </svg>
       </div>
 
       <button
-        className={`cursor-pointer text-sm leading-3.5 absolute top-6 ease-out transition-all duration-300 -z-10 opacity-0 ${
+        className={`cursor-pointer text-sm leading-3.5 absolute top-4.5 left-1.5 ease-out transition-color duration-300 -z-10 opacity-0 ${
           selectedTypes.includes('Ustawa')
             ? 'text-neutral-600 dark:text-neutral-100'
             : 'text-neutral-400 dark:text-neutral-500 max-sm:dark:text-neutral-400'
@@ -79,7 +77,7 @@ const Menu = ({
         Ustawy
       </button>
       <button
-        className={`cursor-pointer text-sm leading-3.5 absolute top-6 ease-out transition-all duration-300 -z-10 opacity-0 ${
+        className={`cursor-pointer text-sm leading-3.5 absolute top-5 left-1.5 ease-out transition-color duration-300 -z-10 opacity-0 ${
           selectedTypes.includes('Rozporządzenie')
             ? 'text-neutral-600 dark:text-neutral-100'
             : 'text-neutral-400 dark:text-neutral-500 max-sm:dark:text-neutral-400'

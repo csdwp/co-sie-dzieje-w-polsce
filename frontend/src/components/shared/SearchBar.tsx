@@ -41,25 +41,23 @@ const SearchBar = ({ searchQuery, setSearchQuery }: SearchBarProps) => {
   return (
     <div
       ref={searchBarRef}
-      className="group w-11/12 md:w-full max-w-[600px] relative before:fixed before:bg-neutral-100
+      className="w-11/12 md:w-full max-w-[600px] relative before:fixed before:bg-neutral-100
         before:flex before:top-[150px] before:-translate-y-1/2
         before:left-1/2 before:-translate-x-1/2 before:bg-gradient-to-r before:from-white before:to-red-500 
-        before:opacity-50 before:blur-3xl before:rounded-full before:w-160 before:h-120 before:rotate-45 before:-z-1 before:pointer-events-none"
+        before:opacity-50 before:blur-3xl before:rounded-full before:w-160 before:h-120 before:rotate-45 before:-z-1 before:pointer-events-none 
+        focus-within:dark:text-neutral-100 focus-within:text-neutral-900
+        dark:text-neutral-500 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-100 duration-300 transition-colors"
     >
       <div
         className="dark:bg-neutral-800/40 bg-neutral-700/10 focus-within:!border-transparent rounded-3xl p-5 py-0 w-full focus:outline-none
-            focus-within:ring-2 dark:focus-within:ring-neutral-100 focus-within:ring-neutral-300 transition-all duration-300
-            shadow-xl flex items-center"
+            transition-all duration-300 shadow-xl flex items-center"
       >
         <input
           type="text"
           value={searchQuery}
           onChange={e => setSearchQuery(e.target.value)}
           placeholder="Szukaj..."
-          className="hover:outline-none focus:outline-none bg-transparent w-full pr-5 py-5 dark:text-neutral-100
-           text-neutral-600 placeholder:text-neutral-400 group-hover:placeholder:text-neutral-600 
-           dark:placeholder:text-neutral-500 dark:group-hover:placeholder:text-neutral-100 
-           placeholder:transition-all placeholder:duration-300"
+          className="hover:outline-none focus:outline-none bg-transparent w-full pr-5 py-5 text-inherit placeholder:text-inherit"
           aria-label="Wyszukaj"
         />
         <svg
@@ -72,8 +70,6 @@ const SearchBar = ({ searchQuery, setSearchQuery }: SearchBarProps) => {
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className="dark:group-hover:text-neutral-100 dark:text-neutral-500 text-neutral-400 duration-300 transition-all
-          group-hover:text-neutral-600"
         >
           <circle cx="11" cy="11" r="8" />
           <line x1="21" y1="21" x2="16.65" y2="16.65" />

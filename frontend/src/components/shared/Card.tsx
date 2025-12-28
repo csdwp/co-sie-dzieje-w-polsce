@@ -101,12 +101,12 @@ const Card = ({
       onClick={onClick}
       data-testid="act-card"
       className={`bg-neutral-700/10 dark:bg-neutral-800/40 mx-auto max-w-11/12 sm:max-w-80 flex flex-col gap-3 p-5 rounded-3xl shadow-xl cursor-pointer group hover:translate-y-[-2px]
-      transition-all duration-300 h-fit w-full
+      transition-transform duration-300 h-fit w-full
       ${isImportant && 'border-2 border-red-500/70 shadow-red-500/10'}
       ${isDeleting && 'opacity-50 pointer-events-none animate-pulse'}`}
     >
       <div className="flex items-center justify-between">
-        <div className="dark:text-neutral-600 text-neutral-500 dark:group-hover:text-neutral-100 group-hover:text-neutral-300 transition-colors duration-300 text-xs">
+        <div className="dark:text-neutral-600 text-neutral-500 dark:group-hover:text-neutral-100 group-hover:text-neutral-900 transition-colors duration-400 text-xs">
           {formattedDate}
         </div>
         <div className="flex items-center gap-2">
@@ -139,10 +139,10 @@ const Card = ({
       >
         {stripDateFromTitle(title)}
       </h3>
-      <div className="dark:text-neutral-600 text-neutral-500 dark:group-hover:text-neutral-100 group-hover:text-neutral-300 transition-colors duration-300 text-xs">
+      <div className="dark:text-neutral-600 text-neutral-500 dark:group-hover:text-neutral-100 group-hover:text-neutral-900 transition-colors duration-400 text-xs">
         W skrócie
       </div>
-      <div className="text-sm text-muted-foreground leading-snug line-clamp-4 text-gradient-gloss font-medium -mt-2.5">
+      <div className="text-base text-muted-foreground leading-snug line-clamp-4 text-gradient-gloss font-medium -mt-2.5">
         &quot;{summary}&quot;
       </div>
       {categories.length > 0 && (
@@ -162,7 +162,7 @@ const Card = ({
       </p>
       {governmentPercentage > 0 && (
         <>
-          <div className="dark:text-neutral-600 text-neutral-500 dark:group-hover:text-neutral-100 group-hover:text-neutral-300 transition-colors duration-300 text-xs">
+          <div className="dark:text-neutral-600 text-neutral-500 dark:group-hover:text-neutral-100 group-hover:text-neutral-900 transition-colors duration-400 text-xs">
             Rozkład głosów &quot;za&quot;
           </div>
           <div className="flex flex-col items-center gap-1 -mt-1.5">
@@ -180,7 +180,7 @@ const Card = ({
                 ></div>
               ))}
             </div>
-            <div className="flex justify-between w-full dark:text-neutral-600 text-neutral-500 dark:group-hover:text-neutral-100 group-hover:text-neutral-300 transition-colors duration-300 text-xs">
+            <div className="flex justify-between w-full dark:text-neutral-600 text-neutral-500 dark:group-hover:text-neutral-100 group-hover:text-neutral-900 transition-colors duration-400 text-xs">
               <span>Rządz.</span>
               <span>Opoz.</span>
             </div>
