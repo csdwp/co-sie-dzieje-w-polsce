@@ -1,7 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useLayoutEffect } from 'react';
 import { SearchBarProps } from '@/types';
+import { gsap } from 'gsap';
 
 const SearchBar = ({ searchQuery, setSearchQuery }: SearchBarProps) => {
+  const searchBarRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     if (searchQuery === '2137') {
       document.body.style.backgroundImage = 'url("/papaj.jpg")';
@@ -14,8 +17,30 @@ const SearchBar = ({ searchQuery, setSearchQuery }: SearchBarProps) => {
     }
   }, [searchQuery]);
 
+  useLayoutEffect(() => {
+    if (searchBarRef.current) {
+      gsap.fromTo(
+        searchBarRef.current,
+        {
+          opacity: 0,
+          y: -30,
+          scale: 0.95,
+        },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.8,
+          ease: 'power3.out',
+          delay: 0.2,
+        }
+      );
+    }
+  }, []);
+
   return (
     <div
+      ref={searchBarRef}
       className="group w-11/12 md:w-full max-w-[600px] relative before:fixed before:bg-neutral-100
         before:flex before:top-[150px] before:-translate-y-1/2
         before:left-1/2 before:-translate-x-1/2 before:bg-gradient-to-r before:from-white before:to-red-500 

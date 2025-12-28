@@ -9,7 +9,10 @@ import type { ActsAndKeywordsResponse } from '@/types';
 
 const ClientWrapper = ({ data }: { data: ActsAndKeywordsResponse }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedTypes, setSelectedTypes] = useState<string[]>(['Ustawa']);
+  const [selectedTypes, setSelectedTypes] = useState<string[]>([
+    'Ustawa',
+    'Rozporządzenie',
+  ]);
 
   return (
     <>
