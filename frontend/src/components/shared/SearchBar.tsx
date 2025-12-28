@@ -44,7 +44,7 @@ const SearchBar = ({ searchQuery, setSearchQuery }: SearchBarProps) => {
       className="group w-11/12 md:w-full max-w-[600px] relative before:fixed before:bg-neutral-100
         before:flex before:top-[150px] before:-translate-y-1/2
         before:left-1/2 before:-translate-x-1/2 before:bg-gradient-to-r before:from-white before:to-red-500 
-        before:opacity-50 before:blur-3xl before:rounded-full before:w-160 before:h-120 before:rotate-45 before:-z-1"
+        before:opacity-50 before:blur-3xl before:rounded-full before:w-160 before:h-120 before:rotate-45 before:-z-1 before:pointer-events-none"
     >
       <div
         className="dark:bg-neutral-800/40 bg-neutral-700/10 focus-within:!border-transparent rounded-3xl p-5 py-0 w-full focus:outline-none
