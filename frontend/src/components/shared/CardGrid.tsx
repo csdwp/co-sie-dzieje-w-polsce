@@ -151,29 +151,37 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
 
   useLayoutEffect(() => {
     if (cardsContainerRef.current && !hasAnimated.current) {
-      const cards = cardsContainerRef.current.querySelectorAll('[data-card]');
+      const animationTimeout = setTimeout(() => {
+        if (cardsContainerRef.current) {
+          const cards =
+            cardsContainerRef.current.querySelectorAll('[data-card]');
 
-      if (cards.length > 0) {
-        gsap.fromTo(
-          cards,
-          {
-            opacity: 0,
-            y: 50,
-          },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 1.6,
-            ease: 'power3.out',
-            stagger: {
-              amount: 0.6,
-              from: 'start',
-            },
-            delay: 0.6,
+          if (cards.length > 0) {
+            gsap.fromTo(
+              cards,
+              {
+                opacity: 0,
+                y: 50,
+              },
+              {
+                opacity: 1,
+                y: 0,
+                duration: 1.6,
+                ease: 'power3.out',
+                stagger: {
+                  amount: 0.8,
+                  from: 'start',
+                  each: 0.08,
+                },
+                delay: 0.6,
+              }
+            );
+            hasAnimated.current = true;
           }
-        );
-        hasAnimated.current = true;
-      }
+        }
+      }, 100);
+
+      return () => clearTimeout(animationTimeout);
     }
   }, []);
 

@@ -25,20 +25,29 @@ const Card = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const [totalDots, setTotalDots] = useState(14);
 
-  const updateTotalDots = () => {
-    if (!containerRef.current) return;
-    const width = containerRef.current.offsetWidth;
-    const dotWidth = 8;
-    const desiredGap = 8;
-    const N = Math.round((width + desiredGap) / (dotWidth + desiredGap));
-    setTotalDots(Math.max(10, N));
-  };
-
   useEffect(() => {
-    window.addEventListener('resize', updateTotalDots);
+    if (!containerRef.current) return;
+
+    const updateTotalDots = () => {
+      if (!containerRef.current) return;
+      const width = containerRef.current.offsetWidth;
+      const dotWidth = 8;
+      const desiredGap = 8;
+      const N = Math.round((width + desiredGap) / (dotWidth + desiredGap));
+      setTotalDots(Math.max(10, N));
+    };
+
+    const resizeObserver = new ResizeObserver(() => {
+      updateTotalDots();
+    });
+
+    resizeObserver.observe(containerRef.current);
+
     updateTotalDots();
 
-    return () => window.removeEventListener('resize', updateTotalDots);
+    return () => {
+      resizeObserver.disconnect();
+    };
   }, []);
 
   const governmentDots = Math.round((governmentPercentage / 100) * totalDots);
