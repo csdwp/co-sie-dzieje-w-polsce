@@ -29,10 +29,7 @@ import { DialogModalProps } from '@/types';
 import { Badge } from '@/components/ui/badge';
 import { useIsAdmin, isLowConfidence } from '@/lib/authHelpers';
 import InlineEditableContent from './InlineEditableContent';
-import {
-  getActStatus,
-  getAllStatusesWithActive,
-} from '@/lib/statusHelpers';
+import { getActStatus, getAllStatusesWithActive } from '@/lib/statusHelpers';
 
 const chartConfig = {
   percentageNo: {
@@ -251,9 +248,7 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
           </div>
           {currentStatus !== 'Nieznany' && (
             <div className="flex flex-col space-y-1.5">
-              <div className="font-semibold tracking-tight text-xl">
-                Status aktu
-              </div>
+              <div className="font-semibold text-xl">Status aktu</div>
               <div className="flex flex-col gap-2 mt-2">
                 {statusList.map(status => (
                   <div
