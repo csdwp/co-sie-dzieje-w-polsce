@@ -20,10 +20,6 @@ import {
   PieChart,
   Bar,
   BarChart,
-  RadarChart,
-  PolarGrid,
-  PolarAngleAxis,
-  Radar,
 } from 'recharts';
 import { DialogModalProps } from '@/types';
 import { Badge } from '@/components/ui/badge';
@@ -55,6 +51,41 @@ const truncatePartyName = (name: string): string => {
     return name.slice(0, 4) + '...';
   }
   return name;
+};
+
+// Custom tooltip to show vote numbers with full party names
+const CustomTooltip = ({ active, payload }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-neutral-900 dark:bg-neutral-800 text-neutral-100 px-3 py-2 rounded-lg shadow-lg border border-neutral-700">
+        <p className="font-semibold mb-1">{payload[0].payload.party}</p>
+        {payload.map((entry: any, index: number) => (
+          <p key={index} className="text-sm" style={{ color: entry.color }}>
+            {entry.name}: {entry.value} głosów
+          </p>
+        ))}
+      </div>
+    );
+  }
+  return null;
+};
+
+// Custom pie chart tooltip to show actual vote numbers
+const CustomPieTooltip = ({ active, payload, totalYes, totalNo }: any) => {
+  if (active && payload && payload.length) {
+    const entry = payload[0];
+    const isYes = entry.name === 'Za';
+    const votes = isYes ? totalYes : totalNo;
+    return (
+      <div className="bg-neutral-900 dark:bg-neutral-800 text-neutral-100 px-3 py-2 rounded-lg shadow-lg border border-neutral-700">
+        <p className="font-semibold mb-1">{entry.name}</p>
+        <p className="text-sm" style={{ color: entry.payload.fill }}>
+          {votes} głosów ({entry.value.toFixed(1)}%)
+        </p>
+      </div>
+    );
+  }
+  return null;
 };
 
 const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
@@ -109,43 +140,6 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
 
   const yesPercentageGov =
     votes?.votesSupportByGroup?.government.yesPercentage ?? 0;
-  const noPercentageGov = 100 - yesPercentageGov;
-
-  const pieChartDataYes = [
-    {
-      name: 'Rządzący',
-      value: yesPercentageGov,
-      fill: chartConfig.government.color,
-    },
-    {
-      name: 'Opozycja',
-      value: 100 - yesPercentageGov,
-      fill: chartConfig.opposition.color,
-    },
-  ];
-
-  const pieChartDataNo = [
-    {
-      name: 'Rządzący',
-      value: noPercentageGov,
-      fill: chartConfig.government.color,
-    },
-    {
-      name: 'Opozycja',
-      value: 100 - noPercentageGov,
-      fill: chartConfig.opposition.color,
-    },
-  ];
-
-  const radarDataYes = combinedData.map(d => ({
-    party: d.party,
-    yes: d.yes,
-  }));
-
-  const radarDataNo = combinedData.map(d => ({
-    party: d.party,
-    no: d.no,
-  }));
 
   const formatDate = (dateString: string) => {
     if (!dateString) return 'Brak daty';
@@ -336,7 +330,7 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
               {/* Toggle Button for Detailed Analysis */}
               <button
                 onClick={() => setShowDetailedAnalysis(!showDetailedAnalysis)}
-                className="w-full px-4 py-3 rounded-lg hover:underline text-neutral-900 dark:text-neutral-100 text-sm font-semibold transition-colors duration-200 flex items-center justify-center gap-2"
+                className="w-full px-4 py-3 rounded-lg hover:underline text-neutral-900 border-none outline-none dark:text-neutral-100 text-sm font-semibold transition-colors duration-200 flex items-center justify-center gap-2"
               >
                 {showDetailedAnalysis
                   ? 'Ukryj szczegółową analizę'
@@ -361,14 +355,129 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
 
               {showDetailedAnalysis && (
                 <>
+                  {/* Government vs Opposition Comparison */}
+                  <div className="flex flex-col space-y-1.5">
+                    <div className="font-semibold tracking-tight text-xl">
+                      Porównanie: Koalicja rządząca vs Opozycja
+                    </div>
+                    <div className="text-sm text-muted-foreground mb-3">
+                      Jak głosowały partie rządzące i opozycyjne
+                    </div>
+                    <div className="flex flex-col gap-3">
+                      {/* Government bar */}
+                      <div className="flex flex-col gap-1">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="font-medium">Koalicja rządząca</span>
+                          <span className="text-neutral-600 dark:text-neutral-400">
+                            {votes?.votesSupportByGroup?.government?.yesVotes ||
+                              0}{' '}
+                            głosów za ({yesPercentageGov.toFixed(1)}%)
+                          </span>
+                        </div>
+                        <div className="w-full bg-neutral-200 dark:bg-neutral-700 rounded-full h-3 overflow-hidden">
+                          <div
+                            className="h-full rounded-full transition-all duration-500"
+                            style={{
+                              width: `${yesPercentageGov}%`,
+                              backgroundColor: '#f8d3d4',
+                            }}
+                          />
+                        </div>
+                      </div>
+                      {/* Opposition bar */}
+                      <div className="flex flex-col gap-1">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="font-medium">Opozycja</span>
+                          <span className="text-neutral-600 dark:text-neutral-400">
+                            {votes?.votesSupportByGroup?.opposition?.yesVotes ||
+                              0}{' '}
+                            głosów za ({(100 - yesPercentageGov).toFixed(1)}%)
+                          </span>
+                        </div>
+                        <div className="w-full bg-neutral-200 dark:bg-neutral-700 rounded-full h-3 overflow-hidden">
+                          <div
+                            className="h-full rounded-full transition-all duration-500"
+                            style={{
+                              width: `${100 - yesPercentageGov}%`,
+                              backgroundColor: '#f96d6e',
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Participation Rate */}
+                  {votes?.summary && (
+                    <div className="flex flex-col space-y-1.5">
+                      <div className="font-semibold tracking-tight text-xl">
+                        Frekwencja głosowania
+                      </div>
+                      <div className="text-sm text-muted-foreground mb-3">
+                        Liczba posłów, którzy wzięli udział w głosowaniu
+                      </div>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div className="flex flex-col gap-1 p-3 rounded-lg bg-neutral-100 dark:bg-neutral-800/40">
+                          <span className="text-xs text-neutral-600 dark:text-neutral-400">
+                            Głosowało
+                          </span>
+                          <div className="flex items-baseline gap-2">
+                            <span className="text-2xl font-bold">
+                              {votes.summary.yes + votes.summary.no}
+                            </span>
+                            <span className="text-xs text-neutral-600 dark:text-neutral-400">
+                              z {votes.summary.total}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex flex-col gap-1 p-3 rounded-lg bg-neutral-100 dark:bg-neutral-800/40">
+                          <span className="text-xs text-neutral-600 dark:text-neutral-400">
+                            Wstrzymało się
+                          </span>
+                          <div className="flex items-baseline gap-2">
+                            <span className="text-2xl font-bold">
+                              {votes.summary.abstain}
+                            </span>
+                            <span className="text-xs text-neutral-600 dark:text-neutral-400">
+                              ({((votes.summary.abstain / votes.summary.total) * 100).toFixed(1)}%)
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex flex-col gap-1 p-3 rounded-lg bg-neutral-100 dark:bg-neutral-800/40">
+                          <span className="text-xs text-neutral-600 dark:text-neutral-400">
+                            Nieobecnych
+                          </span>
+                          <div className="flex items-baseline gap-2">
+                            <span className="text-2xl font-bold">
+                              {votes.summary.absent}
+                            </span>
+                            <span className="text-xs text-neutral-600 dark:text-neutral-400">
+                              ({((votes.summary.absent / votes.summary.total) * 100).toFixed(1)}%)
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex flex-col gap-1 p-3 rounded-lg bg-neutral-100 dark:bg-neutral-800/40">
+                          <span className="text-xs text-neutral-600 dark:text-neutral-400">
+                            Frekwencja
+                          </span>
+                          <div className="flex items-baseline gap-2">
+                            <span className="text-2xl font-bold">
+                              {(((votes.summary.yes + votes.summary.no) / votes.summary.total) * 100).toFixed(1)}%
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   <div className="flex flex-col space-y-1.5">
                     <div className="font-semibold text-xl">
-                      Wykresy głosów &quot;za&quot; i &quot;przeciw&quot;
+                      Szczegółowy rozkład głosów
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      Wykres słupkowy przedstawia liczbę głosów za oraz przeciw
-                      dla każdej partii. Wykres kołowy pokazuje procentowy
-                      rozkład głosów za i przeciw.
+                      Wykres słupkowy pokazuje liczbę głosów za oraz przeciw dla
+                      każdej partii. Wykres kołowy przedstawia ogólny rozkład
+                      wszystkich głosów.
                     </div>
                     {/* Wykresy "za" i "przeciw" */}
                     <div className="flex flex-col md:flex-row gap-5 w-full h-auto md:max-h-80">
@@ -394,10 +503,7 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
                             tickMargin={8}
                             tickFormatter={truncatePartyName}
                           />
-                          <ChartTooltip
-                            cursor={false}
-                            content={<ChartTooltipContent indicator="dashed" />}
-                          />
+                          <ChartTooltip content={<CustomTooltip />} />
                           <Bar
                             dataKey="yes"
                             fill="var(--color-yes)"
@@ -419,7 +525,12 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
                         <PieChart>
                           <ChartTooltip
                             cursor={false}
-                            content={<ChartTooltipContent hideLabel />}
+                            content={
+                              <CustomPieTooltip
+                                totalYes={totalYes}
+                                totalNo={totalNo}
+                              />
+                            }
                           />
                           <Pie
                             data={pieYesNoData}
@@ -452,176 +563,9 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
                                       <tspan
                                         x={viewBox.cx}
                                         y={(viewBox.cy || 0) + 24}
-                                        className="fill-muted-foreground"
+                                        className="fill-muted-foreground text-sm"
                                       >
                                         Za
-                                      </tspan>
-                                    </text>
-                                  );
-                                }
-                              }}
-                            />
-                          </Pie>
-                        </PieChart>
-                      </ChartContainer>
-                    </div>
-                    {/* Wykresy "za" */}
-                    <div className="font-semibold text-xl">
-                      Rozkład głosów &quot;za&quot; przyjęciem ustawy
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      Wykres radarowy przedstawia rozkład głosów za z podziałem
-                      na partie. Wykres kołowy przedstawia procentowy rozkład
-                      głosów za wśród partii rządzących i opozycyjnych.
-                    </div>
-                    <div className="flex flex-col md:flex-row gap-5 w-full h-auto md:max-h-80">
-                      <ChartContainer
-                        config={combinedChartConfig}
-                        className="md:w-1/2 aspect-square"
-                      >
-                        <RadarChart data={radarDataYes}>
-                          <PolarGrid />
-                          <PolarAngleAxis
-                            dataKey="party"
-                            tickFormatter={truncatePartyName}
-                          />
-                          <Radar
-                            name="Głosy za"
-                            dataKey="yes"
-                            fillOpacity={0.6}
-                            fill="#f8d3d4"
-                            stroke="#f8d3d4"
-                          />
-                          <ChartTooltip content={<ChartTooltipContent />} />
-                        </RadarChart>
-                      </ChartContainer>
-                      <ChartContainer
-                        config={chartConfig}
-                        className="md:w-1/2 aspect-square"
-                      >
-                        <PieChart>
-                          <ChartTooltip
-                            cursor={false}
-                            content={<ChartTooltipContent hideLabel />}
-                          />
-                          <Pie
-                            data={pieChartDataYes}
-                            dataKey="value"
-                            nameKey="name"
-                            innerRadius={60}
-                            strokeWidth={5}
-                          >
-                            <Label
-                              content={({ viewBox }) => {
-                                if (
-                                  viewBox &&
-                                  'cx' in viewBox &&
-                                  'cy' in viewBox
-                                ) {
-                                  return (
-                                    <text
-                                      x={viewBox.cx}
-                                      y={viewBox.cy}
-                                      textAnchor="middle"
-                                      dominantBaseline="middle"
-                                    >
-                                      <tspan
-                                        x={viewBox.cx}
-                                        y={viewBox.cy}
-                                        className="fill-foreground text-3xl font-bold"
-                                      >
-                                        {yesPercentageGov.toFixed(1)}%
-                                      </tspan>
-                                      <tspan
-                                        x={viewBox.cx}
-                                        y={(viewBox.cy || 0) + 24}
-                                        className="fill-muted-foreground"
-                                      >
-                                        Rządzący
-                                      </tspan>
-                                    </text>
-                                  );
-                                }
-                              }}
-                            />
-                          </Pie>
-                        </PieChart>
-                      </ChartContainer>
-                    </div>
-                    {/* Wykresy "przeciw" */}
-                    <div className="font-semibold text-xl">
-                      Rozkład głosów &quot;przeciw&quot; przyjęciem ustawy
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      Wykres radarowy przedstawia rozkład głosów przeciw z
-                      podziałem na partie. Wykres kołowy przedstawia procentowy
-                      rozkład głosów przeciw wśród partii rządzących i
-                      opozycyjnych.
-                    </div>
-                    <div className="flex flex-col md:flex-row gap-5 w-full h-auto md:max-h-80">
-                      <ChartContainer
-                        config={combinedChartConfig}
-                        className="md:w-1/2 aspect-square"
-                      >
-                        <RadarChart data={radarDataNo}>
-                          <PolarGrid />
-                          <PolarAngleAxis
-                            dataKey="party"
-                            tickFormatter={truncatePartyName}
-                          />
-                          <Radar
-                            name="Głosy przeciw"
-                            dataKey="no"
-                            fill="#f8d3d4"
-                            stroke="#f8d3d4"
-                            fillOpacity={0.6}
-                          />
-                          <ChartTooltip content={<ChartTooltipContent />} />
-                        </RadarChart>
-                      </ChartContainer>
-                      <ChartContainer
-                        config={chartConfig}
-                        className="md:w-1/2 aspect-square"
-                      >
-                        <PieChart>
-                          <ChartTooltip
-                            cursor={false}
-                            content={<ChartTooltipContent hideLabel />}
-                          />
-                          <Pie
-                            data={pieChartDataNo}
-                            dataKey="value"
-                            nameKey="name"
-                            innerRadius={60}
-                            strokeWidth={5}
-                          >
-                            <Label
-                              content={({ viewBox }) => {
-                                if (
-                                  viewBox &&
-                                  'cx' in viewBox &&
-                                  'cy' in viewBox
-                                ) {
-                                  return (
-                                    <text
-                                      x={viewBox.cx}
-                                      y={viewBox.cy}
-                                      textAnchor="middle"
-                                      dominantBaseline="middle"
-                                    >
-                                      <tspan
-                                        x={viewBox.cx}
-                                        y={viewBox.cy}
-                                        className="fill-foreground text-3xl font-bold"
-                                      >
-                                        {noPercentageGov.toFixed(1)}%
-                                      </tspan>
-                                      <tspan
-                                        x={viewBox.cx}
-                                        y={(viewBox.cy || 0) + 24}
-                                        className="fill-muted-foreground"
-                                      >
-                                        Rządzący
                                       </tspan>
                                     </text>
                                   );
