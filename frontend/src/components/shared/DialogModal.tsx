@@ -29,6 +29,10 @@ import { DialogModalProps } from '@/types';
 import { Badge } from '@/components/ui/badge';
 import { useIsAdmin, isLowConfidence } from '@/lib/authHelpers';
 import InlineEditableContent from './InlineEditableContent';
+import {
+  getActStatus,
+  getAllStatusesWithActive,
+} from '@/lib/statusHelpers';
 
 const chartConfig = {
   percentageNo: {
@@ -59,6 +63,13 @@ const truncatePartyName = (name: string): string => {
 const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
   const votes = card?.votes;
   const parties = votes?.parties;
+
+  // Get status information
+  const currentStatus = getActStatus(
+    card?.announcement_date,
+    card?.promulgation
+  );
+  const statusList = getAllStatusesWithActive(currentStatus);
 
   const combinedData = parties
     ? Object.keys(parties).map(party => ({
@@ -238,6 +249,38 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
               </span>
             </div>
           </div>
+          {currentStatus !== 'Nieznany' && (
+            <div className="flex flex-col space-y-1.5">
+              <div className="font-semibold tracking-tight text-xl">
+                Status aktu
+              </div>
+              <div className="flex flex-col gap-2 mt-2">
+                {statusList.map(status => (
+                  <div
+                    key={status.name}
+                    className="flex items-center gap-3 text-sm"
+                  >
+                    <div
+                      className={`w-2 h-2 rounded-full ${
+                        status.isActive
+                          ? 'bg-red-500'
+                          : 'bg-neutral-300 dark:bg-neutral-600'
+                      }`}
+                    />
+                    <span
+                      className={
+                        status.isActive
+                          ? 'font-semibold text-neutral-900 dark:text-neutral-100'
+                          : 'text-neutral-500 dark:text-neutral-400'
+                      }
+                    >
+                      {status.name}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
           {votes?.government && (
             <>
               <div className="flex flex-col space-y-1.5">

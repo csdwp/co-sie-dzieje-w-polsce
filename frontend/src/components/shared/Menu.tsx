@@ -64,7 +64,6 @@ const Menu = ({
           />
         </svg>
       </div>
-
       <button
         className={`cursor-pointer text-sm leading-3.5 absolute top-4.5 left-1.5 ease-out transition-color duration-300 -z-10 opacity-0 ${
           selectedTypes.includes('Ustawa')

@@ -5,6 +5,7 @@ import { CardProps } from '@/types';
 import { Badge } from '@/components/ui/badge';
 import { useIsAdmin, isLowConfidence } from '@/lib/authHelpers';
 import { Trash2 } from 'lucide-react';
+import { getActStatus, getStatusColor } from '@/lib/statusHelpers';
 
 const Card = ({
   id,
@@ -12,6 +13,7 @@ const Card = ({
   content,
   summary,
   date,
+  promulgation,
   isImportant = false,
   onClick,
   categories = [],
@@ -19,6 +21,7 @@ const Card = ({
   confidenceScore,
   onDelete,
 }: CardProps) => {
+  const status = getActStatus(date, promulgation);
   const containerRef = useRef<HTMLDivElement>(null);
   const [totalDots, setTotalDots] = useState(14);
 
@@ -106,8 +109,18 @@ const Card = ({
       ${isDeleting && 'opacity-50 pointer-events-none animate-pulse'}`}
     >
       <div className="flex items-center justify-between">
-        <div className="dark:text-neutral-600 text-neutral-500 dark:group-hover:text-neutral-100 group-hover:text-neutral-900 transition-colors duration-400 text-xs">
-          {formattedDate}
+        <div className="flex items-center gap-2">
+          <div className="dark:text-neutral-600 text-neutral-500 dark:group-hover:text-neutral-100 group-hover:text-neutral-900 transition-colors duration-400 text-xs">
+            {formattedDate}
+          </div>
+          {status !== 'Nieznany' && (
+            <Badge
+              variant="outline"
+              className={`text-[10px] px-1.5 py-0 ${getStatusColor(status)}`}
+            >
+              {status}
+            </Badge>
+          )}
         </div>
         <div className="flex items-center gap-2">
           {isAdmin && needsVerification && (

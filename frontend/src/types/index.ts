@@ -96,6 +96,7 @@ export interface CardProps {
   content?: string;
   summary?: string;
   date: string;
+  promulgation?: string;
   isImportant?: boolean;
   onClick: () => void;
   categories?: string[];

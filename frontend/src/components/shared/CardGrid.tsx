@@ -161,10 +161,10 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
         {
           opacity: 1,
           y: 0,
-          duration: 1.2,
+          duration: 1.6,
           ease: 'power3.out',
           stagger: {
-            amount: 1.2,
+            amount: 0.6,
             from: 'start',
           },
           delay: 0.6,
@@ -391,6 +391,7 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
                   content={card.content}
                   summary={card.simple_title}
                   date={card.announcement_date}
+                  promulgation={card.promulgation}
                   categories={card.category ? [card.category] : []}
                   isImportant={
                     !!card.votes?.votesSupportByGroup?.government.yesPercentage
