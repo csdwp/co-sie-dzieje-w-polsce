@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -60,6 +60,7 @@ const truncatePartyName = (name: string): string => {
 const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
   const votes = card?.votes;
   const parties = votes?.parties;
+  const [showDetailedAnalysis, setShowDetailedAnalysis] = useState(false);
 
   // Get status information
   const currentStatus = getActStatus(
@@ -207,8 +208,9 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
               className="cursor-pointer inline-flex items-center gap-2 rounded-md text-sm font-medium 
                 transition-colors focus-visible:outline-none focus-visible:ring-1 
                 focus-visible:ring-ring disabled:pointer-events-none [&_svg]:pointer-events-none 
-                [&_svg]:size-4 [&_svg]:shrink-0 hover:text-accent-foreground hover:bg-transparent 
-                  hover:underline justify-start w-fit max-w-full truncate relative mask-alpha mask-r-from-black mask-r-from-97% mask-r-to-transparent"
+                [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-transparent 
+                underline justify-start w-fit max-w-full truncate relative mask-alpha mask-r-from-black mask-r-from-97% mask-r-to-transparent
+                text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 hover:dark:text-neutral-100"
             >
               {card?.title}
             </a>
@@ -276,267 +278,363 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
               </div>
             </div>
           )}
-          {votes?.government && (
+          {votes?.government && totalVotes > 0 && (
             <>
+              {/* Vote Summary Box */}
               <div className="flex flex-col space-y-1.5">
-                <div className="font-semibold text-xl">
-                  Wykresy głosów &quot;za&quot; i &quot;przeciw&quot;
+                <div className="font-semibold tracking-tight text-xl">
+                  Wynik głosowania
                 </div>
-                <div className="text-sm text-muted-foreground">
-                  Wykres słupkowy przedstawia liczbę głosów za oraz przeciw dla
-                  każdej partii. Wykres kołowy pokazuje procentowy rozkład
-                  głosów za i przeciw.
-                </div>
-                {/* Wykresy "za" i "przeciw" */}
-                <div className="flex flex-col md:flex-row gap-5 w-full h-auto md:max-h-80">
-                  <ChartContainer
-                    config={combinedChartConfig}
-                    className="md:w-1/2"
-                  >
-                    <BarChart
-                      accessibilityLayer
-                      data={combinedData}
-                      margin={{
-                        top: 20,
-                        right: 12,
-                        left: 12,
-                        bottom: 5,
-                      }}
-                    >
-                      <CartesianGrid vertical={false} />
-                      <XAxis
-                        dataKey="party"
-                        tickLine={false}
-                        axisLine={false}
-                        tickMargin={8}
-                        tickFormatter={truncatePartyName}
-                      />
-                      <ChartTooltip
-                        cursor={false}
-                        content={<ChartTooltipContent indicator="dashed" />}
-                      />
-                      <Bar
-                        dataKey="yes"
-                        fill="var(--color-yes)"
-                        radius={4}
-                        minPointSize={2}
-                      />
-                      <Bar
-                        dataKey="no"
-                        fill="var(--color-no)"
-                        radius={4}
-                        minPointSize={2}
-                      />
-                    </BarChart>
-                  </ChartContainer>
-                  <ChartContainer
-                    config={chartConfig}
-                    className="md:w-1/2 aspect-square"
-                  >
-                    <PieChart>
-                      <ChartTooltip
-                        cursor={false}
-                        content={<ChartTooltipContent hideLabel />}
-                      />
-                      <Pie
-                        data={pieYesNoData}
-                        dataKey="value"
-                        nameKey="name"
-                        innerRadius={60}
-                        strokeWidth={5}
+                <div className="flex flex-col gap-3 mt-2 p-4 rounded-lg bg-neutral-100 dark:bg-neutral-800/40 border-2 border-neutral-200 dark:border-neutral-700">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={`px-3 py-1.5 rounded-lg font-bold text-sm ${
+                          percentYes > 50
+                            ? 'bg-green-500/20 text-green-700 dark:text-green-400'
+                            : 'bg-red-500/20 text-red-700 dark:text-red-400'
+                        }`}
                       >
-                        <Label
-                          content={({ viewBox }) => {
-                            if (viewBox && 'cx' in viewBox && 'cy' in viewBox) {
-                              return (
-                                <text
-                                  x={viewBox.cx}
-                                  y={viewBox.cy}
-                                  textAnchor="middle"
-                                  dominantBaseline="middle"
-                                >
-                                  <tspan
-                                    x={viewBox.cx}
-                                    y={viewBox.cy}
-                                    className="fill-foreground text-3xl font-bold"
-                                  >
-                                    {percentYes.toFixed(1)}%
-                                  </tspan>
-                                  <tspan
-                                    x={viewBox.cx}
-                                    y={(viewBox.cy || 0) + 24}
-                                    className="fill-muted-foreground"
-                                  >
-                                    Za
-                                  </tspan>
-                                </text>
-                              );
-                            }
-                          }}
-                        />
-                      </Pie>
-                    </PieChart>
-                  </ChartContainer>
-                </div>
-                {/* Wykresy "za" */}
-                <div className="font-semibold text-xl">
-                  Rozkład głosów &quot;za&quot; przyjęciem ustawy
-                </div>
-                <div className="text-sm text-muted-foreground">
-                  Wykres radarowy przedstawia rozkład głosów za z podziałem na
-                  partie. Wykres kołowy przedstawia procentowy rozkład głosów za
-                  wśród partii rządzących i opozycyjnych.
-                </div>
-                <div className="flex flex-col md:flex-row gap-5 w-full h-auto md:max-h-80">
-                  <ChartContainer
-                    config={combinedChartConfig}
-                    className="md:w-1/2 aspect-square"
-                  >
-                    <RadarChart data={radarDataYes}>
-                      <PolarGrid />
-                      <PolarAngleAxis
-                        dataKey="party"
-                        tickFormatter={truncatePartyName}
-                      />
-                      <Radar
-                        name="Głosy za"
-                        dataKey="yes"
-                        fillOpacity={0.6}
-                        fill="#f8d3d4"
-                        stroke="#f8d3d4"
-                      />
-                      <ChartTooltip content={<ChartTooltipContent />} />
-                    </RadarChart>
-                  </ChartContainer>
-                  <ChartContainer
-                    config={chartConfig}
-                    className="md:w-1/2 aspect-square"
-                  >
-                    <PieChart>
-                      <ChartTooltip
-                        cursor={false}
-                        content={<ChartTooltipContent hideLabel />}
-                      />
-                      <Pie
-                        data={pieChartDataYes}
-                        dataKey="value"
-                        nameKey="name"
-                        innerRadius={60}
-                        strokeWidth={5}
-                      >
-                        <Label
-                          content={({ viewBox }) => {
-                            if (viewBox && 'cx' in viewBox && 'cy' in viewBox) {
-                              return (
-                                <text
-                                  x={viewBox.cx}
-                                  y={viewBox.cy}
-                                  textAnchor="middle"
-                                  dominantBaseline="middle"
-                                >
-                                  <tspan
-                                    x={viewBox.cx}
-                                    y={viewBox.cy}
-                                    className="fill-foreground text-3xl font-bold"
-                                  >
-                                    {yesPercentageGov.toFixed(1)}%
-                                  </tspan>
-                                  <tspan
-                                    x={viewBox.cx}
-                                    y={(viewBox.cy || 0) + 24}
-                                    className="fill-muted-foreground"
-                                  >
-                                    Rządzący
-                                  </tspan>
-                                </text>
-                              );
-                            }
-                          }}
-                        />
-                      </Pie>
-                    </PieChart>
-                  </ChartContainer>
-                </div>
-                {/* Wykresy "przeciw" */}
-                <div className="font-semibold text-xl">
-                  Rozkład głosów &quot;przeciw&quot; przyjęciem ustawy
-                </div>
-                <div className="text-sm text-muted-foreground">
-                  Wykres radarowy przedstawia rozkład głosów przeciw z podziałem
-                  na partie. Wykres kołowy przedstawia procentowy rozkład głosów
-                  przeciw wśród partii rządzących i opozycyjnych.
-                </div>
-                <div className="flex flex-col md:flex-row gap-5 w-full h-auto md:max-h-80">
-                  <ChartContainer
-                    config={combinedChartConfig}
-                    className="md:w-1/2 aspect-square"
-                  >
-                    <RadarChart data={radarDataNo}>
-                      <PolarGrid />
-                      <PolarAngleAxis
-                        dataKey="party"
-                        tickFormatter={truncatePartyName}
-                      />
-                      <Radar
-                        name="Głosy przeciw"
-                        dataKey="no"
-                        fill="#f8d3d4"
-                        stroke="#f8d3d4"
-                        fillOpacity={0.6}
-                      />
-                      <ChartTooltip content={<ChartTooltipContent />} />
-                    </RadarChart>
-                  </ChartContainer>
-                  <ChartContainer
-                    config={chartConfig}
-                    className="md:w-1/2 aspect-square"
-                  >
-                    <PieChart>
-                      <ChartTooltip
-                        cursor={false}
-                        content={<ChartTooltipContent hideLabel />}
-                      />
-                      <Pie
-                        data={pieChartDataNo}
-                        dataKey="value"
-                        nameKey="name"
-                        innerRadius={60}
-                        strokeWidth={5}
-                      >
-                        <Label
-                          content={({ viewBox }) => {
-                            if (viewBox && 'cx' in viewBox && 'cy' in viewBox) {
-                              return (
-                                <text
-                                  x={viewBox.cx}
-                                  y={viewBox.cy}
-                                  textAnchor="middle"
-                                  dominantBaseline="middle"
-                                >
-                                  <tspan
-                                    x={viewBox.cx}
-                                    y={viewBox.cy}
-                                    className="fill-foreground text-3xl font-bold"
-                                  >
-                                    {noPercentageGov.toFixed(1)}%
-                                  </tspan>
-                                  <tspan
-                                    x={viewBox.cx}
-                                    y={(viewBox.cy || 0) + 24}
-                                    className="fill-muted-foreground"
-                                  >
-                                    Rządzący
-                                  </tspan>
-                                </text>
-                              );
-                            }
-                          }}
-                        />
-                      </Pie>
-                    </PieChart>
-                  </ChartContainer>
+                        {percentYes > 50 ? '✓ PRZYJĘTO' : '✗ ODRZUCONO'}
+                      </div>
+                      <span className="text-sm text-neutral-600 dark:text-neutral-400">
+                        Margin: {Math.abs(totalYes - totalNo)} głosów
+                      </span>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4 mt-2">
+                    <div className="flex flex-col">
+                      <span className="text-xs text-neutral-600 dark:text-neutral-400 mb-1">
+                        Głosy za
+                      </span>
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
+                          {totalYes}
+                        </span>
+                        <span className="text-sm text-neutral-600 dark:text-neutral-400">
+                          ({percentYes.toFixed(1)}%)
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-xs text-neutral-600 dark:text-neutral-400 mb-1">
+                        Głosy przeciw
+                      </span>
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
+                          {totalNo}
+                        </span>
+                        <span className="text-sm text-neutral-600 dark:text-neutral-400">
+                          ({percentNo.toFixed(1)}%)
+                        </span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
+
+              {/* Toggle Button for Detailed Analysis */}
+              <button
+                onClick={() => setShowDetailedAnalysis(!showDetailedAnalysis)}
+                className="w-full px-4 py-3 rounded-lg hover:underline text-neutral-900 dark:text-neutral-100 text-sm font-semibold transition-colors duration-200 flex items-center justify-center gap-2"
+              >
+                {showDetailedAnalysis
+                  ? 'Ukryj szczegółową analizę'
+                  : 'Pokaż szczegółową analizę'}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className={`transition-transform duration-200 ${
+                    showDetailedAnalysis ? 'rotate-180' : ''
+                  }`}
+                >
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
+              </button>
+
+              {showDetailedAnalysis && (
+                <>
+                  <div className="flex flex-col space-y-1.5">
+                    <div className="font-semibold text-xl">
+                      Wykresy głosów &quot;za&quot; i &quot;przeciw&quot;
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      Wykres słupkowy przedstawia liczbę głosów za oraz przeciw
+                      dla każdej partii. Wykres kołowy pokazuje procentowy
+                      rozkład głosów za i przeciw.
+                    </div>
+                    {/* Wykresy "za" i "przeciw" */}
+                    <div className="flex flex-col md:flex-row gap-5 w-full h-auto md:max-h-80">
+                      <ChartContainer
+                        config={combinedChartConfig}
+                        className="md:w-1/2"
+                      >
+                        <BarChart
+                          accessibilityLayer
+                          data={combinedData}
+                          margin={{
+                            top: 20,
+                            right: 12,
+                            left: 12,
+                            bottom: 5,
+                          }}
+                        >
+                          <CartesianGrid vertical={false} />
+                          <XAxis
+                            dataKey="party"
+                            tickLine={false}
+                            axisLine={false}
+                            tickMargin={8}
+                            tickFormatter={truncatePartyName}
+                          />
+                          <ChartTooltip
+                            cursor={false}
+                            content={<ChartTooltipContent indicator="dashed" />}
+                          />
+                          <Bar
+                            dataKey="yes"
+                            fill="var(--color-yes)"
+                            radius={4}
+                            minPointSize={2}
+                          />
+                          <Bar
+                            dataKey="no"
+                            fill="var(--color-no)"
+                            radius={4}
+                            minPointSize={2}
+                          />
+                        </BarChart>
+                      </ChartContainer>
+                      <ChartContainer
+                        config={chartConfig}
+                        className="md:w-1/2 aspect-square"
+                      >
+                        <PieChart>
+                          <ChartTooltip
+                            cursor={false}
+                            content={<ChartTooltipContent hideLabel />}
+                          />
+                          <Pie
+                            data={pieYesNoData}
+                            dataKey="value"
+                            nameKey="name"
+                            innerRadius={60}
+                            strokeWidth={5}
+                          >
+                            <Label
+                              content={({ viewBox }) => {
+                                if (
+                                  viewBox &&
+                                  'cx' in viewBox &&
+                                  'cy' in viewBox
+                                ) {
+                                  return (
+                                    <text
+                                      x={viewBox.cx}
+                                      y={viewBox.cy}
+                                      textAnchor="middle"
+                                      dominantBaseline="middle"
+                                    >
+                                      <tspan
+                                        x={viewBox.cx}
+                                        y={viewBox.cy}
+                                        className="fill-foreground text-3xl font-bold"
+                                      >
+                                        {percentYes.toFixed(1)}%
+                                      </tspan>
+                                      <tspan
+                                        x={viewBox.cx}
+                                        y={(viewBox.cy || 0) + 24}
+                                        className="fill-muted-foreground"
+                                      >
+                                        Za
+                                      </tspan>
+                                    </text>
+                                  );
+                                }
+                              }}
+                            />
+                          </Pie>
+                        </PieChart>
+                      </ChartContainer>
+                    </div>
+                    {/* Wykresy "za" */}
+                    <div className="font-semibold text-xl">
+                      Rozkład głosów &quot;za&quot; przyjęciem ustawy
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      Wykres radarowy przedstawia rozkład głosów za z podziałem
+                      na partie. Wykres kołowy przedstawia procentowy rozkład
+                      głosów za wśród partii rządzących i opozycyjnych.
+                    </div>
+                    <div className="flex flex-col md:flex-row gap-5 w-full h-auto md:max-h-80">
+                      <ChartContainer
+                        config={combinedChartConfig}
+                        className="md:w-1/2 aspect-square"
+                      >
+                        <RadarChart data={radarDataYes}>
+                          <PolarGrid />
+                          <PolarAngleAxis
+                            dataKey="party"
+                            tickFormatter={truncatePartyName}
+                          />
+                          <Radar
+                            name="Głosy za"
+                            dataKey="yes"
+                            fillOpacity={0.6}
+                            fill="#f8d3d4"
+                            stroke="#f8d3d4"
+                          />
+                          <ChartTooltip content={<ChartTooltipContent />} />
+                        </RadarChart>
+                      </ChartContainer>
+                      <ChartContainer
+                        config={chartConfig}
+                        className="md:w-1/2 aspect-square"
+                      >
+                        <PieChart>
+                          <ChartTooltip
+                            cursor={false}
+                            content={<ChartTooltipContent hideLabel />}
+                          />
+                          <Pie
+                            data={pieChartDataYes}
+                            dataKey="value"
+                            nameKey="name"
+                            innerRadius={60}
+                            strokeWidth={5}
+                          >
+                            <Label
+                              content={({ viewBox }) => {
+                                if (
+                                  viewBox &&
+                                  'cx' in viewBox &&
+                                  'cy' in viewBox
+                                ) {
+                                  return (
+                                    <text
+                                      x={viewBox.cx}
+                                      y={viewBox.cy}
+                                      textAnchor="middle"
+                                      dominantBaseline="middle"
+                                    >
+                                      <tspan
+                                        x={viewBox.cx}
+                                        y={viewBox.cy}
+                                        className="fill-foreground text-3xl font-bold"
+                                      >
+                                        {yesPercentageGov.toFixed(1)}%
+                                      </tspan>
+                                      <tspan
+                                        x={viewBox.cx}
+                                        y={(viewBox.cy || 0) + 24}
+                                        className="fill-muted-foreground"
+                                      >
+                                        Rządzący
+                                      </tspan>
+                                    </text>
+                                  );
+                                }
+                              }}
+                            />
+                          </Pie>
+                        </PieChart>
+                      </ChartContainer>
+                    </div>
+                    {/* Wykresy "przeciw" */}
+                    <div className="font-semibold text-xl">
+                      Rozkład głosów &quot;przeciw&quot; przyjęciem ustawy
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      Wykres radarowy przedstawia rozkład głosów przeciw z
+                      podziałem na partie. Wykres kołowy przedstawia procentowy
+                      rozkład głosów przeciw wśród partii rządzących i
+                      opozycyjnych.
+                    </div>
+                    <div className="flex flex-col md:flex-row gap-5 w-full h-auto md:max-h-80">
+                      <ChartContainer
+                        config={combinedChartConfig}
+                        className="md:w-1/2 aspect-square"
+                      >
+                        <RadarChart data={radarDataNo}>
+                          <PolarGrid />
+                          <PolarAngleAxis
+                            dataKey="party"
+                            tickFormatter={truncatePartyName}
+                          />
+                          <Radar
+                            name="Głosy przeciw"
+                            dataKey="no"
+                            fill="#f8d3d4"
+                            stroke="#f8d3d4"
+                            fillOpacity={0.6}
+                          />
+                          <ChartTooltip content={<ChartTooltipContent />} />
+                        </RadarChart>
+                      </ChartContainer>
+                      <ChartContainer
+                        config={chartConfig}
+                        className="md:w-1/2 aspect-square"
+                      >
+                        <PieChart>
+                          <ChartTooltip
+                            cursor={false}
+                            content={<ChartTooltipContent hideLabel />}
+                          />
+                          <Pie
+                            data={pieChartDataNo}
+                            dataKey="value"
+                            nameKey="name"
+                            innerRadius={60}
+                            strokeWidth={5}
+                          >
+                            <Label
+                              content={({ viewBox }) => {
+                                if (
+                                  viewBox &&
+                                  'cx' in viewBox &&
+                                  'cy' in viewBox
+                                ) {
+                                  return (
+                                    <text
+                                      x={viewBox.cx}
+                                      y={viewBox.cy}
+                                      textAnchor="middle"
+                                      dominantBaseline="middle"
+                                    >
+                                      <tspan
+                                        x={viewBox.cx}
+                                        y={viewBox.cy}
+                                        className="fill-foreground text-3xl font-bold"
+                                      >
+                                        {noPercentageGov.toFixed(1)}%
+                                      </tspan>
+                                      <tspan
+                                        x={viewBox.cx}
+                                        y={(viewBox.cy || 0) + 24}
+                                        className="fill-muted-foreground"
+                                      >
+                                        Rządzący
+                                      </tspan>
+                                    </text>
+                                  );
+                                }
+                              }}
+                            />
+                          </Pie>
+                        </PieChart>
+                      </ChartContainer>
+                    </div>
+                  </div>
+                </>
+              )}
             </>
           )}
         </>
