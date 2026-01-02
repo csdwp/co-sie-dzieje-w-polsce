@@ -33,6 +33,7 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
     user ? AUTHENTICATED_DAILY_LIMIT : ANONYMOUS_DAILY_LIMIT
   );
   const cardsContainerRef = useRef<HTMLDivElement>(null);
+  const hasAnimated = useRef(false);
 
   const { acts } = data || {};
 
@@ -149,29 +150,32 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
   };
 
   useLayoutEffect(() => {
-    if (cardsContainerRef.current) {
+    if (cardsContainerRef.current && !hasAnimated.current) {
       const cards = cardsContainerRef.current.querySelectorAll('[data-card]');
 
-      gsap.fromTo(
-        cards,
-        {
-          opacity: 0,
-          y: 50,
-        },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 1.6,
-          ease: 'power3.out',
-          stagger: {
-            amount: 0.6,
-            from: 'start',
+      if (cards.length > 0) {
+        gsap.fromTo(
+          cards,
+          {
+            opacity: 0,
+            y: 50,
           },
-          delay: 0.6,
-        }
-      );
+          {
+            opacity: 1,
+            y: 0,
+            duration: 1.6,
+            ease: 'power3.out',
+            stagger: {
+              amount: 0.6,
+              from: 'start',
+            },
+            delay: 0.6,
+          }
+        );
+        hasAnimated.current = true;
+      }
     }
-  }, [filteredAndSortedCards]);
+  }, []);
 
   return (
     <div className="w-full max-w-screen-xl mx-auto">
