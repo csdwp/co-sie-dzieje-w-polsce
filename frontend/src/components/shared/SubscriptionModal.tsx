@@ -10,6 +10,7 @@ import {
 import { useEffect, useState } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { useUser } from '@clerk/nextjs';
+import SubscriptionCard from './SubscriptionCard';
 import { STRIPE_CONFIG } from '@/lib/config';
 
 interface CheckoutSessionResponse {
@@ -64,7 +65,7 @@ const SubscriptionModal = ({ onClose }: { onClose: () => void }) => {
 
   return (
     <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className="overflow-auto w-11/12 h-fit lg:w-5/12 lg:h-fit !max-w-[1000px] !max-h-[800px] rounded-3xl flex flex-col gap-6 border-none">
+      <DialogContent className="overflow-auto w-11/12 h-fit lg:w-5/12 lg:h-fit !max-w-[1000px] max-h-11/12 rounded-3xl flex flex-col gap-6 border-none">
         <DialogHeader className="h-fit">
           <DialogTitle className="text-2xl font-bold leading-tight text-left">
             Odblokuj pełny dostęp do aktów prawnych – bez ograniczeń!
@@ -81,15 +82,13 @@ const SubscriptionModal = ({ onClose }: { onClose: () => void }) => {
   );
 };
 
-const ProductsWrapper = ({}: // plans,
-// handleSubscribe,
-{
+const ProductsWrapper = ({}: {
   plans: SubscriptionPlan[];
   handleSubscribe: (priceId: string) => void;
 }) => {
   return (
-    <div className="flex flex-col gap-4 text-left text-sm">
-      <div className="flex gap-4">
+    <div className="flex flex-col gap-4 text-left text-sm w-full">
+      <div className="max-sm:w-full max-sm:overflow-x-auto max-sm:p-8 max-sm:-m-8">
         {/* {plans.map(plan => (
           <Product
             key={plan.id}
@@ -97,13 +96,41 @@ const ProductsWrapper = ({}: // plans,
             handleSubscribe={handleSubscribe}
           />
         ))} */}
-        <button className="w-fit text-lg px-6 py-3 red-background-gloss font-semibold text-white rounded-lg shadow-none hover:shadow-2xl hover:shadow-red-500/60 focus:shadow-none active:shadow-none transition-shadow duration-300 cursor-pointer">
-          <div className="description Box-root text-start">
-            <h3>Subskrybuj</h3>
-            <p>Subskrypcja odnawia się automatycznie co miesiąc</p>
-            <p>Cena: 20 zł / miesiąc</p>
-          </div>
-        </button>
+        <div className="flex flex-row gap-4 items-end w-max sm:w-fit">
+          <SubscriptionCard
+            title="Plan Premium"
+            isBest={true}
+            maxWidth={300}
+            price={49}
+            options={[
+              {
+                option: 'Nielimitowany dostęp do aktów prawnych',
+                active: true,
+              },
+              { option: 'Dostęp do statystyk i kategorii', active: true },
+              { option: 'Aktualizacje na bieżąco', active: true },
+              { option: 'Wsparcie klienta', active: true },
+              { option: 'Dostęp mobilny', active: true },
+              { option: 'Funkcje premium w przyszłości', active: true },
+            ]}
+          />
+          <SubscriptionCard
+            title="Plan Podstawowy"
+            isBest={false}
+            price={29}
+            maxWidth={300}
+            options={[
+              {
+                option: 'Nielimitowany dostęp do aktów prawnych',
+                active: true,
+              },
+              { option: 'Dostęp do statystyk i kategorii', active: true },
+              { option: 'Aktualizacje na bieżąco', active: false },
+              { option: 'Wsparcie klienta', active: false },
+              { option: 'Dostęp mobilny', active: false },
+            ]}
+          />
+        </div>
       </div>
 
       <label className="flex items-start gap-2 cursor-pointer group">
