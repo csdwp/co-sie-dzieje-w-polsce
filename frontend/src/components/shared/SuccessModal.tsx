@@ -17,7 +17,7 @@ const SubscriptionModal = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const sessionId = searchParams.get('session_id');
+  const sessionId = searchParams?.get('session_id');
 
   useEffect(() => {
     if (sessionId) {
@@ -26,6 +26,7 @@ const SubscriptionModal = () => {
     } else {
       setIsOpen(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionId]);
 
   const onClose = () => {

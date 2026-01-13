@@ -10,7 +10,6 @@ import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
-  ChartTooltipContent,
 } from '@/components/ui/chart';
 import {
   CartesianGrid,
@@ -54,12 +53,26 @@ const truncatePartyName = (name: string): string => {
 };
 
 // Custom tooltip to show vote numbers with full party names
-const CustomTooltip = ({ active, payload }: any) => {
+interface TooltipPayloadEntry {
+  name: string;
+  value: number;
+  color: string;
+  payload: {
+    party: string;
+  };
+}
+
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: TooltipPayloadEntry[];
+}
+
+const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
   if (active && payload && payload.length) {
     return (
       <div className="bg-neutral-900 dark:bg-neutral-800 text-neutral-100 px-3 py-2 rounded-lg shadow-lg border border-neutral-700">
         <p className="font-semibold mb-1">{payload[0].payload.party}</p>
-        {payload.map((entry: any, index: number) => (
+        {payload.map((entry: TooltipPayloadEntry, index: number) => (
           <p key={index} className="text-sm" style={{ color: entry.color }}>
             {entry.name}: {entry.value} głosów
           </p>
@@ -71,7 +84,27 @@ const CustomTooltip = ({ active, payload }: any) => {
 };
 
 // Custom pie chart tooltip to show actual vote numbers
-const CustomPieTooltip = ({ active, payload, totalYes, totalNo }: any) => {
+interface PieTooltipPayloadEntry {
+  name: string;
+  value: number;
+  payload: {
+    fill: string;
+  };
+}
+
+interface CustomPieTooltipProps {
+  active?: boolean;
+  payload?: PieTooltipPayloadEntry[];
+  totalYes: number;
+  totalNo: number;
+}
+
+const CustomPieTooltip = ({
+  active,
+  payload,
+  totalYes,
+  totalNo,
+}: CustomPieTooltipProps) => {
   if (active && payload && payload.length) {
     const entry = payload[0];
     const isYes = entry.name === 'Za';
@@ -439,7 +472,11 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
                               {votes.summary.abstain}
                             </span>
                             <span className="text-xs text-neutral-600 dark:text-neutral-400">
-                              ({((votes.summary.abstain / votes.summary.total) * 100).toFixed(1)}%)
+                              {(
+                                (votes.summary.abstain / votes.summary.total) *
+                                100
+                              ).toFixed(1)}
+                              %
                             </span>
                           </div>
                         </div>
@@ -452,7 +489,11 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
                               {votes.summary.absent}
                             </span>
                             <span className="text-xs text-neutral-600 dark:text-neutral-400">
-                              ({((votes.summary.absent / votes.summary.total) * 100).toFixed(1)}%)
+                              {(
+                                (votes.summary.absent / votes.summary.total) *
+                                100
+                              ).toFixed(1)}
+                              %
                             </span>
                           </div>
                         </div>
@@ -462,7 +503,12 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
                           </span>
                           <div className="flex items-baseline gap-2">
                             <span className="text-2xl font-bold">
-                              {(((votes.summary.yes + votes.summary.no) / votes.summary.total) * 100).toFixed(1)}%
+                              {(
+                                ((votes.summary.yes + votes.summary.no) /
+                                  votes.summary.total) *
+                                100
+                              ).toFixed(1)}
+                              %
                             </span>
                           </div>
                         </div>
