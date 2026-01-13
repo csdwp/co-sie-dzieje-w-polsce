@@ -17,7 +17,7 @@ const SubscriptionModal = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const sessionId = searchParams.get('session_id');
+  const sessionId = searchParams?.get('session_id');
 
   useEffect(() => {
     if (sessionId) {
@@ -26,6 +26,7 @@ const SubscriptionModal = () => {
     } else {
       setIsOpen(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionId]);
 
   const onClose = () => {
@@ -65,7 +66,7 @@ const SubscriptionModal = () => {
       <Dialog open={true} onOpenChange={onClose}>
         <DialogContent className="overflow-auto w-6/12 h-fit !max-w-[1000px] !max-h-[800px] rounded-3xl flex flex-col gap-6 shadow-red-500/10">
           <DialogHeader className="h-fit">
-            <DialogTitle className="text-2xl font-bold leading-tight tracking-tighter text-left text-red-600">
+            <DialogTitle className="text-2xl font-bold leading-tight text-left text-red-600">
               Wystąpił błąd
             </DialogTitle>
             <DialogDescription className="text-base font-light dark:text-neutral-100 md:max-w-4/5 text-left">
@@ -91,7 +92,7 @@ const SubscriptionModal = () => {
       <DialogContent className="overflow-auto w-6/12 h-fit !max-w-[1000px] !max-h-[800px] rounded-3xl flex flex-col gap-6 shadow-red-500/10">
         <FixedElement />
         <DialogHeader className="h-fit">
-          <DialogTitle className="text-2xl font-bold leading-tight tracking-tighter text-left">
+          <DialogTitle className="text-2xl font-bold leading-tight text-left">
             Udało się! Masz subskrypcję! 🎉
           </DialogTitle>
           <DialogDescription className="text-base font-light dark:text-neutral-100 md:max-w-4/5 text-left">

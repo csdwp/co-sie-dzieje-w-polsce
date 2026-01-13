@@ -26,8 +26,8 @@ const DailyLimitModal = ({ onClose }: DailyLimitModalProps) => {
         className="overflow-auto w-11/12 h-fit lg:w-5/12 lg:h-fit !max-w-[600px] rounded-3xl flex flex-col gap-6 border-none"
       >
         <DialogHeader className="h-fit">
-          <DialogTitle className="text-2xl font-bold leading-tight tracking-tighter text-left">
-            🕐 Osiągnięto dzienny limit przeglądania
+          <DialogTitle className="text-2xl font-bold leading-tight text-left">
+            🕐 &nbsp;Osiągnięto dzienny limit przeglądania
           </DialogTitle>
           <DialogDescription
             data-testid="limit-message"
@@ -37,14 +37,15 @@ const DailyLimitModal = ({ onClose }: DailyLimitModalProps) => {
               <>
                 Wykorzystałeś swój dzienny limit{' '}
                 <strong>{AUTHENTICATED_DAILY_LIMIT} aktów prawnych</strong>.
+                <br />
                 Wróć jutro, aby kontynuować przeglądanie najnowszych zmian w
                 prawie.
               </>
             ) : (
               <>
                 Wykorzystałeś swój dzienny limit{' '}
-                <strong>{ANONYMOUS_DAILY_LIMIT} aktów prawnych</strong>. Zaloguj
-                się, aby zwiększyć limit do{' '}
+                <strong>{ANONYMOUS_DAILY_LIMIT} aktów prawnych</strong>.<br />
+                Zaloguj się, aby zwiększyć limit do{' '}
                 <strong>{AUTHENTICATED_DAILY_LIMIT} aktów dziennie</strong>, lub
                 wróć jutro!
               </>
@@ -55,11 +56,11 @@ const DailyLimitModal = ({ onClose }: DailyLimitModalProps) => {
         <div className="flex flex-col gap-4 text-left text-sm text-neutral-700 dark:text-neutral-300">
           <div className="bg-red-50 dark:bg-red-950/30 p-4 rounded-lg border border-red-200 dark:border-red-800">
             <h3 className="font-semibold mb-2 text-red-900 dark:text-red-100">
-              ℹ️ Dobre wiadomości!
+              ℹ️ &nbsp;Dobra wiadomość!
             </h3>
             <p>
               Twój limit odnawiany jest automatycznie{' '}
-              <strong>każdego dnia o północy</strong>. Wróć jutro, aby
+              <strong>każdego dnia o północy</strong>.<br /> Wróć jutro, aby
               kontynuować śledzenie zmian w polskim prawie.
             </p>
           </div>

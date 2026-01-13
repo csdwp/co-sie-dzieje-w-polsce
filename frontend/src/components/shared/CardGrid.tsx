@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useLayoutEffect } from 'react';
 import Masonry from 'react-masonry-css';
 import Card from '@/components/shared/Card';
 import DialogModal from '@/components/shared/DialogModal';
@@ -12,6 +12,7 @@ import { useModalLimit } from '@/app/hooks/useModalLimit';
 import { useUser } from '@clerk/nextjs';
 import SubscriptionModal from './SubscriptionModal';
 import DailyLimitModal from './DailyLimitModal';
+import { gsap } from 'gsap';
 import {
   CONFIDENCE_THRESHOLD,
   SUBSCRIPTIONS_ENABLED,
@@ -31,6 +32,8 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
   const { canOpen, registerOpen } = useModalLimit(
     user ? AUTHENTICATED_DAILY_LIMIT : ANONYMOUS_DAILY_LIMIT
   );
+  const cardsContainerRef = useRef<HTMLDivElement>(null);
+  const hasAnimated = useRef(false);
 
   const { acts } = data || {};
 
@@ -145,6 +148,42 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
   const handleCardDelete = (id: string | number) => {
     setDeletedIds(prev => new Set(prev).add(id));
   };
+
+  useLayoutEffect(() => {
+    if (cardsContainerRef.current && !hasAnimated.current) {
+      const animationTimeout = setTimeout(() => {
+        if (cardsContainerRef.current) {
+          const cards =
+            cardsContainerRef.current.querySelectorAll('[data-card]');
+
+          if (cards.length > 0) {
+            gsap.fromTo(
+              cards,
+              {
+                opacity: 0,
+                y: 50,
+              },
+              {
+                opacity: 1,
+                y: 0,
+                duration: 1.6,
+                ease: 'power3.out',
+                stagger: {
+                  amount: 0.8,
+                  from: 'start',
+                  each: 0.08,
+                },
+                delay: 0.6,
+              }
+            );
+            hasAnimated.current = true;
+          }
+        }
+      }, 100);
+
+      return () => clearTimeout(animationTimeout);
+    }
+  }, []);
 
   return (
     <div className="w-full max-w-screen-xl mx-auto">
@@ -348,41 +387,46 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
           </div>
         </div>
       )}
-      <Masonry
-        breakpointCols={breakpointColumnsObj}
-        className="flex w-fit justify-center relative max-w-full min-w-full"
-        columnClassName="flex flex-col gap-y-5 sm:px-2.5 max-[1201px]:!w-fit"
-      >
-        {filteredAndSortedCards
-          .filter((card: Act) => !deletedIds.has(card.id))
-          .map((card: Act) => (
-            <Card
-              key={card.id}
-              id={card.id}
-              title={card.title}
-              content={card.content}
-              summary={card.simple_title}
-              date={card.announcement_date}
-              categories={card.category ? [card.category] : []}
-              isImportant={
-                !!card.votes?.votesSupportByGroup?.government.yesPercentage
-              }
-              governmentPercentage={
-                card.votes?.votesSupportByGroup?.government.yesPercentage || 0
-              }
-              confidenceScore={card.confidence_score}
-              onClick={() => openModal(card)}
-              onDelete={handleCardDelete}
-            />
-          ))}
-        {filteredAndSortedCards.length === 0 && (
-          <>
-            <p className="text-center w-full col-span-full text-gradient-gloss">
-              Brak wyników wyszukiwania.
-            </p>
-          </>
-        )}
-      </Masonry>
+      <div ref={cardsContainerRef}>
+        <Masonry
+          breakpointCols={breakpointColumnsObj}
+          className="flex w-fit justify-center relative max-w-full min-w-full"
+          columnClassName="flex flex-col gap-y-5 sm:px-2.5 max-[1201px]:!w-fit"
+        >
+          {filteredAndSortedCards
+            .filter((card: Act) => !deletedIds.has(card.id))
+            .map((card: Act) => (
+              <div key={card.id} data-card>
+                <Card
+                  id={card.id}
+                  title={card.title}
+                  content={card.content}
+                  summary={card.simple_title}
+                  date={card.announcement_date}
+                  promulgation={card.promulgation}
+                  categories={card.category ? [card.category] : []}
+                  isImportant={
+                    !!card.votes?.votesSupportByGroup?.government.yesPercentage
+                  }
+                  governmentPercentage={
+                    card.votes?.votesSupportByGroup?.government.yesPercentage ||
+                    0
+                  }
+                  confidenceScore={card.confidence_score}
+                  onClick={() => openModal(card)}
+                  onDelete={handleCardDelete}
+                />
+              </div>
+            ))}
+          {filteredAndSortedCards.length === 0 && (
+            <>
+              <p className="text-center w-full col-span-full text-gradient-gloss">
+                Brak wyników wyszukiwania.
+              </p>
+            </>
+          )}
+        </Masonry>
+      </div>
 
       {selectedCard && (
         <DialogModal

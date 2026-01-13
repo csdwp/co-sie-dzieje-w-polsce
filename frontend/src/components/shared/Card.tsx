@@ -5,6 +5,7 @@ import { CardProps } from '@/types';
 import { Badge } from '@/components/ui/badge';
 import { useIsAdmin, isLowConfidence } from '@/lib/authHelpers';
 import { Trash2 } from 'lucide-react';
+import { getActStatus, getStatusColor } from '@/lib/statusHelpers';
 
 const Card = ({
   id,
@@ -12,6 +13,7 @@ const Card = ({
   content,
   summary,
   date,
+  promulgation,
   isImportant = false,
   onClick,
   categories = [],
@@ -19,23 +21,33 @@ const Card = ({
   confidenceScore,
   onDelete,
 }: CardProps) => {
+  const status = getActStatus(date, promulgation);
   const containerRef = useRef<HTMLDivElement>(null);
   const [totalDots, setTotalDots] = useState(14);
 
-  const updateTotalDots = () => {
-    if (!containerRef.current) return;
-    const width = containerRef.current.offsetWidth;
-    const dotWidth = 8;
-    const desiredGap = 8;
-    const N = Math.round((width + desiredGap) / (dotWidth + desiredGap));
-    setTotalDots(Math.max(10, N));
-  };
-
   useEffect(() => {
-    window.addEventListener('resize', updateTotalDots);
+    if (!containerRef.current) return;
+
+    const updateTotalDots = () => {
+      if (!containerRef.current) return;
+      const width = containerRef.current.offsetWidth;
+      const dotWidth = 8;
+      const desiredGap = 8;
+      const N = Math.round((width + desiredGap) / (dotWidth + desiredGap));
+      setTotalDots(Math.max(10, N));
+    };
+
+    const resizeObserver = new ResizeObserver(() => {
+      updateTotalDots();
+    });
+
+    resizeObserver.observe(containerRef.current);
+
     updateTotalDots();
 
-    return () => window.removeEventListener('resize', updateTotalDots);
+    return () => {
+      resizeObserver.disconnect();
+    };
   }, []);
 
   const governmentDots = Math.round((governmentPercentage / 100) * totalDots);
@@ -100,14 +112,24 @@ const Card = ({
     <div
       onClick={onClick}
       data-testid="act-card"
-      className={`bg-neutral-700/10 dark:bg-neutral-800/40 mx-auto max-w-11/12 sm:max-w-80 flex flex-col gap-3 p-5 rounded-3xl shadow-xl cursor-pointer hover:ring-2 
-      dark:hover:ring-neutral-100 hover:ring-neutral-300 hover:!border-transparent transition-all duration-300 h-fit w-full
+      className={`bg-neutral-700/10 dark:bg-neutral-800/40 mx-auto max-w-11/12 sm:max-w-80 flex flex-col gap-3 p-5 rounded-3xl shadow-xl cursor-pointer group hover:translate-y-[-2px]
+      transition-transform duration-300 h-fit w-full
       ${isImportant && 'border-2 border-red-500/70 shadow-red-500/10'}
       ${isDeleting && 'opacity-50 pointer-events-none animate-pulse'}`}
     >
       <div className="flex items-center justify-between">
-        <div className="dark:text-neutral-600 text-neutral-500 text-xs">
-          {formattedDate}
+        <div className="flex items-center gap-2">
+          <div className="dark:text-neutral-600 text-neutral-500 dark:group-hover:text-neutral-100 group-hover:text-neutral-900 transition-colors duration-400 text-xs">
+            {formattedDate}
+          </div>
+          {status !== 'Nieznany' && (
+            <Badge
+              variant="outline"
+              className={`text-[10px] px-1.5 py-0 ${getStatusColor(status)}`}
+            >
+              {status}
+            </Badge>
+          )}
         </div>
         <div className="flex items-center gap-2">
           {isAdmin && needsVerification && (
@@ -135,14 +157,14 @@ const Card = ({
       </div>
       <h3
         data-testid="act-title"
-        className="text-lg leading-snug font-semibold tracking-tight line-clamp-3 -mt-2.5"
+        className="text-lg leading-snug font-semibold line-clamp-3 -mt-2.5"
       >
         {stripDateFromTitle(title)}
       </h3>
-      <div className="dark:text-neutral-600 text-neutral-500 text-xs">
+      <div className="dark:text-neutral-600 text-neutral-500 dark:group-hover:text-neutral-100 group-hover:text-neutral-900 transition-colors duration-400 text-xs">
         W skrócie
       </div>
-      <div className="text-sm text-muted-foreground leading-snug line-clamp-4 text-gradient-gloss font-medium -mt-2.5">
+      <div className="text-base text-muted-foreground leading-snug line-clamp-4 text-gradient-gloss font-medium -mt-2.5">
         &quot;{summary}&quot;
       </div>
       {categories.length > 0 && (
@@ -162,7 +184,7 @@ const Card = ({
       </p>
       {governmentPercentage > 0 && (
         <>
-          <div className="dark:text-neutral-600 text-neutral-500 text-xs">
+          <div className="dark:text-neutral-600 text-neutral-500 dark:group-hover:text-neutral-100 group-hover:text-neutral-900 transition-colors duration-400 text-xs">
             Rozkład głosów &quot;za&quot;
           </div>
           <div className="flex flex-col items-center gap-1 -mt-1.5">
@@ -180,7 +202,7 @@ const Card = ({
                 ></div>
               ))}
             </div>
-            <div className="flex justify-between w-full dark:text-neutral-600 text-neutral-500 text-xs">
+            <div className="flex justify-between w-full dark:text-neutral-600 text-neutral-500 dark:group-hover:text-neutral-100 group-hover:text-neutral-900 transition-colors duration-400 text-xs">
               <span>Rządz.</span>
               <span>Opoz.</span>
             </div>
