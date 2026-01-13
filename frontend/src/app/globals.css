@@ -163,7 +163,7 @@
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  animation: gloss 5s ease-in-out infinite;
+  animation: gloss 3s ease-in-out infinite;
 }
 
 .text-gradient-gloss {
@@ -178,5 +178,5 @@
 .red-background-gloss {
   background: linear-gradient(410deg, #b91c1c, #f35757, #b91c1c);
   background-size: 300% 100%;
-  animation: gloss 5s ease-in-out infinite;
+  animation: gloss 3s ease-in-out infinite;
 }

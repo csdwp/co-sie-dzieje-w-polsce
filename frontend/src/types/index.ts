@@ -91,21 +91,25 @@ export interface ActsAndKeywordsResponse {
 }
 
 export interface CardProps {
+  id: string | number;
   title: string;
   content?: string;
   summary?: string;
   date: string;
+  promulgation?: string;
   isImportant?: boolean;
   onClick: () => void;
   categories?: string[];
   governmentPercentage: number;
   confidenceScore?: number | null;
+  onDelete?: (id: string | number) => void;
 }
 
 export interface DialogModalProps {
   isOpen: boolean;
   onClose: () => void;
   card: {
+    id: string | number;
     title: string;
     content: string;
     announcement_date: string;
@@ -178,6 +182,7 @@ export interface DatabaseAct {
   created_at: Date;
   updated_at: Date;
   ingested_at: Date | null;
+  deleted_at: Date | null;
 }
 
 export interface DatabaseCategory {

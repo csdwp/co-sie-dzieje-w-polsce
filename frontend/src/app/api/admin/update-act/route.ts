@@ -2,11 +2,13 @@ import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { createClerkClient } from '@clerk/backend';
 import { z } from 'zod';
-import { PrismaClient, Prisma } from '@prisma/client';
+import { PrismaClient, Prisma, acts } from '@prisma/client';
+import sanitizeHtml from 'sanitize-html';
+import { CLERK_CONFIG, DEPLOYMENT_CONFIG } from '@/lib/config';
 
 const prisma = new PrismaClient();
 const clerkClient = createClerkClient({
-  secretKey: process.env.CLERK_SECRET_KEY,
+  secretKey: CLERK_CONFIG.secretKey,
 });
 
 const updateActSchema = z.object({
@@ -63,6 +65,18 @@ export const POST = async (
       );
     }
 
+    const sanitizeOptions = {
+      allowedTags: ['p', 'ul', 'li', 'strong', 'em', 'br'],
+      allowedAttributes: {},
+    };
+
+    if (validatedData.content !== undefined) {
+      validatedData.content = sanitizeHtml(
+        validatedData.content,
+        sanitizeOptions
+      );
+    }
+
     try {
       const existingAct = await prisma.acts.findUnique({
         where: { id: validatedData.actId },
@@ -75,8 +89,9 @@ export const POST = async (
         );
       }
 
-      const updateData: Record<string, unknown> = {
-        confidence_score: new Prisma.Decimal(9.99),
+      const updateData: Prisma.actsUpdateInput = {
+        confidence_score: new Prisma.Decimal(0.99),
+        updated_at: new Date(),
       };
 
       if (validatedData.content !== undefined) {
@@ -89,15 +104,13 @@ export const POST = async (
         updateData.impact_section = validatedData.impactSection;
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const updatedAct: any = await prisma.acts.update({
+      const updatedAct: acts = await prisma.acts.update({
         where: { id: validatedData.actId },
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        data: updateData as any,
+        data: updateData,
       });
 
       try {
-        const deployHookUrl = process.env.VERCEL_DEPLOY_HOOK_URL;
+        const deployHookUrl = DEPLOYMENT_CONFIG.vercelDeployHookUrl;
 
         if (deployHookUrl) {
           fetch(deployHookUrl, {
@@ -125,7 +138,26 @@ export const POST = async (
         },
       });
     } catch (dbError) {
-      console.error('Database error:', dbError);
+      if (dbError instanceof Prisma.PrismaClientKnownRequestError) {
+        console.error('Database error details:', {
+          message: dbError.message,
+          code: dbError.code,
+          meta: dbError.meta,
+        });
+        return NextResponse.json(
+          {
+            success: false,
+            message: 'Database error',
+            details:
+              DEPLOYMENT_CONFIG.nodeEnv === 'development'
+                ? dbError.message
+                : undefined,
+          },
+          { status: 500 }
+        );
+      }
+
+      console.error('Unexpected database error:', dbError);
       return NextResponse.json(
         { success: false, message: 'Database error' },
         { status: 500 }

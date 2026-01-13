@@ -11,6 +11,7 @@ import { useEffect, useState } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { useUser } from '@clerk/nextjs';
 import SubscriptionCard from './SubscriptionCard';
+import { STRIPE_CONFIG } from '@/lib/config';
 
 interface CheckoutSessionResponse {
   sessionId: string;
@@ -25,9 +26,7 @@ interface SubscriptionPlan {
   price_id: string;
 }
 
-const stripePromise = loadStripe(
-  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
-);
+const stripePromise = loadStripe(STRIPE_CONFIG.publishableKey!);
 
 const SubscriptionModal = ({ onClose }: { onClose: () => void }) => {
   const [plans, setPlans] = useState([]);
@@ -68,7 +67,7 @@ const SubscriptionModal = ({ onClose }: { onClose: () => void }) => {
     <Dialog open={true} onOpenChange={onClose}>
       <DialogContent className="overflow-auto w-11/12 h-fit lg:w-5/12 lg:h-fit !max-w-[1000px] max-h-11/12 rounded-3xl flex flex-col gap-6 border-none">
         <DialogHeader className="h-fit">
-          <DialogTitle className="text-2xl font-bold leading-tight tracking-tighter text-left">
+          <DialogTitle className="text-2xl font-bold leading-tight text-left">
             Odblokuj pełny dostęp do aktów prawnych – bez ograniczeń!
           </DialogTitle>
           <DialogDescription className="text-base font-light dark:text-neutral-100 md:max-w-4/5 text-left">
@@ -83,8 +82,7 @@ const SubscriptionModal = ({ onClose }: { onClose: () => void }) => {
   );
 };
 
-const ProductsWrapper = ({}:
-{
+const ProductsWrapper = ({}: {
   plans: SubscriptionPlan[];
   handleSubscribe: (priceId: string) => void;
 }) => {
@@ -105,7 +103,10 @@ const ProductsWrapper = ({}:
             maxWidth={300}
             price={49}
             options={[
-              { option: 'Nielimitowany dostęp do aktów prawnych', active: true },
+              {
+                option: 'Nielimitowany dostęp do aktów prawnych',
+                active: true,
+              },
               { option: 'Dostęp do statystyk i kategorii', active: true },
               { option: 'Aktualizacje na bieżąco', active: true },
               { option: 'Wsparcie klienta', active: true },
@@ -113,20 +114,23 @@ const ProductsWrapper = ({}:
               { option: 'Funkcje premium w przyszłości', active: true },
             ]}
           />
-        <SubscriptionCard
-          title="Plan Podstawowy"
-          isBest={false}
-          price={29}
-          maxWidth={300}
-          options={[
-            { option: 'Nielimitowany dostęp do aktów prawnych', active: true },
-            { option: 'Dostęp do statystyk i kategorii', active: true },
-            { option: 'Aktualizacje na bieżąco', active: false },
-            { option: 'Wsparcie klienta', active: false },
-            { option: 'Dostęp mobilny', active: false },
-          ]}
-        />
-      </div>
+          <SubscriptionCard
+            title="Plan Podstawowy"
+            isBest={false}
+            price={29}
+            maxWidth={300}
+            options={[
+              {
+                option: 'Nielimitowany dostęp do aktów prawnych',
+                active: true,
+              },
+              { option: 'Dostęp do statystyk i kategorii', active: true },
+              { option: 'Aktualizacje na bieżąco', active: false },
+              { option: 'Wsparcie klienta', active: false },
+              { option: 'Dostęp mobilny', active: false },
+            ]}
+          />
+        </div>
       </div>
 
       <label className="flex items-start gap-2 cursor-pointer group">

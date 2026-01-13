@@ -54,6 +54,9 @@ export const getActsAndKeywords =
     try {
       const [prismaActs, prismaCategories] = await Promise.all([
         prisma.acts.findMany({
+          where: {
+            deleted_at: null,
+          },
           select: actSelect,
         }),
         prisma.category.findMany({
