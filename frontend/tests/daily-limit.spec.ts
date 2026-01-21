@@ -20,7 +20,7 @@ test.describe('Daily reading limit', () => {
     await firstCard.click();
     await expect(page.locator('[data-testid="limit-modal"]')).toBeVisible();
     await expect(page.locator('[data-testid="limit-message"]')).toContainText(
-      '3 legal acts'
+      '3 aktów prawnych'
     );
   });
 });
