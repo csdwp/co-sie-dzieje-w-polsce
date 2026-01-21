@@ -1,10 +1,6 @@
 import React from 'react';
 import { useUser } from '@clerk/nextjs';
-
-type DarkModeProps = {
-  isDarkMode: boolean;
-  toggleDarkMode: () => void;
-};
+import { DarkModeProps } from '@/types';
 
 const DarkMode = ({ isDarkMode, toggleDarkMode }: DarkModeProps) => {
   const { isSignedIn } = useUser();

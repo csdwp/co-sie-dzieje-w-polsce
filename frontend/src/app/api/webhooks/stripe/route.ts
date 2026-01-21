@@ -2,10 +2,11 @@ import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClerkClient } from '@clerk/backend';
+import { CLERK_CONFIG, STRIPE_CONFIG } from '@/lib/config';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+const stripe = new Stripe(STRIPE_CONFIG.secretKey!);
 const clerkClient = createClerkClient({
-  secretKey: process.env.CLERK_SECRET_KEY,
+  secretKey: CLERK_CONFIG.secretKey,
 });
 
 export async function POST(req: Request) {
@@ -17,7 +18,7 @@ export async function POST(req: Request) {
     event = stripe.webhooks.constructEvent(
       body,
       sig,
-      process.env.STRIPE_WEBHOOK_SECRET!
+      STRIPE_CONFIG.webhookSecret!
     );
   } catch (err) {
     console.error('❌ Invalid signature', err);

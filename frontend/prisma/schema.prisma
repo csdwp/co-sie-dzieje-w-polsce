@@ -9,25 +9,38 @@ datasource db {
 
 model acts {
   id                Int       @id @default(autoincrement())
-  title             String
+  title             String?
   act_number        String?
   simple_title      String?
   content           String?
-  refs              String[]
-  texts             String[]
-  item_type         String?
+  refs              Json?
+  texts             Json?
+  item_type         String?   @db.VarChar(50)
   announcement_date DateTime? @db.Date
-  change_date       DateTime? @db.Date
+  change_date       DateTime? @db.Timestamp(6)
   promulgation      DateTime? @db.Date
-  item_status       String?
+  item_status       String?   @db.VarChar(50)
   comments          String?
   keywords          String[]
   file              String?
   votes             Json?
   category          String?
+  idempotency_key   String?   @unique @db.VarChar(255)
+  impact_section    String?
+  confidence_score  Decimal?  @db.Decimal(3, 2)
+  needs_reprocess   Boolean   @default(false)
+  created_at        DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at        DateTime  @updatedAt @db.Timestamptz(6)
+  ingested_at       DateTime? @db.Timestamptz(6)
+  deleted_at        DateTime? @db.Timestamptz(6)
 }
 
 model category {
-  category          String    @id
-  keywords          String[]  @default([])
+  id       Int     @id @default(autoincrement())
+  category String?
+  keywords Json?   @db.Json
+}
+
+model keywords {
+  keyword String @id
 }

@@ -1,0 +1,54 @@
+---
+alwaysApply: true
+---
+
+# AI Rules for Co się dzieje w polsce
+
+**Co się dzieje w Polsce?** (What's happening in Poland?) is a civic engagement
+platform that delivers clear, accessible summaries of the most important laws
+and regulations published in Poland. The system fetches legal act metadata from
+the government API, generates simplified summaries using LLM models, and
+presents them to users with links to original PDF documents.
+
+## Tech Stack
+
+- Next.js 15 (SSG + API routes)
+- React 19
+- TypeScript 5
+- Tailwind CSS 4
+- Shadcn UI
+- Clerk (auth)
+- Prisma 6 (build time only)
+- Python 3.10+
+- OpenAI SDK
+- psycopg2 (PostgreSQL)
+- smtplib (email)
+- Neon DB (PostgreSQL)
+
+## Project Structure
+
+When introducing changes to the project, always follow the directory structure
+below:
+
+- `./frontend/` - Next.js folder
+- `./frontend/prisma` - Frontend prisma db schema
+- `./frontend/public` - Frontend icons and images
+- `./frontend/components` - Client-side components written in React
+- `./backend/` - Python script's folder
+
+When modifying the directory structure, always update this section.
+
+## Coding practices
+
+### Guidelines for clean code
+
+- Use feedback from linters to improve the code when making changes.
+- Prioritize error handling and edge cases.
+- Handle errors and edge cases at the beginning of functions.
+- Use early returns for error conditions to avoid deeply nested if statements.
+- Place the happy path last in the function for improved readability.
+- Avoid unnecessary else statements; use if-return pattern instead.
+- Use guard clauses to handle preconditions and invalid states early.
+- Implement proper error logging and user-friendly error messages.
+- Consider using custom error types or error factories for consistent error
+  handling.

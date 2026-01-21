@@ -1,0 +1,8 @@
+[MASTER]
+ignore=.venv,venv,__pycache__,.mypy_cache,frontend,scripts
+
+[MESSAGES CONTROL]
+disable=C0111,C0103,R0903,W0212
+
+[FORMAT]
+max-line-length=88

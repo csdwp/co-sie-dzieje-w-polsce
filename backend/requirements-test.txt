@@ -1,0 +1,17 @@
+requests
+python-dotenv
+psycopg2-binary
+tenacity
+openai
+langchain
+langchain-community
+langchain-openai
+tiktoken
+PyMuPDF
+types-requests
+mypy
+pytest
+black
+isort
+flake8
+python-logging-loki

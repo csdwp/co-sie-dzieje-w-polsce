@@ -1,22 +1,24 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useLayoutEffect } from 'react';
 import Masonry from 'react-masonry-css';
 import Card from '@/components/shared/Card';
 import DialogModal from '@/components/shared/DialogModal';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 import 'swiper/css';
-import { ActsAndKeywordsResponse, Act } from '@/app/lib/types';
+import { Act, CardGridProps } from '@/types';
 import { useModalLimit } from '@/app/hooks/useModalLimit';
 import { useUser } from '@clerk/nextjs';
 import SubscriptionModal from './SubscriptionModal';
-
-type CardGridProps = {
-  searchQuery: string;
-  selectedTypes: string[];
-  data: ActsAndKeywordsResponse;
-};
+import DailyLimitModal from './DailyLimitModal';
+import { gsap } from 'gsap';
+import {
+  CONFIDENCE_THRESHOLD,
+  SUBSCRIPTIONS_ENABLED,
+  ANONYMOUS_DAILY_LIMIT,
+  AUTHENTICATED_DAILY_LIMIT,
+} from '@/lib/config';
 
 const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
   const [selectedCard, setSelectedCard] = useState<Act | null>(null);
@@ -24,9 +26,14 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
   const [isFilterOptionsOpen, setIsFilterOptionsOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [sortByTitle, setSortByTitle] = useState<'asc' | 'desc' | null>(null);
-  const [subscriptionModal, setSubscriptionModal] = useState<boolean>(false);
+  const [limitModal, setLimitModal] = useState<boolean>(false);
+  const [deletedIds, setDeletedIds] = useState<Set<string | number>>(new Set());
   const { user } = useUser();
-  const { canOpen, registerOpen } = useModalLimit(user ? 5 : 3);
+  const { canOpen, registerOpen } = useModalLimit(
+    user ? AUTHENTICATED_DAILY_LIMIT : ANONYMOUS_DAILY_LIMIT
+  );
+  const cardsContainerRef = useRef<HTMLDivElement>(null);
+  const hasAnimated = useRef(false);
 
   const { acts } = data || {};
 
@@ -55,6 +62,8 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
     setSortOrder('desc');
   };
 
+  const isAdmin = user?.publicMetadata?.role === 'admin';
+
   const baseFilteredActs = useMemo(() => {
     if (!acts) return [];
 
@@ -67,9 +76,15 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
 
       const matchesType = selectedTypes.includes(card.item_type);
 
-      return matchesQuery && matchesType;
+      const confidenceCheck =
+        isAdmin ||
+        card.confidence_score === null ||
+        card.confidence_score === undefined ||
+        card.confidence_score >= CONFIDENCE_THRESHOLD;
+
+      return matchesQuery && matchesType && confidenceCheck;
     });
-  }, [acts, searchQuery, selectedTypes]);
+  }, [acts, searchQuery, selectedTypes, isAdmin]);
 
   const availableCategories = useMemo(() => {
     if (!baseFilteredActs.length) return [];
@@ -114,7 +129,7 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
 
   const openModal = (card: Act) => {
     if (!canOpen) {
-      setSubscriptionModal(true);
+      setLimitModal(true);
       return;
     }
 
@@ -126,9 +141,49 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
     setSelectedCard(null);
   };
 
-  const handleCloseSubscriptionModal = () => {
-    setSubscriptionModal(false);
+  const handleCloseLimitModal = () => {
+    setLimitModal(false);
   };
+
+  const handleCardDelete = (id: string | number) => {
+    setDeletedIds(prev => new Set(prev).add(id));
+  };
+
+  useLayoutEffect(() => {
+    if (cardsContainerRef.current && !hasAnimated.current) {
+      const animationTimeout = setTimeout(() => {
+        if (cardsContainerRef.current) {
+          const cards =
+            cardsContainerRef.current.querySelectorAll('[data-card]');
+
+          if (cards.length > 0) {
+            gsap.fromTo(
+              cards,
+              {
+                opacity: 0,
+                y: 50,
+              },
+              {
+                opacity: 1,
+                y: 0,
+                duration: 1.6,
+                ease: 'power3.out',
+                stagger: {
+                  amount: 0.8,
+                  from: 'start',
+                  each: 0.08,
+                },
+                delay: 0.6,
+              }
+            );
+            hasAnimated.current = true;
+          }
+        }
+      }, 100);
+
+      return () => clearTimeout(animationTimeout);
+    }
+  }, []);
 
   return (
     <div className="w-full max-w-screen-xl mx-auto">
@@ -332,42 +387,53 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
           </div>
         </div>
       )}
-      <Masonry
-        breakpointCols={breakpointColumnsObj}
-        className="flex w-fit justify-center relative max-w-full min-w-full"
-        columnClassName="flex flex-col gap-y-5 sm:px-2.5 max-[1201px]:!w-fit"
-      >
-        {filteredAndSortedCards.map((card: Act) => (
-          <Card
-            key={card.id}
-            title={card.title}
-            content={card.content}
-            summary={card.simple_title}
-            date={card.announcement_date}
-            categories={card.category ? [card.category] : []}
-            isImportant={
-              !!card.votes?.votesSupportByGroup?.government.yesPercentage
-            }
-            governmentPercentage={
-              card.votes?.votesSupportByGroup?.government.yesPercentage || 0
-            }
-            onClick={() => openModal(card)}
-          />
-        ))}
-        {filteredAndSortedCards.length === 0 && (
-          <>
-            <p className="text-center w-full col-span-full text-gradient-gloss">
-              Brak wyników wyszukiwania.
-            </p>
-          </>
-        )}
-      </Masonry>
+      <div ref={cardsContainerRef}>
+        <Masonry
+          breakpointCols={breakpointColumnsObj}
+          className="flex w-fit justify-center relative max-w-full min-w-full"
+          columnClassName="flex flex-col gap-y-5 sm:px-2.5 max-[1201px]:!w-fit"
+        >
+          {filteredAndSortedCards
+            .filter((card: Act) => !deletedIds.has(card.id))
+            .map((card: Act) => (
+              <div key={card.id} data-card>
+                <Card
+                  id={card.id}
+                  title={card.title}
+                  content={card.content}
+                  summary={card.simple_title}
+                  date={card.announcement_date}
+                  promulgation={card.promulgation}
+                  categories={card.category ? [card.category] : []}
+                  isImportant={
+                    !!card.votes?.votesSupportByGroup?.government.yesPercentage
+                  }
+                  governmentPercentage={
+                    card.votes?.votesSupportByGroup?.government.yesPercentage ||
+                    0
+                  }
+                  confidenceScore={card.confidence_score}
+                  onClick={() => openModal(card)}
+                  onDelete={handleCardDelete}
+                />
+              </div>
+            ))}
+          {filteredAndSortedCards.length === 0 && (
+            <>
+              <p className="text-center w-full col-span-full text-gradient-gloss">
+                Brak wyników wyszukiwania.
+              </p>
+            </>
+          )}
+        </Masonry>
+      </div>
 
       {selectedCard && (
         <DialogModal
           isOpen={selectedCard !== null}
           onClose={closeModal}
           card={{
+            id: selectedCard.id,
             title: selectedCard.title,
             content: selectedCard.content ?? '',
             announcement_date: selectedCard.announcement_date,
@@ -376,12 +442,16 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
             categories: selectedCard.category ? [selectedCard.category] : [],
             votes: (selectedCard as Act).votes ?? {},
             url: (selectedCard as Act).file ?? '',
+            confidence_score: selectedCard.confidence_score,
           }}
         />
       )}
-      {subscriptionModal && (
-        <SubscriptionModal onClose={handleCloseSubscriptionModal} />
-      )}
+      {limitModal &&
+        (SUBSCRIPTIONS_ENABLED ? (
+          <SubscriptionModal onClose={handleCloseLimitModal} />
+        ) : (
+          <DailyLimitModal onClose={handleCloseLimitModal} />
+        ))}
     </div>
   );
 };
