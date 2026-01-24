@@ -48,3 +48,5 @@ backend/app/logs/app.log
 backend/.coverage
 backend/app/logs/app.log
 backend/test.env
+
+CLAUDE.md
