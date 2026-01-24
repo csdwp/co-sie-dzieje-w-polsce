@@ -9,7 +9,6 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { ANONYMOUS_DAILY_LIMIT, AUTHENTICATED_DAILY_LIMIT } from '@/lib/config';
-import { useUser } from '@clerk/nextjs';
 import { SignInButton } from '@clerk/nextjs';
 
 interface DailyLimitModalProps {
@@ -17,8 +16,6 @@ interface DailyLimitModalProps {
 }
 
 const DailyLimitModal = ({ onClose }: DailyLimitModalProps) => {
-  const { isSignedIn } = useUser();
-
   return (
     <Dialog open={true} onOpenChange={onClose}>
       <DialogContent
@@ -33,23 +30,11 @@ const DailyLimitModal = ({ onClose }: DailyLimitModalProps) => {
             data-testid="limit-message"
             className="text-base font-light dark:text-neutral-100 md:max-w-4/5 text-left"
           >
-            {isSignedIn ? (
-              <>
-                Wykorzystałeś swój dzienny limit{' '}
-                <strong>{AUTHENTICATED_DAILY_LIMIT} aktów prawnych</strong>.
-                <br />
-                Wróć jutro, aby kontynuować przeglądanie najnowszych zmian w
-                prawie.
-              </>
-            ) : (
-              <>
-                Wykorzystałeś swój dzienny limit{' '}
-                <strong>{ANONYMOUS_DAILY_LIMIT} aktów prawnych</strong>.<br />
-                Zaloguj się, aby zwiększyć limit do{' '}
-                <strong>{AUTHENTICATED_DAILY_LIMIT} aktów dziennie</strong>, lub
-                wróć jutro!
-              </>
-            )}
+            Wykorzystałeś swój dzienny limit{' '}
+            <strong>{ANONYMOUS_DAILY_LIMIT} aktów prawnych</strong>.<br />
+            Zaloguj się, aby zwiększyć limit do{' '}
+            <strong>{AUTHENTICATED_DAILY_LIMIT} aktów dziennie</strong>, lub
+            wróć jutro!
           </DialogDescription>
         </DialogHeader>
 
@@ -60,25 +45,23 @@ const DailyLimitModal = ({ onClose }: DailyLimitModalProps) => {
             </h3>
             <p>
               Twój limit odnawiany jest automatycznie{' '}
-              <strong>każdego dnia o północy</strong>.<br /> Wróć jutro, aby
+              <strong>co 24 godziny</strong>.<br /> Wróć później, aby
               kontynuować śledzenie zmian w polskim prawie.
             </p>
           </div>
         </div>
 
         <DialogFooter className="flex flex-col sm:flex-row gap-3 w-full">
-          {!isSignedIn && (
-            <SignInButton mode="modal">
-              <button className="w-full sm:w-auto px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors duration-200">
-                Zaloguj się ({AUTHENTICATED_DAILY_LIMIT} aktów/dzień)
-              </button>
-            </SignInButton>
-          )}
+          <SignInButton mode="modal">
+            <button className="w-full sm:w-auto px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors duration-200">
+              Zaloguj się ({AUTHENTICATED_DAILY_LIMIT} aktów/dzień)
+            </button>
+          </SignInButton>
           <button
             onClick={onClose}
             className="w-full sm:w-auto px-6 py-3 bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 dark:hover:bg-neutral-600 text-neutral-900 dark:text-neutral-100 font-semibold rounded-lg transition-colors duration-200"
           >
-            {isSignedIn ? 'Zamknij' : 'Wrócę jutro'}
+            Wrócę później
           </button>
         </DialogFooter>
       </DialogContent>

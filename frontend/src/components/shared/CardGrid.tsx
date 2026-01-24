@@ -15,7 +15,6 @@ import DailyLimitModal from './DailyLimitModal';
 import { gsap } from 'gsap';
 import {
   CONFIDENCE_THRESHOLD,
-  SUBSCRIPTIONS_ENABLED,
   ANONYMOUS_DAILY_LIMIT,
   AUTHENTICATED_DAILY_LIMIT,
 } from '@/lib/config';
@@ -447,7 +446,7 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
         />
       )}
       {limitModal &&
-        (SUBSCRIPTIONS_ENABLED ? (
+        (user ? (
           <SubscriptionModal onClose={handleCloseLimitModal} />
         ) : (
           <DailyLimitModal onClose={handleCloseLimitModal} />

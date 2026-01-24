@@ -7,7 +7,6 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
-import { useEffect, useState } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { useUser } from '@clerk/nextjs';
 import SubscriptionCard from './SubscriptionCard';
@@ -17,26 +16,10 @@ interface CheckoutSessionResponse {
   sessionId: string;
 }
 
-interface SubscriptionPlan {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  interval: string;
-  price_id: string;
-}
-
 const stripePromise = loadStripe(STRIPE_CONFIG.publishableKey!);
 
 const SubscriptionModal = ({ onClose }: { onClose: () => void }) => {
-  const [plans, setPlans] = useState([]);
   const { user } = useUser();
-
-  useEffect(() => {
-    fetch('/api/subscription-plans')
-      .then(res => res.json())
-      .then(data => setPlans(data));
-  }, []);
 
   const handleSubscribe = async (priceId: string): Promise<void> => {
     const stripe = await stripePromise;
@@ -73,35 +56,31 @@ const SubscriptionModal = ({ onClose }: { onClose: () => void }) => {
           <DialogDescription className="text-base font-light dark:text-neutral-100 md:max-w-4/5 text-left">
             Z subskrypcją zyskasz nielimitowany dostęp do pełnych i skróconych
             aktów prawnych, statystyk, kategorii oraz cennych informacji – bez
-            limitu 3 aktów dziennie. Oszczędzaj czas i bądź na bieżąco z prawem!
+            limitu 5 aktów dziennie. Oszczędzaj czas i bądź na bieżąco z prawem!
           </DialogDescription>
         </DialogHeader>
-        <ProductsWrapper plans={plans} handleSubscribe={handleSubscribe} />
+        <ProductsWrapper handleSubscribe={handleSubscribe} />
       </DialogContent>
     </Dialog>
   );
 };
 
-const ProductsWrapper = ({}: {
-  plans: SubscriptionPlan[];
+const ProductsWrapper = ({
+  handleSubscribe,
+}: {
   handleSubscribe: (priceId: string) => void;
 }) => {
   return (
     <div className="flex flex-col gap-4 text-left text-sm w-full">
       <div className="max-sm:w-full max-sm:overflow-x-auto max-sm:p-8 max-sm:-m-8">
-        {/* {plans.map(plan => (
-          <Product
-            key={plan.id}
-            plan={plan}
-            handleSubscribe={handleSubscribe}
-          />
-        ))} */}
         <div className="flex flex-row gap-4 items-end w-max sm:w-fit">
           <SubscriptionCard
             title="Plan Premium"
             isBest={true}
             maxWidth={300}
             price={49}
+            priceId={process.env.NEXT_PUBLIC_STRIPE_PRICE_PREMIUM}
+            onSubscribe={handleSubscribe}
             options={[
               {
                 option: 'Nielimitowany dostęp do aktów prawnych',
@@ -119,6 +98,8 @@ const ProductsWrapper = ({}: {
             isBest={false}
             price={29}
             maxWidth={300}
+            priceId={process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC}
+            onSubscribe={handleSubscribe}
             options={[
               {
                 option: 'Nielimitowany dostęp do aktów prawnych',
@@ -169,31 +150,5 @@ const ProductsWrapper = ({}: {
     </div>
   );
 };
-
-// Im leaving this because we gonna use it later
-
-// const Product = ({
-//   plan,
-//   handleSubscribe,
-// }: {
-//   plan: SubscriptionPlan;
-//   handleSubscribe: (priceId: string) => void;
-// }) => {
-//   return (
-//     <button
-//       key={plan.id}
-//       className="w-fit text-lg px-6 py-3 red-background-gloss font-semibold text-white rounded-lg shadow-none hover:shadow-2xl hover:shadow-red-500/60 focus:shadow-none active:shadow-none transition-shadow duration-300 cursor-pointer"
-//       onClick={() => handleSubscribe(plan.price_id)}
-//     >
-//       <div className="description Box-root text-start">
-//         <h3>{plan.name}</h3>
-//         <p>{plan.description}</p>
-//         <p>
-//           Cena: ${plan.price / 100} / {plan.interval}
-//         </p>
-//       </div>
-//     </button>
-//   );
-// };
 
 export default SubscriptionModal;
