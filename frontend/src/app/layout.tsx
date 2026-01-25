@@ -36,25 +36,25 @@ const RootLayout = ({
       appearance={{
         elements: {
           navbar:
-            '!bg-none !bg-neutral-700/20 dark:!bg-neutral-800/60 backdrop-blur-sm [&_p]:dark:!text-neutral-100 [&_p]:!text-neutral-900 [&_h1]:dark:!text-neutral-100 [&_h1]:!text-neutral-900 [&_.cl-active]:!text-neutral-900 [&_.cl-active]:dark:!text-neutral-100',
+            '!bg-none !bg-white/[0.03] dark:!bg-white/[0.04] !backdrop-blur-xl [&_p]:dark:!text-neutral-200 [&_p]:!text-neutral-800 [&_h1]:dark:!text-neutral-100 [&_h1]:!text-neutral-900 [&_.cl-active]:!text-neutral-900 [&_.cl-active]:dark:!text-neutral-100',
           navbarButton:
-            '!text-neutral-600 hover:!text-neutral-900 dark:!text-neutral-500 dark:hover:!text-neutral-100 !transition-all !duration-300',
+            '!text-neutral-500 hover:!text-neutral-800 dark:!text-neutral-400 dark:hover:!text-neutral-100 !transition-all !duration-500',
           scrollBox:
-            '!bg-neutral-700/20 dark:!bg-neutral-800/60 backdrop-blur-sm [&_p]:dark:!text-neutral-100 [&_p]:!text-neutral-900 [&_h1]:dark:!text-neutral-100 [&_h1]:!text-neutral-900',
+            '!bg-white/[0.03] dark:!bg-white/[0.04] !backdrop-blur-xl [&_p]:dark:!text-neutral-200 [&_p]:!text-neutral-800 [&_h1]:dark:!text-neutral-100 [&_h1]:!text-neutral-900',
           modalCloseButton:
-            '!text-neutral-600 hover:!text-neutral-900 dark:!text-neutral-500 dark:hover:!text-neutral-100 dark:hover:!bg-transparent hover:!bg-transparent !shadow-none active:!shadow-none focus:!shadow-none !transition-all !duration-300',
+            '!text-neutral-400 hover:!text-neutral-700 dark:!text-neutral-500 dark:hover:!text-neutral-200 dark:hover:!bg-white/[0.05] hover:!bg-black/[0.03] !shadow-none active:!shadow-none focus:!shadow-none !transition-all !duration-500 !rounded-full',
           badge:
-            '!dark:bg-neutral-700/50 !bg-neutral-600/40 !text-neutral-900 dark:!text-neutral-100 !rounded-full !shadow-none',
-          userPreviewTextContainer: 'dark:!text-neutral-100 !text-neutral-900',
-          actionCard: '!bg-neutral-100/90 dark:!bg-neutral-800/60 !shadow-none',
+            '!bg-white/[0.04] dark:!bg-white/[0.06] !text-neutral-700 dark:!text-neutral-200 !rounded-full !shadow-none !border-0',
+          userPreviewTextContainer: 'dark:!text-neutral-200 !text-neutral-800',
+          actionCard: '!bg-white/[0.03] dark:!bg-white/[0.04] !shadow-none !border !border-white/[0.04]',
           avatarImageActionsUpload:
-            '!border !border-neutral-100/90 dark:!border-neutral-700/60 !shadow-none !text-neutral-600 hover:!text-neutral-900 dark:!text-neutral-500 dark:hover:!text-neutral-100 !transition-all !duration-300',
+            '!border !border-white/[0.06] !shadow-none !text-neutral-500 hover:!text-neutral-700 dark:!text-neutral-400 dark:hover:!text-neutral-200 !transition-all !duration-500',
           profileSectionPrimaryButton:
-            '!text-neutral-600 hover:!text-neutral-900 dark:!text-neutral-500 dark:hover:!text-neutral-100 !transition-all !duration-300',
+            '!text-neutral-500 hover:!text-neutral-700 dark:!text-neutral-400 dark:hover:!text-neutral-200 !transition-all !duration-500',
           formButtonReset:
-            '!text-neutral-600 hover:!text-neutral-900 dark:!text-neutral-500 dark:hover:!text-neutral-100 !transition-all !duration-300',
+            '!text-neutral-500 hover:!text-neutral-700 dark:!text-neutral-400 dark:hover:!text-neutral-200 !transition-all !duration-500',
           modalBackdrop:
-            '!backdrop-blur-lg !bg-neutral-900/0 dark:!bg-neutral-900/0',
+            '!backdrop-blur-xl !bg-black/40',
         },
       }}
       localization={plPL}

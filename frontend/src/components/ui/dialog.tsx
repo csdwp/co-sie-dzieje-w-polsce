@@ -57,7 +57,7 @@ function DialogContent({
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
-          '!bg-neutral-700/20 dark:!bg-neutral-800/60 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg !p-5 sm:!p-8 shadow-lg duration-200 sm:max-w-lg border-none outline-none',
+          'bg-white/[0.03] dark:bg-white/[0.04] backdrop-blur-xl data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-98 data-[state=open]:zoom-in-98 fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-5 rounded-2xl !p-6 sm:!p-10 duration-300 sm:max-w-lg outline-none',
           className
         )}
         {...props}
@@ -65,7 +65,7 @@ function DialogContent({
         {children}
         <DialogPrimitive.Close
           data-testid="modal-close"
-          className="ring-offset-background focus:ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground absolute top-4 right-4 rounded-xs transition-all focus:ring-0 focus:ring-offset-0 focus:outline-hidden focus:border-none disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 text-neutral-600 hover:text-neutral-900 dark:text-neutral-500 dark:hover:text-neutral-100 duration-300"
+          className="ring-offset-background focus:ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground absolute top-5 right-5 sm:top-6 sm:right-6 rounded-full p-1 transition-all duration-300 focus:ring-0 focus:ring-offset-0 focus:outline-hidden focus:border-none disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 text-neutral-400 hover:text-neutral-600 dark:text-neutral-500 dark:hover:text-neutral-200 hover:bg-white/[0.05]"
         >
           <XIcon />
           <span className="sr-only">Close</span>
@@ -105,7 +105,7 @@ function DialogTitle({
   return (
     <DialogPrimitive.Title
       data-slot="dialog-title"
-      className={cn('text-lg leading-none font-semibold', className)}
+      className={cn('text-xl leading-tight font-medium tracking-tight', className)}
       {...props}
     />
   );

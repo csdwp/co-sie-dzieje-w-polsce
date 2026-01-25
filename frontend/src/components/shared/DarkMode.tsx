@@ -7,9 +7,9 @@ const DarkMode = ({ isDarkMode, toggleDarkMode }: DarkModeProps) => {
 
   return (
     <div
-      className={`cursor-pointer transition-all duration-300  ${
+      className={`cursor-pointer transition-all duration-500 ${
         isDarkMode
-          ? 'text-neutral-500 max-sm:text-neutral-400 hover:text-neutral-100 max-sm:fill-neutral-100 fill-neutral-500 hover:fill-neutral-100'
+          ? 'text-neutral-500 hover:text-neutral-300 fill-neutral-500 hover:fill-neutral-300'
           : 'text-neutral-400 hover:text-neutral-600 fill-neutral-400 hover:fill-neutral-600'
       } ${isSignedIn && 'mb-px'}`}
       onClick={toggleDarkMode}

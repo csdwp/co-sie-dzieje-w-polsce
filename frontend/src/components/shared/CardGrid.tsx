@@ -188,11 +188,11 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
     <div className="w-full max-w-screen-xl mx-auto">
       {availableCategories && availableCategories.length > 0 && (
         <div className="w-full mx-auto max-[640px]:max-w-11/12 max-[700px]:max-w-[320px] max-[950px]:max-w-[660px] max-[1200px]:max-w-[1000px] max-w-[1260px]">
-          <div className="text-xl relative flex flex-row items-center justify-between mb-1 gap-5 w-max">
-            <button className="swiper-button-prev-custom cursor-pointer transition-all duration-300 dark:text-neutral-500 max-sm:dark:text-neutral-400 dark:hover:text-neutral-100 dark:active:text-neutral-100 text-neutral-400 hover:text-neutral-600 active:text-neutral-600">
+          <div className="text-lg relative flex flex-row items-center justify-between mb-1 gap-4 w-max">
+            <button className="swiper-button-prev-custom cursor-pointer transition-all duration-500 text-neutral-400 dark:text-neutral-500 hover:text-neutral-600 dark:hover:text-neutral-300">
               ←
             </button>
-            <button className="swiper-button-next-custom cursor-pointer transition-all duration-300 dark:text-neutral-500 max-sm:dark:text-neutral-400 dark:hover:text-neutral-100 dark:active:text-neutral-100 text-neutral-400 hover:text-neutral-600 active:text-neutral-600">
+            <button className="swiper-button-next-custom cursor-pointer transition-all duration-500 text-neutral-400 dark:text-neutral-500 hover:text-neutral-600 dark:hover:text-neutral-300">
               →
             </button>
           </div>
@@ -213,13 +213,12 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
                 <span
                   onClick={() => setSelectedCategories([])}
                   className={`
-                  transition-all duration-300 shadow-none active:!shadow-none 
-                  hover:not-focus:shadow-lg cursor-pointer min-w-max 
-                  px-2 py-1 text-xs font-medium rounded-full
+                  transition-all duration-500 cursor-pointer min-w-max
+                  px-3 py-1.5 text-[11px] font-medium tracking-wide rounded-full
                   ${
                     selectedCategories.length === 0
-                      ? 'bg-neutral-600/10 dark:bg-neutral-700/70 text-neutral-900 dark:text-neutral-100'
-                      : 'dark:hover:bg-neutral-700/70 hover:bg-neutral-600/10 text-neutral-400 hover:text-neutral-900 dark:text-neutral-500 dark:hover:text-neutral-100'
+                      ? 'bg-white/[0.06] dark:bg-white/[0.08] text-neutral-700 dark:text-neutral-200'
+                      : 'hover:bg-white/[0.04] dark:hover:bg-white/[0.06] text-neutral-400 dark:text-neutral-500 hover:text-neutral-600 dark:hover:text-neutral-300'
                   }
                 `}
                 >
@@ -237,13 +236,12 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
                       );
                     }}
                     className={`
-                    transition-all duration-300 shadow-none active:!shadow-none 
-                    hover:not-focus:shadow-lg cursor-pointer min-w-max 
-                    px-2 py-1 text-xs font-medium rounded-full
+                    transition-all duration-500 cursor-pointer min-w-max
+                    px-3 py-1.5 text-[11px] font-medium tracking-wide rounded-full
                     ${
                       selectedCategories.includes(category)
-                        ? 'bg-neutral-600/10 dark:bg-neutral-700/70 text-neutral-900 dark:text-neutral-100'
-                        : 'dark:hover:bg-neutral-700/70 hover:bg-neutral-600/10 text-neutral-400 hover:text-neutral-900 dark:text-neutral-500 dark:hover:text-neutral-100'
+                        ? 'bg-white/[0.06] dark:bg-white/[0.08] text-neutral-700 dark:text-neutral-200'
+                        : 'hover:bg-white/[0.04] dark:hover:bg-white/[0.06] text-neutral-400 dark:text-neutral-500 hover:text-neutral-600 dark:hover:text-neutral-300'
                     }
                   `}
                   >
@@ -256,10 +254,10 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
             <div className="flex justify-end relative right-0 pb-4">
               <button
                 onClick={toggleFilterOptions}
-                className={`p-2 cursor-pointer transition-all duration-300 ${
+                className={`p-2 cursor-pointer transition-all duration-500 ${
                   isFilterOptionsOpen
-                    ? 'text-neutral-600 dark:text-neutral-100'
-                    : 'text-neutral-400 dark:text-neutral-500 max-sm:dark:text-neutral-400'
+                    ? 'text-neutral-700 dark:text-neutral-200'
+                    : 'text-neutral-400 dark:text-neutral-500 hover:text-neutral-500 dark:hover:text-neutral-400'
                 }`}
               >
                 <svg
@@ -282,15 +280,15 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
                 <button
                   onClick={toggleSortOrder}
                   className={`
-                  p-2 absolute top-0 right-0 ease-out opacity-0 pointer-events-none transition-all duration-300 cursor-pointer
+                  p-2 absolute top-0 right-0 ease-out opacity-0 pointer-events-none transition-all duration-500 cursor-pointer
                   ${
                     isFilterOptionsOpen &&
                     'opacity-100 !pointer-events-auto -translate-y-7 -translate-x-5 max-sm:-translate-x-7'
                   }
                   ${
                     sortOrder === 'asc'
-                      ? 'text-neutral-600 dark:text-neutral-100'
-                      : 'text-neutral-400 dark:text-neutral-500 max-sm:dark:text-neutral-400'
+                      ? 'text-neutral-700 dark:text-neutral-200'
+                      : 'text-neutral-400 dark:text-neutral-500 hover:text-neutral-500 dark:hover:text-neutral-400'
                   }
                 `}
                 >
@@ -338,15 +336,15 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
                 <button
                   onClick={toggleSortByTitle}
                   className={`
-                  p-2 absolute top-0 right-0 opacity-0 ease-out pointer-events-none transition-all duration-300 cursor-pointer
+                  p-2 absolute top-0 right-0 opacity-0 ease-out pointer-events-none transition-all duration-500 cursor-pointer
                   ${
                     isFilterOptionsOpen &&
                     'opacity-100 !pointer-events-auto -translate-y-7 translate-x-6 max-sm:translate-x-1'
                   }
                   ${
                     sortByTitle !== null
-                      ? 'text-neutral-600 dark:text-neutral-100'
-                      : 'text-neutral-400 dark:text-neutral-500 max-sm:dark:text-neutral-400'
+                      ? 'text-neutral-700 dark:text-neutral-200'
+                      : 'text-neutral-400 dark:text-neutral-500 hover:text-neutral-500 dark:hover:text-neutral-400'
                   }
                 `}
                 >
