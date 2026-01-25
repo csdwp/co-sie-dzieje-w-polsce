@@ -43,7 +43,7 @@ const SearchBar = ({ searchQuery, setSearchQuery }: SearchBarProps) => {
       ref={searchBarRef}
       className="w-11/12 md:w-full max-w-[560px] relative
         focus-within:text-neutral-800 dark:focus-within:text-neutral-100
-        text-neutral-400 dark:text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-100 duration-500 transition-colors"
+        text-neutral-400 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-100 duration-500 transition-colors"
     >
       <div
         className="bg-white/[0.03] dark:bg-white/[0.04] backdrop-blur-sm rounded-2xl px-6 py-0 w-full
