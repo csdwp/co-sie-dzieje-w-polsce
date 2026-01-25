@@ -112,20 +112,20 @@ const Card = ({
     <div
       onClick={onClick}
       data-testid="act-card"
-      className={`bg-neutral-700/10 dark:bg-neutral-800/40 mx-auto max-w-11/12 sm:max-w-80 flex flex-col gap-3 p-5 rounded-3xl shadow-xl cursor-pointer group hover:translate-y-[-2px]
-      transition-transform duration-300 h-fit w-full
-      ${isImportant && 'border-2 border-red-500/70 shadow-red-500/10'}
+      className={`bg-white/[0.02] dark:bg-white/[0.03] backdrop-blur-sm mx-auto max-w-11/12 sm:max-w-80 flex flex-col gap-4 p-6 rounded-2xl premium-shadow premium-border cursor-pointer group
+      transition-all duration-500 ease-out h-fit w-full hover:bg-white/[0.04] dark:hover:bg-white/[0.05]
+      ${isImportant && 'border-l-2 border-l-red-500/60'}
       ${isDeleting && 'opacity-50 pointer-events-none animate-pulse'}`}
     >
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="dark:text-neutral-600 text-neutral-500 dark:group-hover:text-neutral-100 group-hover:text-neutral-900 transition-colors duration-400 text-xs">
+        <div className="flex items-center gap-2.5">
+          <div className="text-neutral-400 dark:text-neutral-500 group-hover:text-neutral-600 dark:group-hover:text-neutral-300 transition-colors duration-500 text-xs tracking-wide uppercase">
             {formattedDate}
           </div>
           {status !== 'Nieznany' && (
             <Badge
               variant="outline"
-              className={`text-[10px] px-1.5 py-0 ${getStatusColor(status)}`}
+              className={`text-[10px] px-2 py-0.5 font-medium tracking-wide ${getStatusColor(status)}`}
             >
               {status}
             </Badge>
@@ -135,18 +135,18 @@ const Card = ({
           {isAdmin && needsVerification && (
             <Badge
               variant="outline"
-              className="bg-yellow-500/20 text-yellow-700 dark:text-yellow-400 border-yellow-500/50 text-[10px] px-1.5 py-0"
+              className="bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30 text-[10px] px-2 py-0.5 font-medium"
             >
-              ⚠️ Wymaga weryfikacji
+              Wymaga weryfikacji
             </Badge>
           )}
           {isAdmin && (
             <button
               onClick={handleDelete}
               disabled={isDeleting}
-              className="p-1.5 rounded-lg hover:bg-red-500/20 transition-colors
+              className="p-1.5 rounded-lg hover:bg-red-500/10 transition-all duration-300
                          disabled:opacity-50 disabled:cursor-not-allowed
-                         text-red-500 hover:text-red-600 dark:text-red-400 cursor-pointer"
+                         text-neutral-400 hover:text-red-500 dark:text-neutral-500 dark:hover:text-red-400 cursor-pointer"
               aria-label="Usuń akt"
               title="Usuń akt"
             >
@@ -157,57 +157,59 @@ const Card = ({
       </div>
       <h3
         data-testid="act-title"
-        className="text-lg leading-snug font-semibold line-clamp-3 -mt-2.5"
+        className="text-lg leading-snug font-medium tracking-tight line-clamp-3"
       >
         {stripDateFromTitle(title)}
       </h3>
-      <div className="dark:text-neutral-600 text-neutral-500 dark:group-hover:text-neutral-100 group-hover:text-neutral-900 transition-colors duration-400 text-xs">
-        W skrócie
-      </div>
-      <div className="text-base text-muted-foreground leading-snug line-clamp-4 text-gradient-gloss font-medium -mt-2.5">
-        &quot;{summary}&quot;
+      <div className="space-y-1.5">
+        <div className="text-neutral-400 dark:text-neutral-500 text-[11px] tracking-widest uppercase group-hover:text-neutral-600 dark:group-hover:text-neutral-300 transition-colors duration-500">
+          W skrócie
+        </div>
+        <div className="text-base leading-relaxed line-clamp-4 text-gradient-gloss font-normal">
+          {summary}
+        </div>
       </div>
       {categories.length > 0 && (
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-wrap gap-2">
           {categories.slice(0, 4).map((category, index) => (
             <span
               key={index}
-              className="dark:bg-neutral-700/50 bg-neutral-600/10 px-2 py-1 text-xs font-medium text-neutral-900 dark:text-neutral-100 rounded-full w-max overflow-ellipsis overflow-hidden max-w-full whitespace-nowrap"
+              className="bg-white/[0.04] dark:bg-white/[0.06] px-2.5 py-1 text-[11px] font-medium text-neutral-600 dark:text-neutral-300 rounded-full w-max overflow-ellipsis overflow-hidden max-w-full whitespace-nowrap tracking-wide"
             >
               {category}
             </span>
           ))}
         </div>
       )}
-      <p className="line-clamp-7 font-light text-sm">
+      <p className="line-clamp-7 text-sm text-neutral-500 dark:text-neutral-400 leading-relaxed group-hover:text-neutral-600 dark:group-hover:text-neutral-300 transition-colors duration-500">
         {content && stripHtml(content)}
       </p>
       {governmentPercentage > 0 && (
-        <>
-          <div className="dark:text-neutral-600 text-neutral-500 dark:group-hover:text-neutral-100 group-hover:text-neutral-900 transition-colors duration-400 text-xs">
-            Rozkład głosów &quot;za&quot;
+        <div className="pt-2 border-t border-white/[0.04] space-y-3">
+          <div className="text-neutral-400 dark:text-neutral-500 text-[11px] tracking-widest uppercase group-hover:text-neutral-600 dark:group-hover:text-neutral-300 transition-colors duration-500">
+            Rozkład głosów „za"
           </div>
-          <div className="flex flex-col items-center gap-1 -mt-1.5">
+          <div className="flex flex-col items-center gap-2">
             <div ref={containerRef} className="flex justify-between w-full">
               {[...Array(governmentDots)].map((_, index) => (
                 <div
                   key={`gov-${index}`}
-                  className="w-2 h-2 bg-neutral-100 rounded-full"
+                  className="w-2 h-2 bg-neutral-200 dark:bg-neutral-300 rounded-full transition-colors duration-300"
                 ></div>
               ))}
               {[...Array(oppositionDots)].map((_, index) => (
                 <div
                   key={`opp-${index}`}
-                  className="w-2 h-2 bg-red-500/70 rounded-full"
+                  className="w-2 h-2 bg-red-500/60 dark:bg-red-500/50 rounded-full transition-colors duration-300"
                 ></div>
               ))}
             </div>
-            <div className="flex justify-between w-full dark:text-neutral-600 text-neutral-500 dark:group-hover:text-neutral-100 group-hover:text-neutral-900 transition-colors duration-400 text-xs">
-              <span>Rządz.</span>
-              <span>Opoz.</span>
+            <div className="flex justify-between w-full text-[11px] text-neutral-400 dark:text-neutral-500 tracking-wide group-hover:text-neutral-600 dark:group-hover:text-neutral-300 transition-colors duration-500">
+              <span>Koalicja</span>
+              <span>Opozycja</span>
             </div>
           </div>
-        </>
+        </div>
       )}
     </div>
   );

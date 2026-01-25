@@ -12,6 +12,24 @@
   }
 }
 
+/* Premium utility classes - outside @layer for @apply compatibility */
+.premium-shadow {
+  box-shadow:
+    0 4px 24px 5px rgba(0, 0, 0, 0.08),
+    0 2px 8px 0px rgba(0, 0, 0, 0.04);
+}
+.dark .premium-shadow {
+  box-shadow:
+    0 4px 32px -15px rgba(0, 0, 0, 0.5),
+    0 2px 12px -10px rgba(0, 0, 0, 0.3);
+}
+.premium-border {
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+.dark .premium-border {
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -89,38 +107,41 @@
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
+  /* Premium dark theme with subtle warm undertone */
+  --background: oklch(0.12 0.005 60);
+  --foreground: oklch(0.95 0.005 60);
+  --card: oklch(0.16 0.005 60);
+  --card-foreground: oklch(0.95 0.005 60);
+  --popover: oklch(0.16 0.005 60);
+  --popover-foreground: oklch(0.95 0.005 60);
+  --primary: oklch(0.92 0.005 60);
+  --primary-foreground: oklch(0.16 0.005 60);
+  --secondary: oklch(0.22 0.005 60);
+  --secondary-foreground: oklch(0.95 0.005 60);
+  --muted: oklch(0.22 0.005 60);
+  --muted-foreground: oklch(0.65 0.005 60);
+  --accent: oklch(0.22 0.005 60);
+  --accent-foreground: oklch(0.95 0.005 60);
+  /* Polish red - refined, slightly desaturated for premium feel */
+  --destructive: oklch(0.58 0.18 25);
+  --polish-red: oklch(0.55 0.2 25);
+  --border: oklch(1 0 0 / 6%);
+  --input: oklch(1 0 0 / 8%);
+  --ring: oklch(0.5 0 0);
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
   --chart-4: oklch(0.627 0.265 303.9);
   --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar: oklch(0.16 0.005 60);
+  --sidebar-foreground: oklch(0.95 0.005 60);
   --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
-  @apply bg-neutral-950 text-neutral-50;
+  --sidebar-primary-foreground: oklch(0.95 0.005 60);
+  --sidebar-accent: oklch(0.22 0.005 60);
+  --sidebar-accent-foreground: oklch(0.95 0.005 60);
+  --sidebar-border: oklch(1 0 0 / 6%);
+  --sidebar-ring: oklch(0.5 0 0);
+  @apply bg-[oklch(0.10_0.005_60)] text-neutral-50;
 }
 
 @layer base {
@@ -130,7 +151,7 @@
 }
 
 [data-state='open'][data-slot='dialog-overlay'] {
-  @apply backdrop-blur-lg;
+  @apply backdrop-blur-xl bg-black/40;
 }
 
 [data-slot='dialog-content']::-webkit-scrollbar {
@@ -142,7 +163,16 @@
 }
 
 [data-slot='dialog-content'] {
-  @apply p-8 border-neutral-200 dark:border-neutral-700 border-2;
+  padding: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  box-shadow:
+    0 4px 32px -4px rgba(0, 0, 0, 0.5),
+    0 2px 12px -2px rgba(0, 0, 0, 0.3);
+}
+@media (min-width: 640px) {
+  [data-slot='dialog-content'] {
+    padding: 2.5rem;
+  }
 }
 
 @keyframes gloss {
@@ -157,26 +187,43 @@
   }
 }
 
+/* Premium text gradient - slower, more elegant animation */
 .dark .text-gradient-gloss {
-  background-image: linear-gradient(to right, #6b7280, #d3d7df, #6b7280);
+  background-image: linear-gradient(
+    120deg,
+    oklch(0.55 0.01 60) 0%,
+    oklch(0.85 0.01 60) 50%,
+    oklch(0.55 0.01 60) 100%
+  );
   background-size: 200% 100%;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  animation: gloss 3s ease-in-out infinite;
+  animation: gloss 6s ease-in-out infinite;
 }
 
 .text-gradient-gloss {
-  background-image: linear-gradient(to right, #838c9c, #1c1d1e, #838c9c);
+  background-image: linear-gradient(
+    120deg,
+    oklch(0.45 0.01 60) 0%,
+    oklch(0.25 0.01 60) 50%,
+    oklch(0.45 0.01 60) 100%
+  );
   background-size: 200% 100%;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  animation: gloss 3s ease-in-out infinite;
+  animation: gloss 6s ease-in-out infinite;
 }
 
+/* Polish red accent gradient - refined */
 .red-background-gloss {
-  background: linear-gradient(410deg, #b91c1c, #f35757, #b91c1c);
+  background: linear-gradient(
+    135deg,
+    oklch(0.5 0.18 25) 0%,
+    oklch(0.6 0.2 25) 50%,
+    oklch(0.5 0.18 25) 100%
+  );
   background-size: 300% 100%;
-  animation: gloss 3s ease-in-out infinite;
+  animation: gloss 8s ease-in-out infinite;
 }

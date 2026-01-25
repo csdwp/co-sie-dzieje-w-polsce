@@ -23,16 +23,16 @@ const Menu = ({
   return (
     <>
       <div
-        className={`cursor-pointer absolute top-3.5 left-4 text-neutral-400 dark:text-neutral-500 max-sm:dark:text-neutral-400 transition-colors duration-300 ${
-          isOpen ? 'dark:!text-neutral-100 !text-neutral-600' : ''
+        className={`cursor-pointer absolute top-3.5 left-4 text-neutral-400 dark:text-neutral-500 hover:text-neutral-500 dark:hover:text-neutral-400 transition-colors duration-500 ${
+          isOpen ? 'dark:!text-neutral-200 !text-neutral-700' : ''
         }`}
         onClick={toggleMenu}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 512 512"
-          width="24"
-          height="24"
+          width="22"
+          height="22"
         >
           <line
             x1="50"
@@ -40,12 +40,12 @@ const Menu = ({
             x2={isOpen ? '400' : '450'}
             y2="170"
             stroke="currentColor"
-            strokeWidth="30"
+            strokeWidth="28"
             strokeLinecap="round"
             style={{
               transform: isOpen ? 'translateY(85px) rotate(45deg)' : 'none',
               transformOrigin: 'center',
-              transition: 'transform 300ms ease-out, x2 300ms ease-out',
+              transition: 'transform 400ms cubic-bezier(0.4, 0, 0.2, 1), x2 400ms cubic-bezier(0.4, 0, 0.2, 1)',
             }}
           />
           <line
@@ -54,21 +54,21 @@ const Menu = ({
             x2={isOpen ? '400' : '250'}
             y2="340"
             stroke="currentColor"
-            strokeWidth="30"
+            strokeWidth="28"
             strokeLinecap="round"
             style={{
               transform: isOpen ? 'translateY(-85px) rotate(-45deg)' : 'none',
               transformOrigin: 'center',
-              transition: 'transform 300ms ease-out, x2 300ms ease-out',
+              transition: 'transform 400ms cubic-bezier(0.4, 0, 0.2, 1), x2 400ms cubic-bezier(0.4, 0, 0.2, 1)',
             }}
           />
         </svg>
       </div>
       <button
-        className={`cursor-pointer text-sm leading-3.5 absolute top-4.5 left-1.5 ease-out transition-color duration-300 -z-10 opacity-0 ${
+        className={`cursor-pointer text-[13px] tracking-wide leading-3.5 absolute top-4.5 left-1.5 ease-out transition-all duration-500 -z-10 opacity-0 ${
           selectedTypes.includes('Ustawa')
-            ? 'text-neutral-600 dark:text-neutral-100'
-            : 'text-neutral-400 dark:text-neutral-500 max-sm:dark:text-neutral-400'
+            ? 'text-neutral-700 dark:text-neutral-200'
+            : 'text-neutral-400 dark:text-neutral-500 hover:text-neutral-500 dark:hover:text-neutral-400'
         }
         ${isOpen && 'opacity-100 !pointer-events-auto translate-x-11 z-0'}`}
         onClick={() => toggleType('Ustawa')}
@@ -76,10 +76,10 @@ const Menu = ({
         Ustawy
       </button>
       <button
-        className={`cursor-pointer text-sm leading-3.5 absolute top-5 left-1.5 ease-out transition-color duration-300 -z-10 opacity-0 ${
+        className={`cursor-pointer text-[13px] tracking-wide leading-3.5 absolute top-5 left-1.5 ease-out transition-all duration-500 -z-10 opacity-0 ${
           selectedTypes.includes('Rozporządzenie')
-            ? 'text-neutral-600 dark:text-neutral-100'
-            : 'text-neutral-400 dark:text-neutral-500 max-sm:dark:text-neutral-400'
+            ? 'text-neutral-700 dark:text-neutral-200'
+            : 'text-neutral-400 dark:text-neutral-500 hover:text-neutral-500 dark:hover:text-neutral-400'
         }
         ${
           isOpen &&
