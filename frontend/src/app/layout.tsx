@@ -46,22 +46,25 @@ const RootLayout = ({
           badge:
             '!bg-white/[0.04] dark:!bg-white/[0.06] !text-neutral-700 dark:!text-neutral-200 !rounded-full !shadow-none !border-0',
           userPreviewTextContainer: 'dark:!text-neutral-200 !text-neutral-800',
-          actionCard: '!bg-white/[0.03] dark:!bg-white/[0.04] !shadow-none !border !border-white/[0.04]',
+          actionCard:
+            '!bg-white/[0.03] dark:!bg-white/[0.04] !shadow-none !border !border-white/[0.04]',
           avatarImageActionsUpload:
             '!border !border-white/[0.06] !shadow-none !text-neutral-500 hover:!text-neutral-700 dark:!text-neutral-400 dark:hover:!text-neutral-200 !transition-all !duration-500',
           profileSectionPrimaryButton:
             '!text-neutral-500 hover:!text-neutral-700 dark:!text-neutral-400 dark:hover:!text-neutral-200 !transition-all !duration-500',
           formButtonReset:
             '!text-neutral-500 hover:!text-neutral-700 dark:!text-neutral-400 dark:hover:!text-neutral-200 !transition-all !duration-500',
-          modalBackdrop:
-            '!backdrop-blur-xl !bg-black/40',
+          modalBackdrop: '!backdrop-blur-xl !bg-black/40',
         },
       }}
       localization={plPL}
     >
       <html lang="pl">
         <body
-          className={`${geistSans.variable} ${geistMono.variable} ${libreBodoni.variable} antialiased dark`}
+          className={`${geistSans.variable} ${geistMono.variable} ${libreBodoni.variable} antialiased dark before:fixed before:bg-neutral-100
+        before:flex before:top-[150px] before:-translate-y-1/3
+        before:left-1/2 before:-translate-x-1/2 before:bg-gradient-to-r before:from-white before:to-red-500
+        before:opacity-50 before:blur-[100px] lg:before:blur-[120px] before:rounded-full before:w-120 lg:before:w-220 before:h-80 lg:before:h-180 before:rotate-45 before:-z-1 before:pointer-events-none`}
         >
           {children}
         </body>

@@ -41,10 +41,7 @@ const SearchBar = ({ searchQuery, setSearchQuery }: SearchBarProps) => {
   return (
     <div
       ref={searchBarRef}
-      className="w-11/12 md:w-full max-w-[560px] relative before:fixed before:bg-neutral-100
-        before:flex before:top-[150px] before:-translate-y-1/2
-        before:left-1/2 before:-translate-x-1/2 before:bg-gradient-to-r before:from-white before:to-red-500
-        before:opacity-50 before:blur-3xl before:rounded-full before:w-160 before:h-120 before:rotate-45 before:-z-1 before:pointer-events-none
+      className="w-11/12 md:w-full max-w-[560px] relative
         focus-within:text-neutral-800 dark:focus-within:text-neutral-100
         text-neutral-400 dark:text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-100 duration-500 transition-colors"
     >
