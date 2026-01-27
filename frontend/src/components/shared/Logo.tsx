@@ -48,7 +48,7 @@ const Logo = () => {
           isAnimated ? 'translate-x-0 opacity-100' : '-translate-x-5 opacity-0'
         }`}
       >
-        CSDWP
+        CP
       </span>
     </a>
   );
