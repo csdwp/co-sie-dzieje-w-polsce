@@ -71,13 +71,13 @@ const ProductsWrapper = ({
   handleSubscribe: (priceId: string) => void;
 }) => {
   return (
-    <div className="flex flex-col gap-4 text-left text-sm w-full">
+    <div className="flex flex-col gap-6 text-left text-sm w-full">
       <div className="max-sm:w-full max-sm:overflow-x-auto max-sm:p-8 max-sm:-m-8">
-        <div className="flex flex-row gap-4 items-end w-max sm:w-fit">
+        <div className="flex flex-row gap-5 items-stretch w-max sm:w-fit">
           <SubscriptionCard
-            title="Plan Premium"
+            title="Premium"
             isBest={true}
-            maxWidth={300}
+            maxWidth={280}
             price={49}
             priceId={process.env.NEXT_PUBLIC_STRIPE_PRICE_PREMIUM}
             onSubscribe={handleSubscribe}
@@ -94,10 +94,10 @@ const ProductsWrapper = ({
             ]}
           />
           <SubscriptionCard
-            title="Plan Podstawowy"
+            title="Podstawowy"
             isBest={false}
             price={29}
-            maxWidth={300}
+            maxWidth={280}
             priceId={process.env.NEXT_PUBLIC_STRIPE_PRICE_BASIC}
             onSubscribe={handleSubscribe}
             options={[
@@ -114,29 +114,29 @@ const ProductsWrapper = ({
         </div>
       </div>
 
-      <label className="flex items-start gap-2 cursor-pointer group">
-        <input type="checkbox" required className="hidden peer mt-1" />
-        <svg
-          className="w-4.5 h-4.5 flex-shrink-0 mt-px text-neutral-600 group-hover:text-neutral-900 peer-checked:text-neutral-900 peer-checked:group-hover:text-neutral-900 dark:text-neutral-500 dark:group-hover:text-neutral-100 dark:peer-checked:text-neutral-100 dark:peer-checked:group-hover:text-neutral-100 opacity-50 peer-checked:opacity-100 group-hover:opacity-100 duration-300 transition-all"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
+      <label className="flex items-start gap-3 cursor-pointer group/checkbox">
+        <input type="checkbox" required className="hidden peer" />
+        <span className="flex-shrink-0 w-4 h-4 mt-0.5 rounded border border-neutral-300 dark:border-neutral-600 group-hover/checkbox:border-neutral-400 dark:group-hover/checkbox:border-neutral-500 peer-checked:border-red-500 peer-checked:bg-red-500 transition-all duration-200 flex items-center justify-center">
+          <svg
+            className="w-2.5 h-2.5 text-white scale-0 group-has-[:checked]/checkbox:scale-100 transition-transform duration-200"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            strokeWidth={3}
             strokeLinecap="round"
             strokeLinejoin="round"
-            strokeWidth={2}
-            d="M5 13l4 4L19 7"
-          />
-        </svg>
-        <span>
+          >
+            <path d="M5 13l4 4L19 7" />
+          </svg>
+        </span>
+        <span className="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed">
           Wyrażam zgodę na rozpoczęcie świadczenia usługi przed upływem terminu
           odstąpienia i przyjmuję do wiadomości, że tracę prawo do odstąpienia
           od umowy.
         </span>
       </label>
 
-      <p className="text-xs text-neutral-500">
+      <p className="text-xs text-neutral-400 dark:text-neutral-500">
         Subskrypcja odnawia się automatycznie co miesiąc. Możesz anulować w
         dowolnym momencie w ustawieniach swojego konta Stripe. <br />
         <a href="/regulamin" className="underline">

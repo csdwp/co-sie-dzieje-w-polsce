@@ -45,7 +45,8 @@ const Menu = ({
             style={{
               transform: isOpen ? 'translateY(85px) rotate(45deg)' : 'none',
               transformOrigin: 'center',
-              transition: 'transform 400ms cubic-bezier(0.4, 0, 0.2, 1), x2 400ms cubic-bezier(0.4, 0, 0.2, 1)',
+              transition:
+                'transform 400ms cubic-bezier(0.4, 0, 0.2, 1), x2 400ms cubic-bezier(0.4, 0, 0.2, 1)',
             }}
           />
           <line
@@ -59,7 +60,8 @@ const Menu = ({
             style={{
               transform: isOpen ? 'translateY(-85px) rotate(-45deg)' : 'none',
               transformOrigin: 'center',
-              transition: 'transform 400ms cubic-bezier(0.4, 0, 0.2, 1), x2 400ms cubic-bezier(0.4, 0, 0.2, 1)',
+              transition:
+                'transform 400ms cubic-bezier(0.4, 0, 0.2, 1), x2 400ms cubic-bezier(0.4, 0, 0.2, 1)',
             }}
           />
         </svg>

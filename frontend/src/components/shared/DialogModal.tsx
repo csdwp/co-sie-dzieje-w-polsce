@@ -71,9 +71,15 @@ const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
   if (active && payload && payload.length) {
     return (
       <div className="bg-white/[0.03] dark:bg-white/[0.06] backdrop-blur-xl text-neutral-100 px-4 py-3 rounded-xl shadow-2xl border border-white/[0.06]">
-        <p className="font-medium mb-1.5 text-neutral-200">{payload[0].payload.party}</p>
+        <p className="font-medium mb-1.5 text-neutral-200">
+          {payload[0].payload.party}
+        </p>
         {payload.map((entry: TooltipPayloadEntry, index: number) => (
-          <p key={index} className="text-sm text-neutral-400" style={{ color: entry.color }}>
+          <p
+            key={index}
+            className="text-sm text-neutral-400"
+            style={{ color: entry.color }}
+          >
             {entry.name}: {entry.value} głosów
           </p>
         ))}
@@ -112,7 +118,10 @@ const CustomPieTooltip = ({
     return (
       <div className="bg-white/[0.03] dark:bg-white/[0.06] backdrop-blur-xl text-neutral-100 px-4 py-3 rounded-xl shadow-2xl border border-white/[0.06]">
         <p className="font-medium mb-1.5 text-neutral-200">{entry.name}</p>
-        <p className="text-sm text-neutral-400" style={{ color: entry.payload.fill }}>
+        <p
+          className="text-sm text-neutral-400"
+          style={{ color: entry.payload.fill }}
+        >
           {votes} głosów ({entry.value.toFixed(1)}%)
         </p>
       </div>
@@ -403,7 +412,9 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
                       {/* Government bar */}
                       <div className="flex flex-col gap-2">
                         <div className="flex items-center justify-between text-sm">
-                          <span className="font-medium text-neutral-700 dark:text-neutral-200">Koalicja rządząca</span>
+                          <span className="font-medium text-neutral-700 dark:text-neutral-200">
+                            Koalicja rządząca
+                          </span>
                           <span className="text-neutral-500 dark:text-neutral-400 text-xs">
                             {votes?.votesSupportByGroup?.government?.yesVotes ||
                               0}{' '}
@@ -423,7 +434,9 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
                       {/* Opposition bar */}
                       <div className="flex flex-col gap-2">
                         <div className="flex items-center justify-between text-sm">
-                          <span className="font-medium text-neutral-700 dark:text-neutral-200">Opozycja</span>
+                          <span className="font-medium text-neutral-700 dark:text-neutral-200">
+                            Opozycja
+                          </span>
                           <span className="text-neutral-500 dark:text-neutral-400 text-xs">
                             {votes?.votesSupportByGroup?.opposition?.yesVotes ||
                               0}{' '}
@@ -480,7 +493,8 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
                               {(
                                 (votes.summary.abstain / votes.summary.total) *
                                 100
-                              ).toFixed(1)}%
+                              ).toFixed(1)}
+                              %
                             </span>
                           </div>
                         </div>
@@ -496,7 +510,8 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
                               {(
                                 (votes.summary.absent / votes.summary.total) *
                                 100
-                              ).toFixed(1)}%
+                              ).toFixed(1)}
+                              %
                             </span>
                           </div>
                         </div>
@@ -510,7 +525,8 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
                                 ((votes.summary.yes + votes.summary.no) /
                                   votes.summary.total) *
                                 100
-                              ).toFixed(1)}%
+                              ).toFixed(1)}
+                              %
                             </span>
                           </div>
                         </div>
@@ -524,9 +540,9 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
                         Szczegółowy rozkład głosów
                       </div>
                       <div className="text-sm text-neutral-500 dark:text-neutral-400">
-                        Wykres słupkowy pokazuje liczbę głosów za oraz przeciw dla
-                        każdej partii. Wykres kołowy przedstawia ogólny rozkład
-                        wszystkich głosów.
+                        Wykres słupkowy pokazuje liczbę głosów za oraz przeciw
+                        dla każdej partii. Wykres kołowy przedstawia ogólny
+                        rozkład wszystkich głosów.
                       </div>
                     </div>
                     {/* Wykresy "za" i "przeciw" */}

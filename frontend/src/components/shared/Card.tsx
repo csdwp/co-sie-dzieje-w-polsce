@@ -187,7 +187,7 @@ const Card = ({
       {governmentPercentage > 0 && (
         <div className="pt-2 border-t border-white/[0.04] space-y-3">
           <div className="text-neutral-400 dark:text-neutral-500 text-[11px] tracking-widest uppercase group-hover:text-neutral-600 dark:group-hover:text-neutral-300 transition-colors duration-500">
-            Rozkład głosów „za"
+            Rozkład głosów &bdquo;za&rdquo;
           </div>
           <div className="flex flex-col items-center gap-2">
             <div ref={containerRef} className="flex justify-between w-full">
