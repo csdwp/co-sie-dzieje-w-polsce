@@ -23,7 +23,7 @@ const DailyLimitModal = ({ onClose }: DailyLimitModalProps) => {
         className="overflow-auto w-11/12 h-fit lg:w-5/12 lg:h-fit !max-w-[600px] rounded-3xl flex flex-col gap-6 border-none"
       >
         <DialogHeader className="h-fit">
-          <DialogTitle className="text-2xl font-bold leading-tight text-left">
+          <DialogTitle className="text-2xl font-bold leading-tight text-left max-w-11/12">
             🕐 &nbsp;Osiągnięto dzienny limit przeglądania
           </DialogTitle>
           <DialogDescription

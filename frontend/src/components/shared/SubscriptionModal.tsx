@@ -50,7 +50,7 @@ const SubscriptionModal = ({ onClose }: { onClose: () => void }) => {
     <Dialog open={true} onOpenChange={onClose}>
       <DialogContent className="overflow-auto w-11/12 h-fit lg:w-5/12 lg:h-fit !max-w-[1000px] max-h-11/12 rounded-3xl flex flex-col gap-6 border-none">
         <DialogHeader className="h-fit">
-          <DialogTitle className="text-2xl font-bold leading-tight text-left">
+          <DialogTitle className="text-2xl font-bold leading-tight text-left max-w-11/12">
             Odblokuj pełny dostęp do aktów prawnych – bez ograniczeń!
           </DialogTitle>
           <DialogDescription className="text-base font-light dark:text-neutral-100 md:max-w-4/5 text-left">
@@ -116,19 +116,17 @@ const ProductsWrapper = ({
 
       <label className="flex items-start gap-3 cursor-pointer group/checkbox">
         <input type="checkbox" required className="hidden peer" />
-        <span className="flex-shrink-0 w-4 h-4 mt-0.5 rounded border border-neutral-300 dark:border-neutral-600 group-hover/checkbox:border-neutral-400 dark:group-hover/checkbox:border-neutral-500 peer-checked:border-red-500 peer-checked:bg-red-500 transition-all duration-200 flex items-center justify-center">
-          <svg
-            className="w-2.5 h-2.5 text-white scale-0 group-has-[:checked]/checkbox:scale-100 transition-transform duration-200"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            strokeWidth={3}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M5 13l4 4L19 7" />
-          </svg>
-        </span>
+        <svg
+          className="w-4 h-4 flex-shrink-0 mt-0.5 transition-all duration-200 text-neutral-500 group-has-[:checked]/checkbox:text-white group-has-[:checked]/checkbox:[filter:drop-shadow(0_0_6px_rgba(255,255,255,0.6))]"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={2.5}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M5 13l4 4L19 7" />
+        </svg>
         <span className="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed">
           Wyrażam zgodę na rozpoczęcie świadczenia usługi przed upływem terminu
           odstąpienia i przyjmuję do wiadomości, że tracę prawo do odstąpienia

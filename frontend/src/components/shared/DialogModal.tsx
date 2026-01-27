@@ -211,7 +211,7 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
         <>
           <DialogHeader className="h-fit">
             <div className="flex items-start gap-3 mb-3">
-              <DialogTitle className="text-2xl font-medium tracking-tight leading-tight text-left flex-1">
+              <DialogTitle className="text-2xl font-medium tracking-tight leading-tight text-left flex-1 max-w-11/12">
                 {card?.title}
               </DialogTitle>
               {isAdmin && needsVerification && (
