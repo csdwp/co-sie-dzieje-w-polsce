@@ -6,7 +6,8 @@ const DarkMode = ({ isDarkMode, toggleDarkMode }: DarkModeProps) => {
   const { isSignedIn } = useUser();
 
   return (
-    <div
+    <button
+      aria-label={isDarkMode ? 'Włącz tryb jasny' : 'Włącz tryb ciemny'}
       className={`cursor-pointer transition-all duration-500 ${
         isDarkMode
           ? 'text-neutral-500 hover:text-neutral-300 fill-neutral-500 hover:fill-neutral-300'
@@ -139,7 +140,7 @@ const DarkMode = ({ isDarkMode, toggleDarkMode }: DarkModeProps) => {
           </g>
         </svg>
       )}
-    </div>
+    </button>
   );
 };
 

@@ -22,8 +22,10 @@ const Menu = ({
 
   return (
     <>
-      <div
-        className={`cursor-pointer absolute top-3.5 left-4 text-neutral-400 dark:text-neutral-500 hover:text-neutral-500 dark:hover:text-neutral-400 transition-all duration-500 ${
+      <button
+        aria-label={isOpen ? 'Zamknij menu' : 'Otwórz menu'}
+        aria-expanded={isOpen}
+        className={`cursor-pointer absolute top-5 left-4 text-neutral-400 dark:text-neutral-500 hover:text-neutral-500 dark:hover:text-neutral-400 transition-all duration-500 ${
           isOpen
             ? 'dark:!text-neutral-200 !text-neutral-700 dark:[filter:drop-shadow(0_0_6px_rgba(255,255,255,0.6))]'
             : ''
@@ -67,7 +69,7 @@ const Menu = ({
             }}
           />
         </svg>
-      </div>
+      </button>
       <button
         className={`cursor-pointer text-[13px] tracking-wide leading-3.5 absolute top-4.5 left-1.5 ease-out transition-all duration-500 -z-10 opacity-0 ${
           selectedTypes.includes('Ustawa')
