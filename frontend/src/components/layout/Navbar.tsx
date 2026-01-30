@@ -23,19 +23,21 @@ const Navbar: React.FC<NavbarProps> = ({ selectedTypes, setSelectedTypes }) => {
   }, [isDarkMode]);
 
   return (
-    <div>
-      <Menu
-        isOpen={isOpen}
-        toggleMenu={() => setIsOpen(!isOpen)}
-        selectedTypes={selectedTypes}
-        setSelectedTypes={setSelectedTypes}
-      />
-      <Logo />
-      <div className="h-[26px] absolute top-5 right-5 flex items-end gap-5 sm:items-center justify-center">
-        <AuthButtons isDarkMode={isDarkMode} />
-        <DarkMode isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
-      </div>
-    </div>
+    <header role="banner">
+      <nav aria-label="Główna nawigacja">
+        <Menu
+          isOpen={isOpen}
+          toggleMenu={() => setIsOpen(!isOpen)}
+          selectedTypes={selectedTypes}
+          setSelectedTypes={setSelectedTypes}
+        />
+        <Logo />
+        <div className="h-[26px] absolute top-5 right-5 flex items-end gap-5 sm:items-center justify-center">
+          <AuthButtons isDarkMode={isDarkMode} />
+          <DarkMode isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
+        </div>
+      </nav>
+    </header>
   );
 };
 

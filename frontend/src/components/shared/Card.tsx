@@ -109,9 +109,10 @@ const Card = ({
   };
 
   return (
-    <div
+    <article
       onClick={onClick}
       data-testid="act-card"
+      aria-labelledby={`act-title-${id}`}
       className={`bg-white/[0.02] dark:bg-white/[0.03] backdrop-blur-sm mx-auto max-w-11/12 sm:max-w-80 flex flex-col gap-4 p-6 rounded-2xl premium-shadow premium-border cursor-pointer group
       transition-all duration-500 ease-out h-fit w-full hover:bg-white/[0.04] dark:hover:bg-white/[0.05]
       ${isImportant && 'border-l-2 border-l-red-500/60'}
@@ -155,12 +156,13 @@ const Card = ({
           )}
         </div>
       </div>
-      <h3
+      <h2
+        id={`act-title-${id}`}
         data-testid="act-title"
         className="text-lg leading-snug font-medium tracking-tight line-clamp-3"
       >
         {stripDateFromTitle(title)}
-      </h3>
+      </h2>
       <div className="space-y-1.5">
         <div className="text-neutral-400 dark:text-neutral-500 text-[11px] tracking-widest uppercase group-hover:text-neutral-600 dark:group-hover:text-neutral-300 transition-colors duration-500">
           W skrócie
@@ -211,7 +213,7 @@ const Card = ({
           </div>
         </div>
       )}
-    </div>
+    </article>
   );
 };
 

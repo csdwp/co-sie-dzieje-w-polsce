@@ -1,9 +1,12 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { Libre_Bodoni } from 'next/font/google';
+import Script from 'next/script';
 import './globals.css';
 import { ClerkProvider } from '@clerk/nextjs';
 import { plPL } from '@clerk/localizations';
+
+const GA_MEASUREMENT_ID = 'G-3NBXYCZLZ5';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -21,13 +24,108 @@ const libreBodoni = Libre_Bodoni({
   variable: '--font-libre-bodoni',
 });
 
+const siteUrl = 'https://coprzeszlo.pl';
+const siteName = 'Co przeszło';
+const siteDescription =
+  'Sprawdź jakie ustawy i rozporządzenia zostały uchwalone w Polsce. Proste podsumowania aktów prawnych dla każdego obywatela.';
+
 export const metadata: Metadata = {
-  title: 'Co przeszło',
-  description:
-    'Sprawdź jakie ustawy i rozporządzenia zostały uchwalone w Polsce. Proste podsumowania aktów prawnych.',
-  icons: {
-    icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">⚖️</text></svg>',
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: `${siteName} - Polskie akty prawne w prostym języku`,
+    template: `%s | ${siteName}`,
   },
+  description: siteDescription,
+  keywords: [
+    'ustawy',
+    'rozporządzenia',
+    'prawo polskie',
+    'akty prawne',
+    'Sejm',
+    'Polska',
+    'legislacja',
+    'podsumowania ustaw',
+    'prawo w prostym języku',
+  ],
+  authors: [{ name: siteName }],
+  creator: siteName,
+  publisher: siteName,
+  formatDetection: {
+    email: false,
+    telephone: false,
+  },
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/apple-icon.png',
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'pl_PL',
+    url: siteUrl,
+    siteName: siteName,
+    title: `${siteName} - Polskie akty prawne w prostym języku`,
+    description: siteDescription,
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: `${siteName} - Śledź polskie prawo`,
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: `${siteName} - Polskie akty prawne w prostym języku`,
+    description: siteDescription,
+    images: ['/og-image.png'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  alternates: {
+    canonical: siteUrl,
+  },
+};
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      '@id': `${siteUrl}/#website`,
+      url: siteUrl,
+      name: siteName,
+      description: siteDescription,
+      inLanguage: 'pl-PL',
+    },
+    {
+      '@type': 'Organization',
+      '@id': `${siteUrl}/#organization`,
+      name: siteName,
+      url: siteUrl,
+      description:
+        'Platforma obywatelska prezentująca akty prawne w przystępnym języku.',
+    },
+    {
+      '@type': 'WebPage',
+      '@id': `${siteUrl}/#webpage`,
+      url: siteUrl,
+      name: `${siteName} - Polskie akty prawne w prostym języku`,
+      description: siteDescription,
+      isPartOf: { '@id': `${siteUrl}/#website` },
+      about: { '@id': `${siteUrl}/#organization` },
+      inLanguage: 'pl-PL',
+    },
+  ],
 };
 
 const RootLayout = ({
@@ -64,16 +162,35 @@ const RootLayout = ({
       localization={plPL}
     >
       <html lang="pl">
+        <head>
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          />
+        </head>
         <body
           className={`${geistSans.variable} ${geistMono.variable} ${libreBodoni.variable} antialiased dark before:fixed before:bg-neutral-100
         before:flex before:top-[150px] before:-translate-y-1/3
         before:left-1/2 before:-translate-x-1/2 before:bg-gradient-to-r before:from-white before:to-red-500
         before:opacity-50 before:blur-[100px] lg:before:blur-[180px] before:rounded-full before:w-120 lg:before:w-220 before:h-80 lg:before:h-180 before:rotate-45 before:-z-1 before:pointer-events-none`}
         >
+          <Script
+            src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+            strategy="afterInteractive"
+          />
+          <Script id="google-analytics" strategy="afterInteractive">
+            {`
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', '${GA_MEASUREMENT_ID}');
+            `}
+          </Script>
           {children}
         </body>
       </html>
     </ClerkProvider>
   );
 };
+
 export default RootLayout;
