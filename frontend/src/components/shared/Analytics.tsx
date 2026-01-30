@@ -4,7 +4,7 @@ import Script from 'next/script';
 import { useState, useCallback } from 'react';
 import CookieConsent from './CookieConsent';
 
-const GA_MEASUREMENT_ID = 'G-3NBXYCZLZ5';
+const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 
 const Analytics = () => {
   const [consentGiven, setConsentGiven] = useState(false);
@@ -15,7 +15,7 @@ const Analytics = () => {
 
   return (
     <>
-      {consentGiven && (
+      {consentGiven && GA_MEASUREMENT_ID && (
         <>
           <Script
             src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
