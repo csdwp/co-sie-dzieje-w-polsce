@@ -1,12 +1,10 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { Libre_Bodoni } from 'next/font/google';
-import Script from 'next/script';
 import './globals.css';
 import { ClerkProvider } from '@clerk/nextjs';
 import { plPL } from '@clerk/localizations';
-
-const GA_MEASUREMENT_ID = 'G-3NBXYCZLZ5';
+import Analytics from '@/components/shared/Analytics';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -174,19 +172,8 @@ const RootLayout = ({
         before:left-1/2 before:-translate-x-1/2 before:bg-gradient-to-r before:from-white before:to-red-500
         before:opacity-50 before:blur-[100px] lg:before:blur-[180px] before:rounded-full before:w-120 lg:before:w-220 before:h-80 lg:before:h-180 before:rotate-45 before:-z-1 before:pointer-events-none`}
         >
-          <Script
-            src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
-            strategy="afterInteractive"
-          />
-          <Script id="google-analytics" strategy="afterInteractive">
-            {`
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', '${GA_MEASUREMENT_ID}');
-            `}
-          </Script>
           {children}
+          <Analytics />
         </body>
       </html>
     </ClerkProvider>
