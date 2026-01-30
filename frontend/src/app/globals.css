@@ -206,6 +206,7 @@ body {
   background-clip: text;
   color: transparent;
   animation: gloss 6s ease-in-out infinite;
+  will-change: background-position;
 }
 
 .text-gradient-gloss {
@@ -220,6 +221,16 @@ body {
   background-clip: text;
   color: transparent;
   animation: gloss 6s ease-in-out infinite;
+  will-change: background-position;
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .text-gradient-gloss,
+  .dark .text-gradient-gloss,
+  .red-background-gloss {
+    animation: none;
+  }
 }
 
 /* Polish red accent gradient - refined */

@@ -1,23 +1,36 @@
 'use client';
 
-import React, { useState, useMemo, useRef, useLayoutEffect } from 'react';
+import React, {
+  useState,
+  useMemo,
+  useRef,
+  useLayoutEffect,
+  useCallback,
+} from 'react';
+import dynamic from 'next/dynamic';
 import Masonry from 'react-masonry-css';
 import Card from '@/components/shared/Card';
-import DialogModal from '@/components/shared/DialogModal';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 import 'swiper/css';
 import { Act, CardGridProps } from '@/types';
 import { useModalLimit } from '@/app/hooks/useModalLimit';
 import { useUser } from '@clerk/nextjs';
-import SubscriptionModal from './SubscriptionModal';
-import DailyLimitModal from './DailyLimitModal';
 import { gsap } from 'gsap';
 import {
   CONFIDENCE_THRESHOLD,
   ANONYMOUS_DAILY_LIMIT,
   AUTHENTICATED_DAILY_LIMIT,
 } from '@/lib/config';
+
+// Dynamic imports for modals - loaded only when needed
+const DialogModal = dynamic(() => import('./DialogModal'), { ssr: false });
+const SubscriptionModal = dynamic(() => import('./SubscriptionModal'), {
+  ssr: false,
+});
+const DailyLimitModal = dynamic(() => import('./DailyLimitModal'), {
+  ssr: false,
+});
 
 const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
   const [selectedCard, setSelectedCard] = useState<Act | null>(null);
@@ -43,23 +56,23 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
     700: 1,
   };
 
-  const toggleFilterOptions = () => {
+  const toggleFilterOptions = useCallback(() => {
     setIsFilterOptionsOpen(prev => !prev);
-  };
+  }, []);
 
-  const toggleSortOrder = () => {
+  const toggleSortOrder = useCallback(() => {
     setSortOrder(prev => (prev === 'asc' ? 'desc' : 'asc'));
     setSortByTitle(null);
-  };
+  }, []);
 
-  const toggleSortByTitle = () => {
+  const toggleSortByTitle = useCallback(() => {
     setSortByTitle(prev => {
       if (prev === null) return 'asc';
       if (prev === 'asc') return 'desc';
       return null;
     });
     setSortOrder('desc');
-  };
+  }, []);
 
   const isAdmin = user?.publicMetadata?.role === 'admin';
 
@@ -126,27 +139,30 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
     }
   }, [baseFilteredActs, sortOrder, sortByTitle, selectedCategories]);
 
-  const openModal = (card: Act) => {
-    if (!canOpen) {
-      setLimitModal(true);
-      return;
-    }
+  const openModal = useCallback(
+    (card: Act) => {
+      if (!canOpen) {
+        setLimitModal(true);
+        return;
+      }
 
-    setSelectedCard(card);
-    if (user?.unsafeMetadata.subscription_status !== 'active') registerOpen();
-  };
+      setSelectedCard(card);
+      if (user?.unsafeMetadata.subscription_status !== 'active') registerOpen();
+    },
+    [canOpen, user?.unsafeMetadata.subscription_status, registerOpen]
+  );
 
-  const closeModal = () => {
+  const closeModal = useCallback(() => {
     setSelectedCard(null);
-  };
+  }, []);
 
-  const handleCloseLimitModal = () => {
+  const handleCloseLimitModal = useCallback(() => {
     setLimitModal(false);
-  };
+  }, []);
 
-  const handleCardDelete = (id: string | number) => {
+  const handleCardDelete = useCallback((id: string | number) => {
     setDeletedIds(prev => new Set(prev).add(id));
-  };
+  }, []);
 
   useLayoutEffect(() => {
     if (cardsContainerRef.current && !hasAnimated.current) {

@@ -1,11 +1,17 @@
 'use client';
 
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useMemo, memo } from 'react';
 import { CardProps } from '@/types';
 import { Badge } from '@/components/ui/badge';
 import { useIsAdmin, isLowConfidence } from '@/lib/authHelpers';
 import { Trash2 } from 'lucide-react';
 import { getActStatus, getStatusColor } from '@/lib/statusHelpers';
+
+// Memoized helper functions
+const stripHtml = (html: string) => html.replace(/<[^>]*>/g, '');
+
+const stripDateFromTitle = (title: string) =>
+  title.replace(/z dnia \d{1,2} \w+ \d{4}\s*r\.\s*/i, '').trim();
 
 const Card = ({
   id,
@@ -53,22 +59,21 @@ const Card = ({
   const governmentDots = Math.round((governmentPercentage / 100) * totalDots);
   const oppositionDots = totalDots - governmentDots;
 
-  const formattedDate = new Date(date).toLocaleDateString('pl-PL', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  });
+  const formattedDate = useMemo(
+    () =>
+      new Date(date).toLocaleDateString('pl-PL', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      }),
+    [date]
+  );
 
-  const stripHtml = (html: string) => {
-    return html.replace(/<[^>]*>/g, '');
-  };
-
-  const stripDateFromTitle = (title: string) => {
-    const titleWithoutDate = title
-      .replace(/z dnia \d{1,2} \w+ \d{4}\s*r\.\s*/i, '')
-      .trim();
-    return titleWithoutDate;
-  };
+  const processedTitle = useMemo(() => stripDateFromTitle(title), [title]);
+  const processedContent = useMemo(
+    () => (content ? stripHtml(content) : ''),
+    [content]
+  );
 
   const isAdmin = useIsAdmin();
   const needsVerification = isLowConfidence(confidenceScore);
@@ -161,7 +166,7 @@ const Card = ({
         data-testid="act-title"
         className="text-lg leading-snug font-medium tracking-tight line-clamp-3"
       >
-        {stripDateFromTitle(title)}
+        {processedTitle}
       </h2>
       <div className="space-y-1.5">
         <div className="text-neutral-400 dark:text-neutral-500 text-[11px] tracking-widest uppercase group-hover:text-neutral-600 dark:group-hover:text-neutral-300 transition-colors duration-500">
@@ -184,7 +189,7 @@ const Card = ({
         </div>
       )}
       <p className="line-clamp-7 text-sm text-neutral-500 dark:text-neutral-400 leading-relaxed group-hover:text-neutral-600 dark:group-hover:text-neutral-300 transition-colors duration-500">
-        {content && stripHtml(content)}
+        {processedContent}
       </p>
       {governmentPercentage > 0 && (
         <div className="pt-2 border-t border-white/[0.04] space-y-3">
@@ -217,4 +222,4 @@ const Card = ({
   );
 };
 
-export default Card;
+export default memo(Card);
