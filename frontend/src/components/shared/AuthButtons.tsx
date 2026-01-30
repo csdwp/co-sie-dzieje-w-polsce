@@ -17,7 +17,7 @@ const AuthButtons = ({ isDarkMode }: { isDarkMode: boolean }) => {
   return (
     <>
       <SignedOut>
-        <div className="relative">
+        <div className="relative h-6">
           <button
             aria-label={
               isOpen ? 'Zamknij menu użytkownika' : 'Otwórz menu użytkownika'
