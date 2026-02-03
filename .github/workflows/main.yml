@@ -5,6 +5,7 @@ on:
       - main
     paths:
       - 'backend/app/**'
+  workflow_dispatch:
 jobs:
   ftp-deploy:
     runs-on: ubuntu-latest
