@@ -27,7 +27,6 @@ const CookieConsent = ({ onAccept }: CookieConsentProps) => {
     }
   }, [onAccept]);
 
-  // Block scrolling while banner is visible
   useEffect(() => {
     if (isVisible && status === 'pending') {
       document.body.style.overflow = 'hidden';
@@ -59,14 +58,11 @@ const CookieConsent = ({ onAccept }: CookieConsentProps) => {
 
   return (
     <>
-      {/* Overlay that blocks interaction */}
       <div
         className="fixed inset-0 z-[9998] cursor-not-allowed"
         onClick={handleOverlayClick}
         aria-hidden="true"
       />
-
-      {/* Banner */}
       <div
         className={`fixed bottom-0 left-0 right-0 z-[9999] p-4 sm:p-6 transition-transform duration-300 ${
           nudge ? '-translate-y-2' : 'translate-y-0'
