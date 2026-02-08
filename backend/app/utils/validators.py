@@ -13,7 +13,7 @@ def validate_eli_format(eli: str) -> bool:
     Validate ELI (European Legislation Identifier) format.
 
     Args:
-        eli: ELI string to validate
+        eli: ELI string to validate (format: PUBLISHER/YEAR/NUMBER, e.g., DU/2026/137)
 
     Returns:
         True if valid, False otherwise
@@ -21,8 +21,8 @@ def validate_eli_format(eli: str) -> bool:
     if not eli or not isinstance(eli, str):
         return False
 
-    # Basic ELI format: /pl/act/dz/2024/123
-    pattern = r"^/[a-z]{2}/[a-z]+/[a-z]+/\d{4}/\d+.*$"
+    # ELI format from Sejm API: DU/2026/137 (Publisher/Year/Number)
+    pattern = r"^[A-Z]{2,}/\d{4}/\d+$"
     return bool(re.match(pattern, eli))
 
 

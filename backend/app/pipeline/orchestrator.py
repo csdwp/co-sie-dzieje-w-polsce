@@ -8,6 +8,7 @@ from ..core.config import (
     MAX_ACTS_TO_PROCESS,
     check_environment,
 )
+from ..core.exceptions import InsufficientQuotaError
 from ..core.logging import get_logger
 from ..services.act_processor import ActProcessor
 from ..services.external.sejm_api import SejmAPIClient
@@ -77,9 +78,16 @@ class PipelineOrchestrator:
 
         # Process acts (oldest first)
         success_count = 0
-        for act in reversed(acts_to_process):
-            if self.processor.process_and_save(act):
-                success_count += 1
+        try:
+            for act in reversed(acts_to_process):
+                if self.processor.process_and_save(act):
+                    success_count += 1
+        except InsufficientQuotaError as e:
+            logger.error(f"❌ OpenAI quota exceeded - stopping pipeline: {e}")
+            logger.info(
+                f"Successfully processed {success_count}/{len(acts_to_process)} acts before quota exceeded"
+            )
+            raise
 
         logger.info(
             f"Successfully processed {success_count}/{len(acts_to_process)} acts"

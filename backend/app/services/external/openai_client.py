@@ -7,7 +7,7 @@ from typing import Any, Dict, Optional, cast
 from dotenv import load_dotenv
 from openai import OpenAI
 
-from ...core.exceptions import AIServiceError
+from ...core.exceptions import AIServiceError, InsufficientQuotaError
 from ...core.logging import get_logger
 from ...utils.retry_handler import retry_ai_service
 
@@ -76,6 +76,12 @@ class OpenAIClient:
             return {"content": content}
 
         except Exception as e:
+            # Check if this is a quota exceeded error
+            error_str = str(e).lower()
+            if "insufficient_quota" in error_str or "quota" in error_str:
+                logger.error(f"OpenAI quota exceeded: {e}")
+                raise InsufficientQuotaError(f"OpenAI quota exceeded: {e}")
+
             logger.error(f"OpenAI API error: {e}")
             raise AIServiceError(f"OpenAI analysis failed: {e}")
 

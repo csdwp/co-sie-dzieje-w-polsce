@@ -41,3 +41,9 @@ class FileOperationError(BackendException):
     """Raised when file operations fail."""
 
     pass
+
+
+class InsufficientQuotaError(BackendException):
+    """Raised when OpenAI API quota is exceeded."""
+
+    pass

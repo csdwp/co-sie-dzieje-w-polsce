@@ -3,7 +3,7 @@
 from datetime import datetime
 from typing import Any, Dict, Optional, Tuple
 
-from ..core.exceptions import AIServiceError, PDFProcessingError
+from ..core.exceptions import AIServiceError, InsufficientQuotaError, PDFProcessingError
 from ..core.logging import get_logger
 from ..models.act import Act, ActData
 from ..repositories.act_repository import ActRepository
@@ -127,6 +127,9 @@ class ActProcessor:
 
             return success
 
+        except InsufficientQuotaError:
+            # Quota exceeded - don't catch, let pipeline orchestrator handle it
+            raise
         except PDFProcessingError as e:
             logger.error(f"PDF processing failed for {title}: {e}")
             return False
