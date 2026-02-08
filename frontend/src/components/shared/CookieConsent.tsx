@@ -108,9 +108,7 @@ const CookieConsent = ({ onAccept }: CookieConsentProps) => {
               <button
                 onClick={handleReject}
                 className={`flex-1 sm:flex-none px-4 py-2 text-sm font-medium text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 transition-all duration-300 rounded-lg ${
-                  nudge
-                    ? 'bg-neutral-100 dark:bg-white/[0.06]'
-                    : ''
+                  nudge ? 'bg-neutral-100 dark:bg-white/[0.06]' : ''
                 }`}
               >
                 Odrzuć
