@@ -223,13 +223,15 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
                 </Badge>
               )}
             </div>
-            <DialogDescription className="text-neutral-500 dark:text-neutral-400 leading-relaxed">
-              <InlineEditableContent
-                content={card?.content ?? ''}
-                field="content"
-                actId={card?.id ?? ''}
-                isAdmin={isAdmin}
-              />
+            <DialogDescription asChild>
+              <div className="text-neutral-500 dark:text-neutral-400 leading-relaxed">
+                <InlineEditableContent
+                  content={card?.content ?? ''}
+                  field="content"
+                  actId={card?.id ?? ''}
+                  isAdmin={isAdmin}
+                />
+              </div>
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col space-y-2">
