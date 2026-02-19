@@ -5,7 +5,6 @@ import CardGrid from '@/components/shared/CardGrid';
 import Navbar from '@/components/layout/Navbar';
 import { useState } from 'react';
 import type { ActsAndKeywordsResponse } from '@/types';
-// import SuccessModal from '@/components/shared/SuccessModal';
 
 const ClientWrapper = ({ data }: { data: ActsAndKeywordsResponse }) => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -20,7 +19,6 @@ const ClientWrapper = ({ data }: { data: ActsAndKeywordsResponse }) => {
         selectedTypes={selectedTypes}
         setSelectedTypes={setSelectedTypes}
       />
-      {/* <SuccessModal /> */}
       <div className="overflow-hidden flex flex-col gap-4 sm:gap-20 items-center justify-items-center w-full min-h-screen pt-[110px] py-8 pb-20 font-[family-name:var(--font-geist-sans)]">
         <h1 className="sr-only">
           Co przeszło - Akty prawne w Polsce w prostym języku
