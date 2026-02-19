@@ -117,7 +117,9 @@ const CustomPieTooltip = ({
     const votes = isYes ? totalYes : totalNo;
     return (
       <div className="bg-white/95 dark:bg-white/[0.06] backdrop-blur-xl text-neutral-800 dark:text-neutral-100 px-4 py-3 rounded-xl shadow-2xl border border-black/[0.06] dark:border-white/[0.06]">
-        <p className="font-medium mb-1.5 text-neutral-700 dark:text-neutral-200">{entry.name}</p>
+        <p className="font-medium mb-1.5 text-neutral-700 dark:text-neutral-200">
+          {entry.name}
+        </p>
         <p
           className="text-sm text-neutral-400"
           style={{ color: entry.payload.fill }}
