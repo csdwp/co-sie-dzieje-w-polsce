@@ -10,26 +10,6 @@
 export const CONFIDENCE_THRESHOLD = 0.5;
 
 /**
- * Feature flag to enable/disable subscriptions system
- * When false, shows daily limit modal instead of subscription modal
- * @default false
- */
-export const SUBSCRIPTIONS_ENABLED =
-  process.env.NEXT_PUBLIC_ENABLE_SUBSCRIPTIONS === 'true';
-
-/**
- * Daily limit for anonymous users
- * @default 3
- */
-export const ANONYMOUS_DAILY_LIMIT = 3;
-
-/**
- * Daily limit for authenticated users
- * @default 5
- */
-export const AUTHENTICATED_DAILY_LIMIT = 5;
-
-/**
  * =================================================================
  * ENVIRONMENT VARIABLES CONFIGURATION
  * =================================================================
@@ -40,15 +20,6 @@ export const AUTHENTICATED_DAILY_LIMIT = 5;
  */
 export const CLERK_CONFIG = {
   secretKey: process.env.CLERK_SECRET_KEY,
-} as const;
-
-/**
- * Stripe Payment Configuration
- */
-export const STRIPE_CONFIG = {
-  secretKey: process.env.STRIPE_SECRET_KEY,
-  publishableKey: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
-  webhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
 } as const;
 
 /**

@@ -70,8 +70,8 @@ interface CustomTooltipProps {
 const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-white/[0.03] dark:bg-white/[0.06] backdrop-blur-xl text-neutral-100 px-4 py-3 rounded-xl shadow-2xl border border-white/[0.06]">
-        <p className="font-medium mb-1.5 text-neutral-200">
+      <div className="bg-white/95 dark:bg-white/[0.06] backdrop-blur-xl text-neutral-800 dark:text-neutral-100 px-4 py-3 rounded-xl shadow-2xl border border-black/[0.06] dark:border-white/[0.06]">
+        <p className="font-medium mb-1.5 text-neutral-700 dark:text-neutral-200">
           {payload[0].payload.party}
         </p>
         {payload.map((entry: TooltipPayloadEntry, index: number) => (
@@ -116,8 +116,8 @@ const CustomPieTooltip = ({
     const isYes = entry.name === 'Za';
     const votes = isYes ? totalYes : totalNo;
     return (
-      <div className="bg-white/[0.03] dark:bg-white/[0.06] backdrop-blur-xl text-neutral-100 px-4 py-3 rounded-xl shadow-2xl border border-white/[0.06]">
-        <p className="font-medium mb-1.5 text-neutral-200">{entry.name}</p>
+      <div className="bg-white/95 dark:bg-white/[0.06] backdrop-blur-xl text-neutral-800 dark:text-neutral-100 px-4 py-3 rounded-xl shadow-2xl border border-black/[0.06] dark:border-white/[0.06]">
+        <p className="font-medium mb-1.5 text-neutral-700 dark:text-neutral-200">{entry.name}</p>
         <p
           className="text-sm text-neutral-400"
           style={{ color: entry.payload.fill }}
@@ -257,7 +257,7 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
                 {card.categories.map((category: string, index: number) => (
                   <span
                     key={index}
-                    className="bg-white/[0.04] dark:bg-white/[0.06] px-3 py-1.5 text-[11px] font-medium tracking-wide text-neutral-600 dark:text-neutral-300 rounded-full cursor-default"
+                    className="bg-black/[0.04] dark:bg-white/[0.06] px-3 py-1.5 text-[11px] font-medium tracking-wide text-neutral-600 dark:text-neutral-300 rounded-full cursor-default"
                   >
                     {category}
                   </span>
@@ -322,7 +322,7 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
                 <div className="text-[11px] tracking-widest uppercase text-neutral-400 dark:text-neutral-500">
                   Wynik głosowania
                 </div>
-                <div className="flex flex-col gap-4 p-5 rounded-xl bg-white/[0.02] dark:bg-white/[0.03] premium-border">
+                <div className="flex flex-col gap-4 p-5 rounded-xl bg-black/[0.02] dark:bg-white/[0.03] premium-border">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                       <div
@@ -373,7 +373,7 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
               {/* Toggle Button for Detailed Analysis */}
               <button
                 onClick={() => setShowDetailedAnalysis(!showDetailedAnalysis)}
-                className="w-full px-4 py-3 rounded-xl bg-white/[0.02] hover:bg-white/[0.04] text-neutral-600 dark:text-neutral-300 border-none outline-none text-sm font-medium tracking-wide transition-all duration-500 flex items-center justify-center gap-2"
+                className="w-full px-4 py-3 rounded-xl bg-black/[0.02] dark:bg-white/[0.02] hover:bg-black/[0.04] dark:hover:bg-white/[0.04] text-neutral-600 dark:text-neutral-300 border-none outline-none text-sm font-medium tracking-wide transition-all duration-500 flex items-center justify-center gap-2"
               >
                 {showDetailedAnalysis
                   ? 'Ukryj szczegółową analizę'
@@ -421,7 +421,7 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
                             głosów za ({yesPercentageGov.toFixed(1)}%)
                           </span>
                         </div>
-                        <div className="w-full bg-white/[0.04] dark:bg-white/[0.06] rounded-full h-2 overflow-hidden">
+                        <div className="w-full bg-black/[0.06] dark:bg-white/[0.06] rounded-full h-2 overflow-hidden">
                           <div
                             className="h-full rounded-full transition-all duration-700 ease-out"
                             style={{
@@ -443,7 +443,7 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
                             głosów za ({(100 - yesPercentageGov).toFixed(1)}%)
                           </span>
                         </div>
-                        <div className="w-full bg-white/[0.04] dark:bg-white/[0.06] rounded-full h-2 overflow-hidden">
+                        <div className="w-full bg-black/[0.06] dark:bg-white/[0.06] rounded-full h-2 overflow-hidden">
                           <div
                             className="h-full rounded-full transition-all duration-700 ease-out"
                             style={{
@@ -468,7 +468,7 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
                         </div>
                       </div>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                        <div className="flex flex-col gap-1.5 p-4 rounded-xl bg-white/[0.02] dark:bg-white/[0.03] premium-border">
+                        <div className="flex flex-col gap-1.5 p-4 rounded-xl bg-black/[0.02] dark:bg-white/[0.03] premium-border">
                           <span className="text-[10px] tracking-widest uppercase text-neutral-400 dark:text-neutral-500">
                             Głosowało
                           </span>
@@ -481,7 +481,7 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
                             </span>
                           </div>
                         </div>
-                        <div className="flex flex-col gap-1.5 p-4 rounded-xl bg-white/[0.02] dark:bg-white/[0.03] premium-border">
+                        <div className="flex flex-col gap-1.5 p-4 rounded-xl bg-black/[0.02] dark:bg-white/[0.03] premium-border">
                           <span className="text-[10px] tracking-widest uppercase text-neutral-400 dark:text-neutral-500">
                             Wstrzymało się
                           </span>
@@ -498,7 +498,7 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
                             </span>
                           </div>
                         </div>
-                        <div className="flex flex-col gap-1.5 p-4 rounded-xl bg-white/[0.02] dark:bg-white/[0.03] premium-border">
+                        <div className="flex flex-col gap-1.5 p-4 rounded-xl bg-black/[0.02] dark:bg-white/[0.03] premium-border">
                           <span className="text-[10px] tracking-widest uppercase text-neutral-400 dark:text-neutral-500">
                             Nieobecnych
                           </span>
@@ -515,7 +515,7 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
                             </span>
                           </div>
                         </div>
-                        <div className="flex flex-col gap-1.5 p-4 rounded-xl bg-white/[0.02] dark:bg-white/[0.03] premium-border">
+                        <div className="flex flex-col gap-1.5 p-4 rounded-xl bg-black/[0.02] dark:bg-white/[0.03] premium-border">
                           <span className="text-[10px] tracking-widest uppercase text-neutral-400 dark:text-neutral-500">
                             Frekwencja
                           </span>
