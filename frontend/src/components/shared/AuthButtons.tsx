@@ -23,12 +23,12 @@ const AuthButtons = ({ isDarkMode }: { isDarkMode: boolean }) => {
               isOpen ? 'Zamknij menu użytkownika' : 'Otwórz menu użytkownika'
             }
             aria-expanded={isOpen}
-            className={`cursor-pointer transition-colors duration-300 ${
+            className={`cursor-pointer transition-all duration-300 ${
               isOpen
                 ? isDarkMode
-                  ? 'text-neutral-100'
-                  : 'text-neutral-600'
-                : 'text-neutral-400 dark:text-neutral-500'
+                  ? 'text-neutral-100 [filter:drop-shadow(0_0_8px_rgba(255,255,255,0.5))]'
+                  : 'text-neutral-600 [filter:drop-shadow(0_0_0px_rgba(255,255,255,0))]'
+                : 'text-neutral-400 dark:text-neutral-500 [filter:drop-shadow(0_0_0px_rgba(255,255,255,0))]'
             }`}
             onClick={toggleMenu}
           >
@@ -51,7 +51,7 @@ const AuthButtons = ({ isDarkMode }: { isDarkMode: boolean }) => {
             <button
               className={`cursor-pointer w-max text-sm leading-3.5 absolute ease-out top-0 transition-all duration-300 -z-10 opacity-0 ${
                 isDarkMode
-                  ? 'text-neutral-500 hover:text-neutral-100'
+                  ? 'text-neutral-500 hover:text-neutral-100 [text-shadow:0_0_0px_rgba(255,255,255,0)] hover:[text-shadow:0_0_8px_rgba(255,255,255,0.5)]'
                   : 'text-neutral-500 hover:text-neutral-800'
               }
               ${
@@ -66,7 +66,7 @@ const AuthButtons = ({ isDarkMode }: { isDarkMode: boolean }) => {
             <button
               className={`cursor-pointer w-max text-sm leading-3.5 absolute ease-out top-0 transition-all duration-300 -z-10 opacity-0 ${
                 isDarkMode
-                  ? 'text-neutral-500 hover:text-neutral-100'
+                  ? 'text-neutral-500 hover:text-neutral-100 [text-shadow:0_0_0px_rgba(255,255,255,0)] hover:[text-shadow:0_0_8px_rgba(255,255,255,0.5)]'
                   : 'text-neutral-500 hover:text-neutral-800'
               }
               ${

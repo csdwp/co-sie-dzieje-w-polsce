@@ -262,3 +262,7 @@ body {
     background-position: 200% 0;
   }
 }
+
+.swiper-wrapper {
+  @apply h-auto!;
+}
