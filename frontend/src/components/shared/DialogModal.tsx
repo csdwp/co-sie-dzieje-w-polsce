@@ -481,7 +481,7 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
                               {votes.summary.yes + votes.summary.no}
                             </span>
                             <span className="text-xs text-neutral-500 dark:text-neutral-400">
-                              /{votes.summary.total}
+                              / {votes.summary.total}
                             </span>
                           </div>
                         </div>
