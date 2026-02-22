@@ -35,17 +35,21 @@ class TextAnalyzer:
             Summary text
         """
         prompt = (
-            "Podsumuj ten fragment dokumentu prawnego w języku polskim w 2-3 zwięzłych zdaniach, "
-            "wychwytując kluczowe zmiany lub przepisy. Skup się na istocie, unikając zbędnych szczegółów."
+            "Jesteś ekspertem od prawa polskiego tłumaczącym przepisy zwykłym obywatelom. "
+            "Podsumuj ten fragment dokumentu prawnego w 2-3 zdaniach po polsku. "
+            "Zachowaj konkretne szczegóły: kwoty, kary, terminy, progi, daty wejścia w życie "
+            "oraz grupy osób lub podmiotów, których dotyczą zmiany. "
+            "Pomiń formalne odniesienia do artykułów i numerów ustaw — "
+            "skup się na tym, co faktycznie się zmienia i kogo to dotyczy."
         )
 
         result = self.openai_client.analyze_with_prompt(
-            text=text, prompt=prompt, max_tokens=200, expect_json=False
+            text=text, prompt=prompt, max_tokens=350, expect_json=False
         )
         return str(result.get("content", ""))
 
     def analyze_full_text(
-        self, text: str, chunk_size: int = 3000, chunk_overlap: int = 200
+        self, text: str, chunk_size: int = 3000, chunk_overlap: int = 500
     ) -> ActAnalysis:
         """
         Analyze full legal text by splitting into chunks and summarizing.
@@ -72,22 +76,32 @@ class TextAnalyzer:
             summary = self.summarize_fragment(chunk)
             summaries.append(summary)
 
-        # Combine summaries
-        combined_summary = "\n".join(summaries)
+        # Combine summaries with structural markers so the final model
+        # understands document order and can resolve cross-references
+        total = len(summaries)
+        combined_summary = "\n\n".join(
+            f"[Fragment {i + 1}/{total}]\n{s}" for i, s in enumerate(summaries)
+        )
         logger.info(
             f"Combined summaries, total length: {len(combined_summary)} characters"
         )
 
         # Generate final analysis
         analysis_prompt = (
-            "Napisz jasne i zwięzłe podsumowanie zmiany prawnej w języku polskim, odpowiednie dla wiadomości na stronie głównej lub powiadomienia push. "
-            'Zwróć wynik jako obiekt JSON z dwoma polami: "title": krótki, informacyjny nagłówek (maks. 8 słów, neutralny ton, bez języka pierwszoosobowego), '
-            '"content_html": lekki tekst HTML (<p>, <ul>, <li>, <strong>), zawierający: Nieco rozszerzone wyjaśnienie, co się zmieniło (3-5 zdań), '
-            "Jeśli istotne, proste wyjaśnienie konsekwencji lub skutków zmiany (1-2 zdania), "
-            'Unikaj zbędnych porównań typu "przed i po". Skup się na samej zmianie, bez wyraźnego porównania jej z przeszłością, chyba że jest to konieczne dla kontekstu. '
-            'Pisz neutralnym i profesjonalnym tonem. Unikaj niepotrzebnych wstępów ("ten tekst informuje..."). '
-            "Dane wejściowe to połączone streszczenie większego dokumentu prawnego; przedstaw spójne podsumowanie na tej podstawie. "
-            "**Cała treść musi być napisana w języku polskim.**"
+            "Jesteś redaktorem serwisu obywatelskiego tłumaczącym zmiany prawne Polakom bez wykształcenia prawniczego. "
+            "Na podstawie poniższych streszczeń fragmentów dokumentu prawnego napisz końcowe podsumowanie. "
+            'Zwróć JSON z polami "title" i "content_html". '
+            '"title": konkretny nagłówek max 8 słów opisujący co się faktycznie zmienia — nie nazwę ustawy, neutralny ton. '
+            '"content_html": treść w HTML używając tylko <p>, <ul>, <li>, <strong>. '
+            "Zasady dla content_html: "
+            "1. Zacznij od najważniejszego faktu — tego co czytelnik powinien wiedzieć w pierwszej kolejności. "
+            "2. Wyjaśnij kogo dotyczy zmiana (pracownicy, firmy, emeryci, kierowcy, wszyscy obywatele itp.). "
+            "3. Uwzględnij konkretne liczby: kwoty, kary, terminy, progi — jeśli są w tekście, muszą być w podsumowaniu. "
+            "4. Jeśli to zmiana istniejącego przepisu, powiedz krótko jak było i jak będzie — to ułatwia zrozumienie. "
+            "5. Zakończ jednym zdaniem o skutkach praktycznych jeśli są istotne. "
+            "6. Pisz prostym aktywnym językiem — jakbyś wyjaśniał znajomemu, nie prawnikowi. "
+            'Unikaj pustych wstępów ("Ustawa ta...", "Przepisy dotyczą..."). '
+            "Cała treść po polsku."
         )
 
         result = self.openai_client.analyze_with_prompt(
