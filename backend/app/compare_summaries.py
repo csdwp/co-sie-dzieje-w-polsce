@@ -8,6 +8,7 @@ Example:
     python compare_summaries.py https://isap.nsf.gov.pl/download.xsp/WDU20240000001/T/D20240001L.pdf
 """
 
+import re
 import sys
 import textwrap
 
@@ -108,8 +109,6 @@ def run_new(text: str) -> dict:
 
 
 def strip_html(html: str) -> str:
-    import re
-
     return re.sub(r"<[^>]+>", "", html).strip()
 
 
