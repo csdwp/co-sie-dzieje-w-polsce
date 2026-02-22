@@ -120,7 +120,7 @@ def print_result(label: str, result: dict) -> None:
     title = result.get("title", "[no title]")
     content = strip_html(result.get("content_html", "[no content]"))
     print(f"  TITLE:   {title}")
-    print(f"\n  CONTENT:")
+    print("\n  CONTENT:")
     for line in textwrap.wrap(content, width=68):
         print(f"    {line}")
 
