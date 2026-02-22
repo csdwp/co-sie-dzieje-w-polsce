@@ -27,7 +27,9 @@ def summarize_fragment_old(client: OpenAIClient, text: str) -> str:
         "Podsumuj ten fragment dokumentu prawnego w języku polskim w 2-3 zwięzłych zdaniach, "
         "wychwytując kluczowe zmiany lub przepisy. Skup się na istocie, unikając zbędnych szczegółów."
     )
-    result = client.analyze_with_prompt(text=text, prompt=prompt, max_tokens=200, expect_json=False)
+    result = client.analyze_with_prompt(
+        text=text, prompt=prompt, max_tokens=200, expect_json=False
+    )
     return str(result.get("content", ""))
 
 
@@ -40,7 +42,9 @@ def summarize_fragment_new(client: OpenAIClient, text: str) -> str:
         "Pomiń formalne odniesienia do artykułów i numerów ustaw — "
         "skup się na tym, co faktycznie się zmienia i kogo to dotyczy."
     )
-    result = client.analyze_with_prompt(text=text, prompt=prompt, max_tokens=350, expect_json=False)
+    result = client.analyze_with_prompt(
+        text=text, prompt=prompt, max_tokens=350, expect_json=False
+    )
     return str(result.get("content", ""))
 
 
@@ -63,7 +67,9 @@ def run_old(text: str) -> dict:
         "Dane wejściowe to połączone streszczenie większego dokumentu prawnego; przedstaw spójne podsumowanie na tej podstawie. "
         "**Cała treść musi być napisana w języku polskim.**"
     )
-    result = client.analyze_with_prompt(text=combined, prompt=final_prompt, max_tokens=1000, expect_json=True)
+    result = client.analyze_with_prompt(
+        text=combined, prompt=final_prompt, max_tokens=1000, expect_json=True
+    )
     return result
 
 
@@ -75,7 +81,9 @@ def run_new(text: str) -> dict:
 
     total = len(chunks)
     summaries = [summarize_fragment_new(client, c) for c in chunks]
-    combined = "\n\n".join(f"[Fragment {i + 1}/{total}]\n{s}" for i, s in enumerate(summaries))
+    combined = "\n\n".join(
+        f"[Fragment {i + 1}/{total}]\n{s}" for i, s in enumerate(summaries)
+    )
 
     final_prompt = (
         "Jesteś redaktorem serwisu obywatelskiego tłumaczącym zmiany prawne Polakom bez wykształcenia prawniczego. "
@@ -93,12 +101,15 @@ def run_new(text: str) -> dict:
         'Unikaj pustych wstępów ("Ustawa ta...", "Przepisy dotyczą..."). '
         "Cała treść po polsku."
     )
-    result = client.analyze_with_prompt(text=combined, prompt=final_prompt, max_tokens=1000, expect_json=True)
+    result = client.analyze_with_prompt(
+        text=combined, prompt=final_prompt, max_tokens=1000, expect_json=True
+    )
     return result
 
 
 def strip_html(html: str) -> str:
     import re
+
     return re.sub(r"<[^>]+>", "", html).strip()
 
 
