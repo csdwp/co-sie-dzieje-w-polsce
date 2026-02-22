@@ -56,7 +56,7 @@ const AuthButtons = ({ isDarkMode }: { isDarkMode: boolean }) => {
               }
               ${
                 isOpen &&
-                'opacity-100 !pointer-events-auto -translate-x-12 translate-y-8 z-0'
+                'opacity-100 !pointer-events-auto -translate-x-17 translate-y-8 z-0'
               }`}
             >
               Zaloguj się
@@ -71,7 +71,7 @@ const AuthButtons = ({ isDarkMode }: { isDarkMode: boolean }) => {
               }
               ${
                 isOpen &&
-                'opacity-100 !pointer-events-auto -translate-x-[69px] translate-y-14 z-0'
+                'opacity-100 !pointer-events-auto -translate-x-[89px] translate-y-14 z-0'
               }`}
             >
               Zarejestruj się
