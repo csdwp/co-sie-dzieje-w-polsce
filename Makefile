@@ -28,4 +28,4 @@ type-check-file:
 	$(MYPY) $(FILE)
 
 test:
-	cd backend && python -m pytest
+	cd backend && venv/bin/python3 -m pytest tests/unit/

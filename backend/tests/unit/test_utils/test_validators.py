@@ -10,8 +10,9 @@ class TestValidateEliFormat:
         """Test that validate_eli_format returns True for valid ELI."""
         # Arrange - test representative valid cases
         valid_elis = [
-            "/pl/act/dz/2024/123",           # basic format
-            "/pl/act/dz/2024/456/extra",     # with extra segments
+            "DU/2026/137",   # basic format
+            "DU/2024/456",   # different year
+            "MP/2025/50",    # different publisher
         ]
 
         # Act & Assert
@@ -22,11 +23,12 @@ class TestValidateEliFormat:
         """Test that validate_eli_format returns False for invalid ELI."""
         # Arrange - test key invalid cases
         invalid_elis = [
-            "",                      # empty string
-            "not-an-eli",           # missing leading slash
-            "/pl/act/dz/2024",      # missing number part
-            "/pl/act/dz/abcd/123",  # non-numeric year
-            "/pl/act/dz/2024/abc",  # non-numeric number
+            "",                # empty string
+            "not-an-eli",     # wrong format
+            "DU/2024",        # missing number part
+            "DU/abcd/123",    # non-numeric year
+            "DU/2024/abc",    # non-numeric number
+            "DU//2026",       # missing year
         ]
 
         # Act & Assert
@@ -50,7 +52,7 @@ class TestValidateActData:
         """Test that validate_act_data returns True for complete valid data."""
         # Arrange
         valid_data = {
-            "ELI": "/pl/act/dz/2024/123",
+            "ELI": "DU/2024/123",
             "title": "Ustawa testowa",
             "type": "Ustawa"
         }
@@ -67,12 +69,12 @@ class TestValidateActData:
         test_cases = [
             # Missing fields
             {"title": "Ustawa testowa", "type": "Ustawa"},  # missing ELI
-            {"ELI": "/pl/act/dz/2024/123", "type": "Ustawa"},  # missing title
-            {"ELI": "/pl/act/dz/2024/123", "title": "Ustawa testowa"},  # missing type
+            {"ELI": "DU/2024/123", "type": "Ustawa"},  # missing title
+            {"ELI": "DU/2024/123", "title": "Ustawa testowa"},  # missing type
             # Empty fields
             {"ELI": "", "title": "Ustawa testowa", "type": "Ustawa"},  # empty ELI
-            {"ELI": "/pl/act/dz/2024/123", "title": "", "type": "Ustawa"},  # empty title
-            {"ELI": "/pl/act/dz/2024/123", "title": "Ustawa testowa", "type": ""},  # empty type
+            {"ELI": "DU/2024/123", "title": "", "type": "Ustawa"},  # empty title
+            {"ELI": "DU/2024/123", "title": "Ustawa testowa", "type": ""},  # empty type
         ]
 
         # Act & Assert
@@ -99,7 +101,7 @@ class TestValidateActData:
         """Test that validate_act_data returns False for invalid act type."""
         # Arrange
         invalid_data = {
-            "ELI": "/pl/act/dz/2024/123",
+            "ELI": "DU/2024/123",
             "title": "Ustawa testowa",
             "type": "InvalidType"
         }
@@ -117,7 +119,7 @@ class TestValidateActData:
 
         for act_type in valid_types:
             data = {
-                "ELI": "/pl/act/dz/2024/123",
+                "ELI": "DU/2024/123",
                 "title": "Ustawa testowa",
                 "type": act_type
             }
