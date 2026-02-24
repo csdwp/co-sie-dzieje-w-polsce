@@ -19,7 +19,7 @@ jobs:
           username: ${{ secrets.FTP_USER }}
           password: ${{ secrets.FTP_PASS }}
           local-dir: backend/app/
-          server-dir: /public_html/csdwp/
+          server-dir: /home/srv90707/domains/srv90707.seohost.com.pl/public_ftp/csdwp/
           dangerous-clean-slate: false
           timeout: 60000
           retries: 3

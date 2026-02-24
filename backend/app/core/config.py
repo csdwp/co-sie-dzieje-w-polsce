@@ -4,7 +4,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(Path(__file__).parent.parent / ".env")
 
 BASIC_URL = os.getenv("BASIC_URL")
 API_URL = os.getenv("DU_URL")
