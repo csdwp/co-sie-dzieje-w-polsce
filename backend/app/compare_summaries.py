@@ -8,17 +8,20 @@ Example:
     python compare_summaries.py https://isap.nsf.gov.pl/download.xsp/WDU20240000001/T/D20240001L.pdf
 """
 
+import os
 import re
 import sys
 import textwrap
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 try:
     from langchain_text_splitters import RecursiveCharacterTextSplitter
 except ImportError:
     from langchain.text_splitter import RecursiveCharacterTextSplitter  # type: ignore[no-redef]
 
-from services.external.openai_client import OpenAIClient
-from services.external.pdf_processor import PDFProcessor
+from app.services.external.openai_client import OpenAIClient
+from app.services.external.pdf_processor import PDFProcessor
 
 SEP = "─" * 72
 
