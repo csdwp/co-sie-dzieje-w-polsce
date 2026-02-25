@@ -131,8 +131,8 @@ const MobileMenu = ({
                 onClick={() => toggleType('Ustawa')}
                 className={`text-[15px] tracking-wide transition-all duration-500 ${
                   selectedTypes.includes('Ustawa')
-                    ? 'text-neutral-200 [filter:drop-shadow(0_0_8px_rgba(255,255,255,0.6))]'
-                    : 'text-neutral-500 hover:text-neutral-300'
+                    ? 'text-neutral-200 [text-shadow:0_0_8px_rgba(255,255,255,0.6)]'
+                    : 'text-neutral-500 hover:text-neutral-300 [text-shadow:none]'
                 }`}
               >
                 Ustawy
@@ -141,8 +141,8 @@ const MobileMenu = ({
                 onClick={() => toggleType('Rozporządzenie')}
                 className={`text-[15px] tracking-wide transition-all duration-500 ${
                   selectedTypes.includes('Rozporządzenie')
-                    ? 'text-neutral-200 [filter:drop-shadow(0_0_8px_rgba(255,255,255,0.6))]'
-                    : 'text-neutral-500 hover:text-neutral-300'
+                    ? 'text-neutral-200 [text-shadow:0_0_8px_rgba(255,255,255,0.6)]'
+                    : 'text-neutral-500 hover:text-neutral-300 [text-shadow:none]'
                 }`}
               >
                 Rozporządzenia

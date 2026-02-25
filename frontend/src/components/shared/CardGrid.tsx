@@ -14,23 +14,12 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 import 'swiper/css';
 import { Act, CardGridProps } from '@/types';
-import { useModalLimit } from '@/app/hooks/useModalLimit';
 import { useUser } from '@clerk/nextjs';
 import { gsap } from 'gsap';
-import {
-  CONFIDENCE_THRESHOLD,
-  ANONYMOUS_DAILY_LIMIT,
-  AUTHENTICATED_DAILY_LIMIT,
-} from '@/lib/config';
+import { CONFIDENCE_THRESHOLD } from '@/lib/config';
 
 // Dynamic imports for modals - loaded only when needed
 const DialogModal = dynamic(() => import('./DialogModal'), { ssr: false });
-const SubscriptionModal = dynamic(() => import('./SubscriptionModal'), {
-  ssr: false,
-});
-const DailyLimitModal = dynamic(() => import('./DailyLimitModal'), {
-  ssr: false,
-});
 
 const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
   const [selectedCard, setSelectedCard] = useState<Act | null>(null);
@@ -38,12 +27,8 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
   const [isFilterOptionsOpen, setIsFilterOptionsOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [sortByTitle, setSortByTitle] = useState<'asc' | 'desc' | null>(null);
-  const [limitModal, setLimitModal] = useState<boolean>(false);
   const [deletedIds, setDeletedIds] = useState<Set<string | number>>(new Set());
   const { user } = useUser();
-  const { canOpen, registerOpen } = useModalLimit(
-    user ? AUTHENTICATED_DAILY_LIMIT : ANONYMOUS_DAILY_LIMIT
-  );
   const cardsContainerRef = useRef<HTMLDivElement>(null);
   const hasAnimated = useRef(false);
 
@@ -139,25 +124,12 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
     }
   }, [baseFilteredActs, sortOrder, sortByTitle, selectedCategories]);
 
-  const openModal = useCallback(
-    (card: Act) => {
-      if (!canOpen) {
-        setLimitModal(true);
-        return;
-      }
-
-      setSelectedCard(card);
-      if (user?.unsafeMetadata.subscription_status !== 'active') registerOpen();
-    },
-    [canOpen, user?.unsafeMetadata.subscription_status, registerOpen]
-  );
+  const openModal = useCallback((card: Act) => {
+    setSelectedCard(card);
+  }, []);
 
   const closeModal = useCallback(() => {
     setSelectedCard(null);
-  }, []);
-
-  const handleCloseLimitModal = useCallback(() => {
-    setLimitModal(false);
   }, []);
 
   const handleCardDelete = useCallback((id: string | number) => {
@@ -205,10 +177,10 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
       {availableCategories && availableCategories.length > 0 && (
         <div className="w-full mx-auto max-[640px]:max-w-11/12 max-[700px]:max-w-[320px] max-[950px]:max-w-[660px] max-[1200px]:max-w-[1000px] max-w-[1260px]">
           <div className="text-lg relative flex flex-row items-center justify-between mb-1 gap-4 w-max">
-            <button className="swiper-button-prev-custom cursor-pointer transition-all duration-500 text-neutral-400 dark:text-neutral-500 hover:text-neutral-600 dark:hover:text-neutral-300">
+            <button className="swiper-button-prev-custom cursor-pointer transition-all duration-500 text-neutral-400 dark:text-neutral-500 hover:text-neutral-600 dark:hover:text-neutral-300 dark:[text-shadow:0_0_0px_rgba(255,255,255,0)] dark:hover:[text-shadow:0_0_8px_rgba(255,255,255,0.5)]">
               ←
             </button>
-            <button className="swiper-button-next-custom cursor-pointer transition-all duration-500 text-neutral-400 dark:text-neutral-500 hover:text-neutral-600 dark:hover:text-neutral-300">
+            <button className="swiper-button-next-custom cursor-pointer transition-all duration-500 text-neutral-400 dark:text-neutral-500 hover:text-neutral-600 dark:hover:text-neutral-300 dark:[text-shadow:0_0_0px_rgba(255,255,255,0)] dark:hover:[text-shadow:0_0_8px_rgba(255,255,255,0.5)]">
               →
             </button>
           </div>
@@ -223,7 +195,7 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
               slidesPerView="auto"
               freeMode={true}
               className="!mx-0 cursor-default relative mask-alpha mask-r-from-black mask-r-from-97% mask-r-to-transparent
-            mask-l-from-black mask-l-from-97% mask-l-to-transparent !pb-4 w-full"
+            mask-l-from-black mask-l-from-97% mask-l-to-transparent !pb-4 w-full flex! items-center h-[45px]"
             >
               <SwiperSlide key="wszystkie" className="!w-max">
                 <span
@@ -233,8 +205,8 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
                   px-3 py-1.5 text-[11px] font-medium tracking-wide rounded-full
                   ${
                     selectedCategories.length === 0
-                      ? 'bg-white/[0.06] dark:bg-white/[0.08] text-neutral-700 dark:text-neutral-200'
-                      : 'hover:bg-white/[0.04] dark:hover:bg-white/[0.06] text-neutral-400 dark:text-neutral-500 hover:text-neutral-600 dark:hover:text-neutral-300'
+                      ? 'bg-black/[0.06] dark:bg-white/[0.08] text-neutral-700 dark:text-neutral-200'
+                      : 'text-neutral-400 dark:text-neutral-500 hover:text-neutral-600 dark:hover:text-neutral-300'
                   }
                 `}
                 >
@@ -256,8 +228,8 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
                     px-3 py-1.5 text-[11px] font-medium tracking-wide rounded-full
                     ${
                       selectedCategories.includes(category)
-                        ? 'bg-white/[0.06] dark:bg-white/[0.08] text-neutral-700 dark:text-neutral-200'
-                        : 'hover:bg-white/[0.04] dark:hover:bg-white/[0.06] text-neutral-400 dark:text-neutral-500 hover:text-neutral-600 dark:hover:text-neutral-300'
+                        ? 'bg-black/[0.06] dark:bg-white/[0.08] text-neutral-700 dark:text-neutral-200'
+                        : 'text-neutral-400 dark:text-neutral-500 hover:text-neutral-600 dark:hover:text-neutral-300'
                     }
                   `}
                   >
@@ -272,8 +244,8 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
                 onClick={toggleFilterOptions}
                 className={`p-2 cursor-pointer transition-all duration-500 ${
                   isFilterOptionsOpen
-                    ? 'text-neutral-700 dark:text-neutral-200'
-                    : 'text-neutral-400 dark:text-neutral-500 hover:text-neutral-500 dark:hover:text-neutral-400'
+                    ? 'text-neutral-700 dark:text-neutral-200 dark:[filter:drop-shadow(0_0_8px_rgba(255,255,255,0.5))]'
+                    : 'text-neutral-400 dark:text-neutral-500 hover:text-neutral-500 dark:hover:text-neutral-400 dark:[filter:drop-shadow(0_0_0px_rgba(255,255,255,0))]'
                 }`}
               >
                 <svg
@@ -303,8 +275,8 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
                   }
                   ${
                     sortOrder === 'asc'
-                      ? 'text-neutral-700 dark:text-neutral-200'
-                      : 'text-neutral-400 dark:text-neutral-500 hover:text-neutral-500 dark:hover:text-neutral-400'
+                      ? 'text-neutral-700 dark:text-neutral-200 dark:[filter:drop-shadow(0_0_8px_rgba(255,255,255,0.5))]'
+                      : 'text-neutral-400 dark:text-neutral-500 hover:text-neutral-500 dark:hover:text-neutral-400 dark:[filter:drop-shadow(0_0_0px_rgba(255,255,255,0))]'
                   }
                 `}
                 >
@@ -359,8 +331,8 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
                   }
                   ${
                     sortByTitle !== null
-                      ? 'text-neutral-700 dark:text-neutral-200'
-                      : 'text-neutral-400 dark:text-neutral-500 hover:text-neutral-500 dark:hover:text-neutral-400'
+                      ? 'text-neutral-700 dark:text-neutral-200 dark:[filter:drop-shadow(0_0_8px_rgba(255,255,255,0.5))]'
+                      : 'text-neutral-400 dark:text-neutral-500 hover:text-neutral-500 dark:hover:text-neutral-400 dark:[filter:drop-shadow(0_0_0px_rgba(255,255,255,0))]'
                   }
                 `}
                 >
@@ -459,12 +431,6 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
           }}
         />
       )}
-      {limitModal &&
-        (user ? (
-          <SubscriptionModal onClose={handleCloseLimitModal} />
-        ) : (
-          <DailyLimitModal onClose={handleCloseLimitModal} />
-        ))}
     </div>
   );
 };

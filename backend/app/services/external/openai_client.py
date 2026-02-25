@@ -2,6 +2,7 @@
 
 import json
 import os
+import re
 from typing import Any, Dict, Optional, cast
 
 from dotenv import load_dotenv
@@ -18,13 +19,13 @@ load_dotenv()
 class OpenAIClient:
     """Client for OpenAI API interactions."""
 
-    def __init__(self, api_key: Optional[str] = None, model: str = "gpt-3.5-turbo"):
+    def __init__(self, api_key: Optional[str] = None, model: str = "gpt-4o-mini"):
         """
         Initialize OpenAI client.
 
         Args:
             api_key: OpenAI API key (default: from env)
-            model: Model to use (default: gpt-3.5-turbo)
+            model: Model to use (default: gpt-4o-mini)
         """
         self.api_key = api_key or os.getenv("OPENAI_API_KEY")
         if not self.api_key:
@@ -52,7 +53,7 @@ class OpenAIClient:
         logger.info(f"Analyzing text, length: {len(text)} characters")
 
         try:
-            response = self.client.chat.completions.create(
+            create_kwargs: Dict[str, Any] = dict(
                 model=self.model,
                 messages=[
                     {"role": "system", "content": prompt},
@@ -60,14 +61,21 @@ class OpenAIClient:
                 ],
                 max_tokens=max_tokens,
             )
+            if expect_json:
+                create_kwargs["response_format"] = {"type": "json_object"}
+
+            response = self.client.chat.completions.create(**create_kwargs)
 
             content = response.choices[0].message.content
 
             if expect_json or "json" in prompt.lower():
                 try:
+                    cleaned = (content or "").strip()
+                    cleaned = re.sub(r"^```(?:json)?\s*", "", cleaned)
+                    cleaned = re.sub(r"\s*```$", "", cleaned)
                     return cast(
                         Dict[str, Any],
-                        json.loads(content if content is not None else "{}"),
+                        json.loads(cleaned or "{}"),
                     )
                 except json.JSONDecodeError:
                     logger.error(f"Invalid JSON format: {content}")
