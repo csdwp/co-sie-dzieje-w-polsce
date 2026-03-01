@@ -30,7 +30,7 @@ body {
     0 2px 12px -10px rgba(0, 0, 0, 0.3);
 }
 .premium-border {
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.09);
 }
 .dark .premium-border {
   border: 1px solid rgba(255, 255, 255, 0.04);

@@ -57,7 +57,7 @@ function DialogContent({
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
-          'bg-white dark:bg-white/[0.04] dark:backdrop-blur-xl text-neutral-900 dark:text-neutral-100 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-98 data-[state=open]:zoom-in-98 fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-5 rounded-2xl !p-6 sm:!p-10 duration-300 sm:max-w-lg outline-none',
+          'bg-neutral-50 dark:bg-white/[0.04] dark:backdrop-blur-xl text-neutral-900 dark:text-neutral-100 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-98 data-[state=open]:zoom-in-98 fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-5 rounded-2xl !p-6 sm:!p-10 duration-300 sm:max-w-lg outline-none',
           className
         )}
         {...props}
@@ -65,7 +65,7 @@ function DialogContent({
         {children}
         <DialogPrimitive.Close
           data-testid="modal-close"
-          className="ring-offset-background focus:ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground absolute top-5 right-5 sm:top-6 sm:right-6 rounded-full p-1 transition-all duration-300 focus:ring-0 focus:ring-offset-0 focus:outline-hidden focus:border-none disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 text-neutral-400 hover:text-neutral-600 dark:text-neutral-500 dark:hover:text-neutral-200 hover:bg-black/[0.05] dark:hover:bg-white/[0.05]"
+          className="ring-offset-background focus:ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground absolute top-5 right-5 sm:top-6 sm:right-6 rounded-full p-1 transition-all duration-300 focus:ring-0 focus:ring-offset-0 focus:outline-hidden focus:border-none disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 text-neutral-400 hover:text-neutral-600 dark:text-neutral-400 dark:hover:text-neutral-200 hover:bg-black/[0.05] dark:hover:bg-white/[0.05]"
         >
           <XIcon />
           <span className="sr-only">Close</span>

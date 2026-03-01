@@ -1,6 +1,6 @@
 export type ActStatus =
   | 'Obowiązuje'
-  | 'Oczekuje na wejście w życie'
+  | 'Oczekuje'
   | 'W trakcie głosowania'
   | 'Nieznany';
 
@@ -12,7 +12,7 @@ export interface StatusInfo {
 // All possible statuses - easy to add/remove
 export const ALL_STATUSES: ActStatus[] = [
   'W trakcie głosowania',
-  'Oczekuje na wejście w życie',
+  'Oczekuje',
   'Obowiązuje',
 ];
 
@@ -35,7 +35,7 @@ export function getActStatus(
 
   // If promulgation date is in the future, act is pending
   if (promulgation > now) {
-    return 'Oczekuje na wejście w życie';
+    return 'Oczekuje';
   }
 
   // If promulgation date has passed, act is in force
@@ -65,7 +65,7 @@ export function getStatusColor(status: ActStatus): string {
   switch (status) {
     case 'Obowiązuje':
       return 'bg-green-500/20 text-green-700 dark:text-green-400 border-green-500/50';
-    case 'Oczekuje na wejście w życie':
+    case 'Oczekuje':
       return 'bg-yellow-500/20 text-yellow-700 dark:text-yellow-400 border-yellow-500/50';
     case 'W trakcie głosowania':
       return 'bg-blue-500/20 text-blue-700 dark:text-blue-400 border-blue-500/50';

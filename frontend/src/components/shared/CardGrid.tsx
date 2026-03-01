@@ -30,6 +30,7 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
   const [deletedIds, setDeletedIds] = useState<Set<string | number>>(new Set());
   const { user } = useUser();
   const cardsContainerRef = useRef<HTMLDivElement>(null);
+  const tagsContainerRef = useRef<HTMLDivElement>(null);
   const hasAnimated = useRef(false);
 
   const { acts } = data || {};
@@ -137,6 +138,16 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
   }, []);
 
   useLayoutEffect(() => {
+    if (tagsContainerRef.current) {
+      gsap.fromTo(
+        tagsContainerRef.current,
+        { opacity: 0, y: -20, scale: 0.97 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.7, ease: 'power3.out', delay: 0.4 }
+      );
+    }
+  }, []);
+
+  useLayoutEffect(() => {
     if (cardsContainerRef.current && !hasAnimated.current) {
       const animationTimeout = setTimeout(() => {
         if (cardsContainerRef.current) {
@@ -175,12 +186,12 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
   return (
     <div className="w-full max-w-screen-xl mx-auto">
       {availableCategories && availableCategories.length > 0 && (
-        <div className="w-full mx-auto max-[640px]:max-w-11/12 max-[700px]:max-w-[320px] max-[950px]:max-w-[660px] max-[1200px]:max-w-[1000px] max-w-[1260px]">
+        <div ref={tagsContainerRef} className="w-full mx-auto max-[640px]:max-w-11/12 max-[700px]:max-w-[320px] max-[950px]:max-w-[660px] max-[1200px]:max-w-[1000px] max-w-[1260px]">
           <div className="text-lg relative flex flex-row items-center justify-between mb-1 gap-4 w-max">
-            <button className="swiper-button-prev-custom cursor-pointer transition-all duration-500 text-neutral-400 dark:text-neutral-500 hover:text-neutral-600 dark:hover:text-neutral-300 dark:[text-shadow:0_0_0px_rgba(255,255,255,0)] dark:hover:[text-shadow:0_0_8px_rgba(255,255,255,0.5)]">
+            <button className="swiper-button-prev-custom cursor-pointer transition-all duration-500 text-neutral-400 dark:text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 dark:[text-shadow:0_0_0px_rgba(255,255,255,0)] dark:hover:[text-shadow:0_0_8px_rgba(255,255,255,0.5)]">
               ←
             </button>
-            <button className="swiper-button-next-custom cursor-pointer transition-all duration-500 text-neutral-400 dark:text-neutral-500 hover:text-neutral-600 dark:hover:text-neutral-300 dark:[text-shadow:0_0_0px_rgba(255,255,255,0)] dark:hover:[text-shadow:0_0_8px_rgba(255,255,255,0.5)]">
+            <button className="swiper-button-next-custom cursor-pointer transition-all duration-500 text-neutral-400 dark:text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 dark:[text-shadow:0_0_0px_rgba(255,255,255,0)] dark:hover:[text-shadow:0_0_8px_rgba(255,255,255,0.5)]">
               →
             </button>
           </div>
@@ -206,7 +217,7 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
                   ${
                     selectedCategories.length === 0
                       ? 'bg-black/[0.06] dark:bg-white/[0.08] text-neutral-700 dark:text-neutral-200'
-                      : 'text-neutral-400 dark:text-neutral-500 hover:text-neutral-600 dark:hover:text-neutral-300'
+                      : 'text-neutral-400 dark:text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300'
                   }
                 `}
                 >
@@ -229,7 +240,7 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
                     ${
                       selectedCategories.includes(category)
                         ? 'bg-black/[0.06] dark:bg-white/[0.08] text-neutral-700 dark:text-neutral-200'
-                        : 'text-neutral-400 dark:text-neutral-500 hover:text-neutral-600 dark:hover:text-neutral-300'
+                        : 'text-neutral-400 dark:text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300'
                     }
                   `}
                   >
@@ -245,7 +256,7 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
                 className={`p-2 cursor-pointer transition-all duration-500 ${
                   isFilterOptionsOpen
                     ? 'text-neutral-700 dark:text-neutral-200 dark:[filter:drop-shadow(0_0_8px_rgba(255,255,255,0.5))]'
-                    : 'text-neutral-400 dark:text-neutral-500 hover:text-neutral-500 dark:hover:text-neutral-400 dark:[filter:drop-shadow(0_0_0px_rgba(255,255,255,0))]'
+                    : 'text-neutral-400 dark:text-neutral-400 hover:text-neutral-500 dark:hover:text-neutral-300 dark:[filter:drop-shadow(0_0_0px_rgba(255,255,255,0))]'
                 }`}
               >
                 <svg
@@ -276,7 +287,7 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
                   ${
                     sortOrder === 'asc'
                       ? 'text-neutral-700 dark:text-neutral-200 dark:[filter:drop-shadow(0_0_8px_rgba(255,255,255,0.5))]'
-                      : 'text-neutral-400 dark:text-neutral-500 hover:text-neutral-500 dark:hover:text-neutral-400 dark:[filter:drop-shadow(0_0_0px_rgba(255,255,255,0))]'
+                      : 'text-neutral-400 dark:text-neutral-400 hover:text-neutral-500 dark:hover:text-neutral-300 dark:[filter:drop-shadow(0_0_0px_rgba(255,255,255,0))]'
                   }
                 `}
                 >
@@ -332,7 +343,7 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
                   ${
                     sortByTitle !== null
                       ? 'text-neutral-700 dark:text-neutral-200 dark:[filter:drop-shadow(0_0_8px_rgba(255,255,255,0.5))]'
-                      : 'text-neutral-400 dark:text-neutral-500 hover:text-neutral-500 dark:hover:text-neutral-400 dark:[filter:drop-shadow(0_0_0px_rgba(255,255,255,0))]'
+                      : 'text-neutral-400 dark:text-neutral-400 hover:text-neutral-500 dark:hover:text-neutral-300 dark:[filter:drop-shadow(0_0_0px_rgba(255,255,255,0))]'
                   }
                 `}
                 >

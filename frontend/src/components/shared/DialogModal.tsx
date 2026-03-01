@@ -237,7 +237,7 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col space-y-2">
-            <div className="text-[11px] tracking-widest uppercase text-neutral-400 dark:text-neutral-500">
+            <div className="text-[11px] tracking-widest uppercase text-neutral-400 dark:text-neutral-400">
               Odnośnik do pełnej treści aktu
             </div>
             <a
@@ -254,7 +254,7 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
           </div>
           {card?.categories && card.categories.length > 0 && (
             <div className="flex flex-col space-y-3">
-              <div className="text-[11px] tracking-widest uppercase text-neutral-400 dark:text-neutral-500">
+              <div className="text-[11px] tracking-widest uppercase text-neutral-400 dark:text-neutral-400">
                 Akt dotyczy
               </div>
               <div className="flex flex-wrap gap-2">
@@ -271,7 +271,7 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
           )}
           <div className="flex flex-col md:flex-row gap-8 md:gap-12">
             <div className="flex flex-col space-y-1.5">
-              <div className="text-[11px] tracking-widest uppercase text-neutral-400 dark:text-neutral-500">
+              <div className="text-[11px] tracking-widest uppercase text-neutral-400 dark:text-neutral-400">
                 Data ogłoszenia
               </div>
               <span className="text-sm text-neutral-700 dark:text-neutral-300">
@@ -279,7 +279,7 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
               </span>
             </div>
             <div className="flex flex-col space-y-1.5">
-              <div className="text-[11px] tracking-widest uppercase text-neutral-400 dark:text-neutral-500">
+              <div className="text-[11px] tracking-widest uppercase text-neutral-400 dark:text-neutral-400">
                 Data wejścia w życie
               </div>
               <span className="text-sm text-neutral-700 dark:text-neutral-300">
@@ -289,7 +289,7 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
           </div>
           {currentStatus !== 'Nieznany' && (
             <div className="flex flex-col space-y-4">
-              <div className="text-[11px] tracking-widest uppercase text-neutral-400 dark:text-neutral-500">
+              <div className="text-[11px] tracking-widest uppercase text-neutral-400 dark:text-neutral-400">
                 Status aktu
               </div>
               <div className="flex flex-col gap-3">
@@ -309,7 +309,7 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
                       className={`transition-colors duration-300 ${
                         status.isActive
                           ? 'font-medium text-neutral-800 dark:text-neutral-100'
-                          : 'text-neutral-400 dark:text-neutral-500'
+                          : 'text-neutral-400 dark:text-neutral-400'
                       }`}
                     >
                       {status.name}
@@ -323,10 +323,10 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
             <>
               {/* Vote Summary Box */}
               <div className="flex flex-col space-y-4">
-                <div className="text-[11px] tracking-widest uppercase text-neutral-400 dark:text-neutral-500">
+                <div className="text-[11px] tracking-widest uppercase text-neutral-400 dark:text-neutral-400">
                   Wynik głosowania
                 </div>
-                <div className="flex flex-col gap-4 p-5 rounded-xl bg-black/[0.02] dark:bg-white/[0.03] premium-border">
+                <div className="flex flex-col gap-4 p-5 rounded-xl bg-black/[0.05] dark:bg-white/[0.03] premium-border">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                       <div
@@ -345,7 +345,7 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
                   </div>
                   <div className="grid grid-cols-2 gap-6 pt-2">
                     <div className="flex flex-col space-y-1">
-                      <span className="text-[10px] tracking-widest uppercase text-neutral-400 dark:text-neutral-500">
+                      <span className="text-[10px] tracking-widest uppercase text-neutral-400 dark:text-neutral-400">
                         Głosy za
                       </span>
                       <div className="flex items-baseline gap-2">
@@ -358,7 +358,7 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
                       </div>
                     </div>
                     <div className="flex flex-col space-y-1">
-                      <span className="text-[10px] tracking-widest uppercase text-neutral-400 dark:text-neutral-500">
+                      <span className="text-[10px] tracking-widest uppercase text-neutral-400 dark:text-neutral-400">
                         Głosy przeciw
                       </span>
                       <div className="flex items-baseline gap-2">
@@ -377,7 +377,7 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
               {/* Toggle Button for Detailed Analysis */}
               <button
                 onClick={() => setShowDetailedAnalysis(!showDetailedAnalysis)}
-                className="w-full px-4 py-3 rounded-xl bg-black/[0.02] dark:bg-white/[0.02] hover:bg-black/[0.04] dark:hover:bg-white/[0.04] text-neutral-600 dark:text-neutral-300 border-none outline-none text-sm font-medium tracking-wide transition-all duration-500 flex items-center justify-center gap-2"
+                className="w-full px-4 py-3 rounded-xl bg-black/[0.05] dark:bg-white/[0.02] hover:bg-black/[0.08] dark:hover:bg-white/[0.04] text-neutral-600 dark:text-neutral-300 border-none outline-none text-sm font-medium tracking-wide transition-all duration-500 flex items-center justify-center gap-2"
               >
                 {showDetailedAnalysis
                   ? 'Ukryj szczegółową analizę'
@@ -405,7 +405,7 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
                   {/* Government vs Opposition Comparison */}
                   <div className="flex flex-col space-y-4">
                     <div>
-                      <div className="text-[11px] tracking-widest uppercase text-neutral-400 dark:text-neutral-500 mb-1.5">
+                      <div className="text-[11px] tracking-widest uppercase text-neutral-400 dark:text-neutral-400 mb-1.5">
                         Koalicja vs Opozycja
                       </div>
                       <div className="text-sm text-neutral-500 dark:text-neutral-400">
@@ -464,7 +464,7 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
                   {votes?.summary && (
                     <div className="flex flex-col space-y-4">
                       <div>
-                        <div className="text-[11px] tracking-widest uppercase text-neutral-400 dark:text-neutral-500 mb-1.5">
+                        <div className="text-[11px] tracking-widest uppercase text-neutral-400 dark:text-neutral-400 mb-1.5">
                           Frekwencja głosowania
                         </div>
                         <div className="text-sm text-neutral-500 dark:text-neutral-400">
@@ -472,8 +472,8 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
                         </div>
                       </div>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                        <div className="flex flex-col gap-1.5 p-4 rounded-xl bg-black/[0.02] dark:bg-white/[0.03] premium-border">
-                          <span className="text-[10px] tracking-widest uppercase text-neutral-400 dark:text-neutral-500">
+                        <div className="flex flex-col gap-1.5 p-4 rounded-xl bg-black/[0.05] dark:bg-white/[0.03] premium-border">
+                          <span className="text-[10px] tracking-widest uppercase text-neutral-400 dark:text-neutral-400">
                             Głosowało
                           </span>
                           <div className="flex items-baseline gap-1.5">
@@ -485,8 +485,8 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
                             </span>
                           </div>
                         </div>
-                        <div className="flex flex-col gap-1.5 p-4 rounded-xl bg-black/[0.02] dark:bg-white/[0.03] premium-border">
-                          <span className="text-[10px] tracking-widest uppercase text-neutral-400 dark:text-neutral-500">
+                        <div className="flex flex-col gap-1.5 p-4 rounded-xl bg-black/[0.05] dark:bg-white/[0.03] premium-border">
+                          <span className="text-[10px] tracking-widest uppercase text-neutral-400 dark:text-neutral-400">
                             Wstrzymało się
                           </span>
                           <div className="flex items-baseline gap-1.5">
@@ -502,8 +502,8 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
                             </span>
                           </div>
                         </div>
-                        <div className="flex flex-col gap-1.5 p-4 rounded-xl bg-black/[0.02] dark:bg-white/[0.03] premium-border">
-                          <span className="text-[10px] tracking-widest uppercase text-neutral-400 dark:text-neutral-500">
+                        <div className="flex flex-col gap-1.5 p-4 rounded-xl bg-black/[0.05] dark:bg-white/[0.03] premium-border">
+                          <span className="text-[10px] tracking-widest uppercase text-neutral-400 dark:text-neutral-400">
                             Nieobecnych
                           </span>
                           <div className="flex items-baseline gap-1.5">
@@ -519,8 +519,8 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
                             </span>
                           </div>
                         </div>
-                        <div className="flex flex-col gap-1.5 p-4 rounded-xl bg-black/[0.02] dark:bg-white/[0.03] premium-border">
-                          <span className="text-[10px] tracking-widest uppercase text-neutral-400 dark:text-neutral-500">
+                        <div className="flex flex-col gap-1.5 p-4 rounded-xl bg-black/[0.05] dark:bg-white/[0.03] premium-border">
+                          <span className="text-[10px] tracking-widest uppercase text-neutral-400 dark:text-neutral-400">
                             Frekwencja
                           </span>
                           <div className="flex items-baseline gap-1.5">
@@ -540,7 +540,7 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
 
                   <div className="flex flex-col space-y-4">
                     <div>
-                      <div className="text-[11px] tracking-widest uppercase text-neutral-400 dark:text-neutral-500 mb-1.5">
+                      <div className="text-[11px] tracking-widest uppercase text-neutral-400 dark:text-neutral-400 mb-1.5">
                         Szczegółowy rozkład głosów
                       </div>
                       <div className="text-sm text-neutral-500 dark:text-neutral-400">
