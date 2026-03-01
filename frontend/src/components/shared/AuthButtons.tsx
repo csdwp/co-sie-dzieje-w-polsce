@@ -80,7 +80,9 @@ const AuthButtons = ({
     <>
       <SignedOut>
         <button
-          aria-label={isOpen ? 'Zamknij menu użytkownika' : 'Otwórz menu użytkownika'}
+          aria-label={
+            isOpen ? 'Zamknij menu użytkownika' : 'Otwórz menu użytkownika'
+          }
           aria-expanded={isOpen}
           className={`cursor-pointer z-50 relative transition-all duration-300 ${
             isOpen

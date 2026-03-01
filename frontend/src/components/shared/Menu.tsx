@@ -1,7 +1,12 @@
 import React from 'react';
 import { MenuProps } from '@/types';
 
-const Menu = ({ isOpen, toggleMenu, selectedTypes, setSelectedTypes }: MenuProps) => {
+const Menu = ({
+  isOpen,
+  toggleMenu,
+  selectedTypes,
+  setSelectedTypes,
+}: MenuProps) => {
   const toggleType = (type: string) => {
     setSelectedTypes(prev => {
       const includesType = prev.includes(type);

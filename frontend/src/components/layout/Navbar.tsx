@@ -11,7 +11,9 @@ import { NavbarProps } from '@/types';
 
 const Navbar: React.FC<NavbarProps> = ({ selectedTypes, setSelectedTypes }) => {
   const [isDarkMode, setIsDarkMode] = useState(true);
-  const [openPanel, setOpenPanel] = useState<'menu' | 'auth' | 'mobile' | null>(null);
+  const [openPanel, setOpenPanel] = useState<'menu' | 'auth' | 'mobile' | null>(
+    null
+  );
 
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
@@ -43,7 +45,9 @@ const Navbar: React.FC<NavbarProps> = ({ selectedTypes, setSelectedTypes }) => {
         <div className="sm:hidden">
           <MobileMenu
             isOpen={openPanel === 'mobile'}
-            toggleMenu={() => setOpenPanel(p => p === 'mobile' ? null : 'mobile')}
+            toggleMenu={() =>
+              setOpenPanel(p => (p === 'mobile' ? null : 'mobile'))
+            }
             selectedTypes={selectedTypes}
             setSelectedTypes={setSelectedTypes}
             isDarkMode={isDarkMode}
@@ -55,7 +59,7 @@ const Navbar: React.FC<NavbarProps> = ({ selectedTypes, setSelectedTypes }) => {
         <div className="hidden sm:block">
           <Menu
             isOpen={openPanel === 'menu'}
-            toggleMenu={() => setOpenPanel(p => p === 'menu' ? null : 'menu')}
+            toggleMenu={() => setOpenPanel(p => (p === 'menu' ? null : 'menu'))}
             selectedTypes={selectedTypes}
             setSelectedTypes={setSelectedTypes}
           />
@@ -68,7 +72,7 @@ const Navbar: React.FC<NavbarProps> = ({ selectedTypes, setSelectedTypes }) => {
           <AuthButtons
             isDarkMode={isDarkMode}
             isOpen={openPanel === 'auth'}
-            onToggle={() => setOpenPanel(p => p === 'auth' ? null : 'auth')}
+            onToggle={() => setOpenPanel(p => (p === 'auth' ? null : 'auth'))}
           />
           <DarkMode isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
         </div>

@@ -142,7 +142,14 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
       gsap.fromTo(
         tagsContainerRef.current,
         { opacity: 0, y: -20, scale: 0.97 },
-        { opacity: 1, y: 0, scale: 1, duration: 0.7, ease: 'power3.out', delay: 0.4 }
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.7,
+          ease: 'power3.out',
+          delay: 0.4,
+        }
       );
     }
   }, []);
@@ -186,7 +193,10 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
   return (
     <div className="w-full max-w-screen-xl mx-auto">
       {availableCategories && availableCategories.length > 0 && (
-        <div ref={tagsContainerRef} className="w-full mx-auto max-[640px]:max-w-11/12 max-[700px]:max-w-[320px] max-[950px]:max-w-[660px] max-[1200px]:max-w-[1000px] max-w-[1260px]">
+        <div
+          ref={tagsContainerRef}
+          className="w-full mx-auto max-[640px]:max-w-11/12 max-[700px]:max-w-[320px] max-[950px]:max-w-[660px] max-[1200px]:max-w-[1000px] max-w-[1260px]"
+        >
           <div className="text-lg relative flex flex-row items-center justify-between mb-1 gap-4 w-max">
             <button className="swiper-button-prev-custom cursor-pointer transition-all duration-500 text-neutral-400 dark:text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 dark:[text-shadow:0_0_0px_rgba(255,255,255,0)] dark:hover:[text-shadow:0_0_8px_rgba(255,255,255,0.5)]">
               ←
