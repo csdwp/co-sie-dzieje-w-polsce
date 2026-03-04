@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useEffect, useMemo, memo } from 'react';
+import { useRef, useState, useEffect, useMemo, memo, useCallback } from 'react';
 import { CardProps } from '@/types';
 import { Badge } from '@/components/ui/badge';
 import { useIsAdmin, isLowConfidence } from '@/lib/authHelpers';
@@ -43,8 +43,10 @@ const Card = ({
       setTotalDots(Math.max(10, N));
     };
 
+    let rafId: ReturnType<typeof requestAnimationFrame>;
     const resizeObserver = new ResizeObserver(() => {
-      updateTotalDots();
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(updateTotalDots);
     });
 
     resizeObserver.observe(containerRef.current);
@@ -53,6 +55,7 @@ const Card = ({
 
     return () => {
       resizeObserver.disconnect();
+      cancelAnimationFrame(rafId);
     };
   }, []);
 
@@ -74,6 +77,19 @@ const Card = ({
     () => (content ? stripHtml(content) : ''),
     [content]
   );
+
+  const handleMouseLeave = useCallback((e: React.MouseEvent<HTMLElement>) => {
+    e.currentTarget.style.setProperty('--shine-x', '100%');
+  }, []);
+
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    // maps cursor 0→1 to background-position 75%→25% (keeps shine on bright gradient spot)
+    const pos = 75 - x * 50;
+    e.currentTarget.style.setProperty('--shine-x', `${pos}%`);
+  }, []);
+
 
   const isAdmin = useIsAdmin();
   const needsVerification = isLowConfidence(confidenceScore);
@@ -116,6 +132,8 @@ const Card = ({
   return (
     <article
       onClick={onClick}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
       data-testid="act-card"
       aria-labelledby={`act-title-${id}`}
       className={`bg-white/[0.02] dark:bg-white/[0.03] backdrop-blur-sm mx-auto max-w-11/12 sm:max-w-80 flex flex-col gap-4 p-6 rounded-2xl premium-shadow premium-border cursor-pointer group

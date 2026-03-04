@@ -169,7 +169,7 @@ const RootLayout = ({
           className={`${geistSans.variable} ${geistMono.variable} ${libreBodoni.variable} antialiased dark before:fixed before:bg-neutral-100
         before:flex before:top-[150px] before:-translate-y-1/3
         before:left-1/2 before:-translate-x-1/2 before:bg-gradient-to-r before:from-white before:to-red-500
-        before:opacity-50 before:blur-[100px] lg:before:blur-[180px] before:rounded-full before:w-120 lg:before:w-220 before:h-80 lg:before:h-180 before:rotate-45 before:-z-1 before:pointer-events-none`}
+        before:opacity-50 before:blur-[100px] lg:before:blur-[160px] before:rounded-full before:w-120 lg:before:w-220 before:h-80 lg:before:h-180 before:rotate-45 before:-z-1 before:pointer-events-none`}
         >
           {children}
           <Analytics />
