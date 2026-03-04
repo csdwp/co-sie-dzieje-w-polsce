@@ -30,6 +30,7 @@ class ActRepository(BaseRepository):
             announcement_date, change_date, promulgation, item_status, comments,
             keywords, file, votes, category, created_at, updated_at
         ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
+        RETURNING id
         """
 
         try:
@@ -59,10 +60,11 @@ class ActRepository(BaseRepository):
 
             with self.get_connection() as (conn, cursor):
                 cursor.execute(insert_query, data_tuple)
+                act_id = cursor.fetchone()[0]
                 conn.commit()
 
             logger.info(f"Successfully saved act: {act.title}")
-            return True
+            return act_id
 
         except Exception as e:
             logger.error(f"Error saving act to database: {e}")

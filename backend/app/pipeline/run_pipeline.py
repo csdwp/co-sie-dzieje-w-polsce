@@ -15,7 +15,8 @@ if __name__ == "__main__":
     all_processed = new_acts + delayed_acts
     if all_processed:
         print(f"\nAdded {len(all_processed)} act(s):")
-        for title in all_processed:
+        for title, act_id in all_processed:
             print(f"  - {title}")
+            print(f"    https://coprzeszlo.pl/{act_id}")
     else:
         print("\nNo new acts added.")

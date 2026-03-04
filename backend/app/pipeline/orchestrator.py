@@ -81,8 +81,9 @@ class PipelineOrchestrator:
         # Process acts (oldest first)
         processed = []
         for act in reversed(acts_to_process):
-            if self.processor.process_and_save(act):
-                processed.append(act.get("title", act.get("ELI", "?")))
+            act_id = self.processor.process_and_save(act)
+            if act_id:
+                processed.append((act.get("title", act.get("ELI", "?")), act_id))
 
         logger.info(
             f"Successfully processed {len(processed)}/{len(acts_to_process)} acts"
@@ -132,9 +133,10 @@ class PipelineOrchestrator:
                         "promulgation": act_details.promulgation,
                     }
 
-                    if self.processor.process_and_save(act_data):
+                    act_id = self.processor.process_and_save(act_data)
+                    if act_id:
                         logger.info(f"✅ Successfully processed delayed act: {eli}")
-                        processed.append(act_details.title or eli)
+                        processed.append((act_details.title or eli, act_id))
                         continue
 
                 logger.error(f"❌ Failed to process delayed act: {eli}")
