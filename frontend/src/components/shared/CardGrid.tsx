@@ -195,6 +195,7 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
       {availableCategories && availableCategories.length > 0 && (
         <div
           ref={tagsContainerRef}
+          style={{ opacity: 0 }}
           className="w-full mx-auto max-[640px]:max-w-11/12 max-[700px]:max-w-[320px] max-[950px]:max-w-[660px] max-[1200px]:max-w-[1000px] max-w-[1260px]"
         >
           <div className="text-lg relative flex flex-row items-center justify-between mb-1 gap-4 w-max">
@@ -402,7 +403,7 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
           {filteredAndSortedCards
             .filter((card: Act) => !deletedIds.has(card.id))
             .map((card: Act) => (
-              <div key={card.id} data-card>
+              <div key={card.id} data-card style={{ opacity: 0 }}>
                 <Card
                   id={card.id}
                   title={card.title}
