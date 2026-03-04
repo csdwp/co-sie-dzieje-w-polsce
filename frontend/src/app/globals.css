@@ -8,6 +8,12 @@ body {
   overflow-x: hidden;
 }
 
+/* Promote background glow to its own GPU layer so it doesn't trigger repaints */
+body::before {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
 @layer utilities {
   .no-scrollbar::-webkit-scrollbar {
     display: none;
@@ -202,35 +208,58 @@ body {
   }
 }
 
-/* Premium text gradient - slower, more elegant animation */
-.dark .text-gradient-gloss {
-  background-image: linear-gradient(
-    120deg,
-    oklch(0.55 0.01 60) 0%,
-    oklch(0.85 0.01 60) 50%,
-    oklch(0.55 0.01 60) 100%
-  );
-  background-size: 200% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  animation: gloss 6s ease-in-out infinite;
-  will-change: background-position;
-}
-
+/* Premium text shimmer - follows cursor on desktop, auto-animates on mobile */
 .text-gradient-gloss {
   background-image: linear-gradient(
-    120deg,
-    oklch(0.45 0.01 60) 0%,
-    oklch(0.25 0.01 60) 50%,
-    oklch(0.45 0.01 60) 100%
+    90deg,
+    oklch(0.42 0.01 60) 0%,
+    oklch(0.42 0.01 60) 35%,
+    oklch(0.18 0.01 60) 50%,
+    oklch(0.42 0.01 60) 65%,
+    oklch(0.42 0.01 60) 100%
   );
-  background-size: 200% 100%;
+  background-size: 300% 100%;
+  background-position: var(--shine-x, 100%) 0;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  animation: gloss 6s ease-in-out infinite;
-  will-change: background-position;
+}
+
+.dark .text-gradient-gloss {
+  background-image: linear-gradient(
+    90deg,
+    oklch(0.65 0.01 60) 0%,
+    oklch(0.65 0.01 60) 35%,
+    oklch(0.96 0.01 60) 50%,
+    oklch(0.65 0.01 60) 65%,
+    oklch(0.65 0.01 60) 100%
+  );
+  background-size: 300% 100%;
+  background-position: var(--shine-x, 100%) 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Instant cursor tracking on desktop */
+@media (hover: hover) {
+  article .text-gradient-gloss {
+    transition: none;
+  }
+}
+
+/* Auto shimmer on touch devices */
+@media (hover: none) {
+  .text-gradient-gloss,
+  .dark .text-gradient-gloss {
+    animation: text-shimmer 4s ease-in-out infinite;
+    background-position: 100% 0;
+  }
+}
+
+@keyframes text-shimmer {
+  0%, 100% { background-position: 100% 0; }
+  50% { background-position: 50% 0; }
 }
 
 @keyframes breathe {
@@ -252,12 +281,16 @@ body {
 
 /* Respect reduced motion preferences */
 @media (prefers-reduced-motion: reduce) {
-  .text-gradient-gloss,
-  .dark .text-gradient-gloss,
   .red-background-gloss,
   .animate-breathe,
-  .dark .animate-breathe {
+  .dark .animate-breathe,
+  .text-gradient-gloss,
+  .dark .text-gradient-gloss {
     animation: none;
+  }
+  .text-gradient-gloss,
+  .dark .text-gradient-gloss {
+    transition: none;
   }
 }
 
