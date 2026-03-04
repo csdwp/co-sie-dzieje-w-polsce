@@ -319,6 +319,12 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
               </div>
             </div>
           )}
+          {card?.item_type?.toLowerCase().includes('ustawa') &&
+            (!votes?.government || totalVotes === 0) && (
+              <div className="text-sm text-neutral-500 dark:text-neutral-400 py-2">
+                Aktualnie brak danych o głosowaniu
+              </div>
+            )}
           {votes?.government && totalVotes > 0 && (
             <>
               {/* Vote Summary Box */}
