@@ -14,7 +14,7 @@ logger = get_logger(__name__)
 class ActRepository(BaseRepository):
     """Repository for acts data access."""
 
-    def save_act(self, act: Act) -> bool:
+    def save_act(self, act: Act) -> Optional[int]:
         """
         Save an act to the database.
 
@@ -22,7 +22,7 @@ class ActRepository(BaseRepository):
             act: Act entity to save
 
         Returns:
-            True if successful, False otherwise
+            ID of the saved act if successful, None otherwise
         """
         insert_query = """
         INSERT INTO acts (
