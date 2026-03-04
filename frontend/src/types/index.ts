@@ -126,6 +126,7 @@ export interface CardGridProps {
   searchQuery: string;
   selectedTypes: string[];
   data: ActsAndKeywordsResponse;
+  initialOpenId?: number;
 }
 
 export interface SearchBarProps {

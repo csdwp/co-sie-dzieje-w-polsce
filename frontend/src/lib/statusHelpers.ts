@@ -1,7 +1,4 @@
-export type ActStatus =
-  | 'Obowiązuje'
-  | 'Oczekuje'
-  | 'Nieznany';
+export type ActStatus = 'Obowiązuje' | 'Oczekuje' | 'Nieznany';
 
 export interface StatusInfo {
   name: ActStatus;
@@ -9,10 +6,7 @@ export interface StatusInfo {
 }
 
 // All possible statuses - easy to add/remove
-export const ALL_STATUSES: ActStatus[] = [
-  'Oczekuje',
-  'Obowiązuje',
-];
+export const ALL_STATUSES: ActStatus[] = ['Oczekuje', 'Obowiązuje'];
 
 /**
  * Determines the current status of a legal act based on its dates

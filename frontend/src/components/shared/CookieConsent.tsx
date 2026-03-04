@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 
 const CONSENT_KEY = 'cookie-consent';
 
@@ -47,12 +48,12 @@ const CookieConsent = ({ onAccept }: CookieConsentProps) => {
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
           <p className="text-sm text-neutral-600 dark:text-neutral-300 flex-1">
             Używamy plików cookie do analizy ruchu.{' '}
-            <a
+            <Link
               href="/polityka-prywatnosci"
               className="underline underline-offset-2 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
             >
               Polityka prywatności
-            </a>
+            </Link>
           </p>
           <div className="flex gap-2 w-full sm:w-auto">
             <button
