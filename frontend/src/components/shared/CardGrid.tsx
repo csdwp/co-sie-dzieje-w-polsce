@@ -403,7 +403,7 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
           {filteredAndSortedCards
             .filter((card: Act) => !deletedIds.has(card.id))
             .map((card: Act) => (
-              <div key={card.id} data-card style={{ opacity: 0 }}>
+              <div key={card.id} data-card>
                 <Card
                   id={card.id}
                   title={card.title}

@@ -56,23 +56,54 @@ const ClientWrapper = ({ data }: { data: ActsAndKeywordsResponse }) => {
         <div className="flex flex-col items-center gap-5 w-11/12 md:w-full max-w-[560px]">
           <div ref={heroRef} className="text-center">
             <p className="font-[family-name:var(--font-libre-bodoni)] text-3xl sm:text-4xl font-semibold text-neutral-800 dark:text-neutral-100 leading-snug">
-              <span data-hero-line style={{ opacity: 0, display: 'block', willChange: 'transform, opacity' }}>
+              <span
+                data-hero-line
+                style={{
+                  opacity: 0,
+                  display: 'block',
+                  willChange: 'transform, opacity',
+                }}
+              >
                 Polskie prawo.
               </span>
-              <span data-hero-line style={{ opacity: 0, display: 'block', willChange: 'transform, opacity' }}>
+              <span
+                data-hero-line
+                style={{
+                  opacity: 0,
+                  display: 'block',
+                  willChange: 'transform, opacity',
+                }}
+              >
                 W twoim języku.
               </span>
             </p>
             <p className="mt-3 text-sm text-neutral-500 dark:text-neutral-400 leading-relaxed tracking-wide">
-              <span data-hero-line style={{ opacity: 0, display: 'block', willChange: 'transform, opacity' }}>
+              <span
+                data-hero-line
+                style={{
+                  opacity: 0,
+                  display: 'block',
+                  willChange: 'transform, opacity',
+                }}
+              >
                 Śledzimy każdą ustawę i rozporządzenie
               </span>
-              <span data-hero-line style={{ opacity: 0, display: 'block', willChange: 'transform, opacity' }}>
+              <span
+                data-hero-line
+                style={{
+                  opacity: 0,
+                  display: 'block',
+                  willChange: 'transform, opacity',
+                }}
+              >
                 — i tłumaczymy je na ludzki język.
               </span>
             </p>
           </div>
-          <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+          <SearchBar
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+          />
           {isNewUser && (
             <p className="animate-breathe text-xs tracking-wide text-center leading-relaxed">
               Kliknij kartę, by zobaczyć podsumowanie i wyniki głosowania w

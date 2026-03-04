@@ -90,7 +90,6 @@ const Card = ({
     e.currentTarget.style.setProperty('--shine-x', `${pos}%`);
   }, []);
 
-
   const isAdmin = useIsAdmin();
   const needsVerification = isLowConfidence(confidenceScore);
   const [isDeleting, setIsDeleting] = useState(false);
