@@ -82,9 +82,8 @@ const CardGrid = ({
 
       const confidenceCheck =
         isAdmin ||
-        card.confidence_score === null ||
-        card.confidence_score === undefined ||
-        card.confidence_score >= CONFIDENCE_THRESHOLD;
+        (card.confidence_score != null &&
+          card.confidence_score >= CONFIDENCE_THRESHOLD);
 
       return matchesQuery && matchesType && confidenceCheck;
     });
