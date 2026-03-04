@@ -127,6 +127,16 @@ def print_result(label: str, result: dict) -> None:
         print(f"    {line}")
 
 
+def save_result(filename: str, label: str, result: dict) -> None:
+    title = result.get("title", "[no title]")
+    content = strip_html(result.get("content_html", "[no content]"))
+    with open(filename, "w", encoding="utf-8") as f:
+        f.write(f"# {title}\n\n")
+        f.write(f"_{label}_\n\n")
+        f.write(content + "\n")
+    print(f"  Saved → {filename}")
+
+
 def main() -> None:
     if len(sys.argv) < 2:
         print("Usage: python compare_summaries.py <pdf_url>")
@@ -155,6 +165,9 @@ def main() -> None:
     print_result("BEFORE  (gpt-3.5-turbo / old prompts)", old_result)
     print_result("AFTER   (gpt-4o-mini / new prompts)", new_result)
     print(f"\n{SEP}\n")
+
+    save_result("old.md", "gpt-3.5-turbo / old prompts", old_result)
+    save_result("new.md", "gpt-4o-mini / new prompts", new_result)
 
 
 if __name__ == "__main__":
