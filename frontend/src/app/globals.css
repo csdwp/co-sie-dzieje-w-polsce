@@ -233,11 +233,30 @@ body {
   will-change: background-position;
 }
 
+@keyframes breathe {
+  0%, 100% { color: oklch(0.60 0 0); }
+  50% { color: oklch(0.25 0 0); }
+}
+.dark .animate-breathe,
+.dark .animate-breathe {
+  animation: breathe-dark 4s ease-in-out infinite;
+}
+@keyframes breathe-dark {
+  0%, 100% { color: oklch(0.55 0 0); }
+  50% { color: oklch(0.93 0 0); }
+}
+
+.animate-breathe {
+  animation: breathe 4s ease-in-out infinite;
+}
+
 /* Respect reduced motion preferences */
 @media (prefers-reduced-motion: reduce) {
   .text-gradient-gloss,
   .dark .text-gradient-gloss,
-  .red-background-gloss {
+  .red-background-gloss,
+  .animate-breathe,
+  .dark .animate-breathe {
     animation: none;
   }
 }
