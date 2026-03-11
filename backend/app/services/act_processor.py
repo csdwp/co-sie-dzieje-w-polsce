@@ -83,7 +83,8 @@ class ActProcessor:
 
             # Step 2: Analyze text with AI
             logger.info("Analyzing text with AI...")
-            analysis = self.text_analyzer.analyze_full_text(pdf_text)
+            result = self.text_analyzer.analyze_full_text(pdf_text)
+            analysis = result.analysis
 
             # Step 3: Fetch act details and voting
             logger.info("Fetching act details and voting data...")

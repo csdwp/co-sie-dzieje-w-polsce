@@ -6,7 +6,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from ...core.exceptions import AIServiceError
 from ...core.logging import get_logger
-from ...models.act import ActAnalysis
+from ...models.act import ActAnalysis, AnalysisResult
 from ..external.openai_client import OpenAIClient
 
 logger = get_logger(__name__)
@@ -50,7 +50,7 @@ class TextAnalyzer:
 
     def analyze_full_text(
         self, text: str, chunk_size: int = 3000, chunk_overlap: int = 500
-    ) -> ActAnalysis:
+    ) -> AnalysisResult:
         """
         Analyze full legal text by splitting into chunks and summarizing.
 
@@ -60,7 +60,7 @@ class TextAnalyzer:
             chunk_overlap: Overlap between chunks
 
         Returns:
-            ActAnalysis with title and content
+            AnalysisResult with ActAnalysis and original chunks
         """
         # Split text into chunks
         text_splitter = RecursiveCharacterTextSplitter(
@@ -112,8 +112,11 @@ class TextAnalyzer:
         )
 
         if isinstance(result, dict) and "title" in result and "content_html" in result:
-            return ActAnalysis(
-                title=result["title"], content_html=result["content_html"]
+            return AnalysisResult(
+                analysis=ActAnalysis(
+                    title=result["title"], content_html=result["content_html"]
+                ),
+                chunks=chunks,
             )
         else:
             logger.error(f"Unexpected analysis result format: {result}")

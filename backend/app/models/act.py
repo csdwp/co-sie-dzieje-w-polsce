@@ -14,6 +14,14 @@ class ActAnalysis:
 
 
 @dataclass
+class AnalysisResult:
+    """Full result of text analysis including source chunks for validation."""
+
+    analysis: ActAnalysis
+    chunks: List[str]
+
+
+@dataclass
 class ActData:
     """Raw act data from API before processing."""
 
