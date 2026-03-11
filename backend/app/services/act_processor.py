@@ -91,16 +91,23 @@ class ActProcessor:
             analysis = result.analysis
 
             # Step 2b: Validate summary against source chunks
-            logger.info("Validating summary...")
-            plain_summary = re.sub(r"<[^>]+>", " ", analysis.content_html).strip()
-            validation = self.text_validator.validate(result.chunks, plain_summary)
-            logger.info(
-                f"Validation: confidence={validation.overall_confidence}, "
-                f"verdict={validation.verdict}, "
-                f"hallucinations={len(validation.hallucinations)}/{len(validation.claims)} claims"
-            )
-            if validation.hallucinations:
-                logger.warning(f"Unsupported claims: {validation.hallucinations}")
+            confidence_score: Optional[float] = None
+            needs_reprocess: bool = True
+            try:
+                logger.info("Validating summary...")
+                plain_summary = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", analysis.content_html)).strip()
+                validation = self.text_validator.validate(result.chunks, plain_summary)
+                confidence_score = validation.overall_confidence
+                needs_reprocess = validation.verdict == "unreliable"
+                logger.info(
+                    f"Validation: confidence={confidence_score}, "
+                    f"verdict={validation.verdict}, "
+                    f"hallucinations={len(validation.hallucinations)}/{len(validation.claims)} claims"
+                )
+                if validation.hallucinations:
+                    logger.warning(f"Unsupported claims: {validation.hallucinations}")
+            except Exception as e:
+                logger.error(f"Validation failed for {title}, saving with needs_reprocess=True: {e}")
 
             # Step 3: Fetch act details and voting
             logger.info("Fetching act details and voting data...")
@@ -131,8 +138,8 @@ class ActProcessor:
                 voting_details=voting_details,
                 category=category,
                 pdf_url=pdf_url,
-                confidence_score=validation.overall_confidence,
-                needs_reprocess=validation.verdict == "unreliable",
+                confidence_score=confidence_score,
+                needs_reprocess=needs_reprocess,
             )
 
             # Step 6: Save to database

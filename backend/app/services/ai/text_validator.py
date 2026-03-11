@@ -1,9 +1,9 @@
 """Text validation service using atomic claim verification."""
 
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from ...core.logging import get_logger
-from ...models.act import ClaimVerification, ValidationReport
+from ...models.validation import ClaimVerification, ValidationReport
 from ..external.openai_client import OpenAIClient
 
 logger = get_logger(__name__)
@@ -78,13 +78,28 @@ class TextValidator:
     def _verify_claims(
         self, claims: List[str], chunks: List[str]
     ) -> List[ClaimVerification]:
-        """Verify each claim against source chunks."""
-        source_text = "\n\n".join(
-            f"[Fragment {i + 1}]\n{chunk}" for i, chunk in enumerate(chunks)
-        )
+        """Verify each claim against source chunks, processing chunks in batches."""
+        BATCH_CHAR_LIMIT = 9000
+
+        batches: List[List[tuple]] = []
+        current_batch: List[tuple] = []
+        current_size = 0
+        for i, chunk in enumerate(chunks):
+            if current_size + len(chunk) > BATCH_CHAR_LIMIT and current_batch:
+                batches.append(current_batch)
+                current_batch = [(i, chunk)]
+                current_size = len(chunk)
+            else:
+                current_batch.append((i, chunk))
+                current_size += len(chunk)
+        if current_batch:
+            batches.append(current_batch)
+
+        claim_supported: Dict[str, bool] = {c: False for c in claims}
+        claim_evidence: Dict[str, Optional[int]] = {c: None for c in claims}
         claims_json = "\n".join(f"{i + 1}. {c}" for i, c in enumerate(claims))
 
-        prompt = (
+        prompt_template = (
             "Jesteś weryfikatorem faktów w dokumentach prawnych. "
             "Sprawdź każde z poniższych twierdzeń wobec tekstu źródłowego podanego przez użytkownika.\n\n"
             "Dla każdego twierdzenia określ:\n"
@@ -94,32 +109,45 @@ class TextValidator:
             'Zwróć JSON: {"verifications": [{"claim": "...", "supported": true, "evidence_chunk": 1}]}'
         )
 
-        result = self.openai_client.analyze_with_prompt(
-            text=source_text, prompt=prompt, max_tokens=1500, expect_json=True
-        )
-
-        verifications = result.get("verifications", [])
-        if not isinstance(verifications, list):
-            logger.warning(
-                "Unexpected verifications format, marking all as unsupported"
+        for batch in batches:
+            source_text = "\n\n".join(
+                f"[Fragment {orig_i + 1}]\n{chunk}" for orig_i, chunk in batch
             )
-            return [
-                ClaimVerification(claim=c, supported=False, evidence_chunk=None)
-                for c in claims
-            ]
+            result = self.openai_client.analyze_with_prompt(
+                text=source_text,
+                prompt=prompt_template,
+                max_tokens=1500,
+                expect_json=True,
+            )
 
-        verified = []
-        for item in verifications:
-            if not isinstance(item, dict):
+            verifications = result.get("verifications", [])
+            if not isinstance(verifications, list):
+                logger.warning("Unexpected verifications format for batch, skipping")
                 continue
-            verified.append(
-                ClaimVerification(
-                    claim=str(item.get("claim", "")),
-                    supported=bool(item.get("supported", False)),
-                    evidence_chunk=item.get("evidence_chunk"),
-                )
+
+            for item in verifications:
+                if not isinstance(item, dict):
+                    continue
+                claim_text = str(item.get("claim", ""))
+                if claim_text not in claim_supported:
+                    continue
+                if bool(item.get("supported", False)):
+                    claim_supported[claim_text] = True
+                    raw_evidence = item.get("evidence_chunk")
+                    if raw_evidence is not None:
+                        try:
+                            claim_evidence[claim_text] = int(raw_evidence)
+                        except (ValueError, TypeError):
+                            pass
+
+        return [
+            ClaimVerification(
+                claim=c,
+                supported=claim_supported[c],
+                evidence_chunk=claim_evidence[c],
             )
-        return verified
+            for c in claims
+        ]
 
     def _build_report(
         self, verified_claims: List[ClaimVerification]
