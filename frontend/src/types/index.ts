@@ -22,6 +22,7 @@ export interface Act {
   votes?: Votes | null;
   category?: string | null;
   confidence_score?: number | null;
+  created_at?: string;
 }
 
 export interface ActReferences {
@@ -103,6 +104,7 @@ export interface CardProps {
   governmentPercentage: number;
   confidenceScore?: number | null;
   onDelete?: (id: string | number) => void;
+  createdAt?: string;
 }
 
 export interface DialogModalProps {

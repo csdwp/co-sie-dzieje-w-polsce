@@ -26,6 +26,7 @@ const Card = ({
   governmentPercentage,
   confidenceScore,
   onDelete,
+  createdAt,
 }: CardProps) => {
   const status = getActStatus(date, promulgation);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -67,6 +68,18 @@ const Card = ({
         year: 'numeric',
       }),
     [date]
+  );
+
+  const formattedCreatedAt = useMemo(
+    () =>
+      createdAt
+        ? new Date(createdAt).toLocaleDateString('pl-PL', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+          })
+        : null,
+    [createdAt]
   );
 
   const processedTitle = useMemo(() => stripDateFromTitle(title), [title]);
@@ -126,7 +139,7 @@ const Card = ({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <div className="text-neutral-400 dark:text-neutral-400 group-hover:text-neutral-600 dark:group-hover:text-neutral-300 transition-colors duration-500 text-xs tracking-wide uppercase">
-            {formattedDate}
+            {formattedCreatedAt ?? formattedDate}
           </div>
           {status !== 'Nieznany' && (
             <Badge

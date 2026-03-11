@@ -432,6 +432,7 @@ const CardGrid = ({
                     0
                   }
                   confidenceScore={card.confidence_score}
+                  createdAt={card.created_at}
                   onClick={() => openModal(card)}
                   onDelete={handleCardDelete}
                 />
