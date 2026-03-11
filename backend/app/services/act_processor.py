@@ -1,9 +1,8 @@
 """Act processing orchestrator service."""
 
+import re
 from datetime import datetime
 from typing import Any, Dict, Optional, Tuple
-
-import re
 
 from ..core.exceptions import AIServiceError, PDFProcessingError
 from ..core.logging import get_logger

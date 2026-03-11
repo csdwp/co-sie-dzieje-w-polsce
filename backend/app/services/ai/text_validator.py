@@ -48,7 +48,9 @@ class TextValidator:
                 recommendation="Nie udało się wyodrębnić twierdzeń z podsumowania.",
             )
 
-        logger.info(f"Extracted {len(claims)} claims, verifying against {len(chunks)} chunks")
+        logger.info(
+            f"Extracted {len(claims)} claims, verifying against {len(chunks)} chunks"
+        )
         verified_claims = self._verify_claims(claims, chunks)
         return self._build_report(verified_claims)
 
@@ -98,7 +100,9 @@ class TextValidator:
 
         verifications = result.get("verifications", [])
         if not isinstance(verifications, list):
-            logger.warning("Unexpected verifications format, marking all as unsupported")
+            logger.warning(
+                "Unexpected verifications format, marking all as unsupported"
+            )
             return [
                 ClaimVerification(claim=c, supported=False, evidence_chunk=None)
                 for c in claims
@@ -117,7 +121,9 @@ class TextValidator:
             )
         return verified
 
-    def _build_report(self, verified_claims: List[ClaimVerification]) -> ValidationReport:
+    def _build_report(
+        self, verified_claims: List[ClaimVerification]
+    ) -> ValidationReport:
         """Build ValidationReport from verified claims."""
         if not verified_claims:
             return ValidationReport(
