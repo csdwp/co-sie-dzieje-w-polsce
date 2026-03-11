@@ -115,10 +115,7 @@ def split_and_analyze_text(
         "Dane wejściowe to połączone streszczenie większego dokumentu prawnego; przedstaw spójne podsumowanie na tej podstawie. "
         "**Cała treść musi być napisana w języku polskim.**"
     )
-    return cast(
-        Dict[str, Any],
-        analyze_text_with_openai(combined_summary, analysis_prompt, max_tokens=1000),
-    )
+    return analyze_text_with_openai(combined_summary, analysis_prompt, max_tokens=1000)
 
 
 def save_analysis_to_file(analysis: Dict[str, Any], filename: str) -> None:
