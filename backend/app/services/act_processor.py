@@ -46,7 +46,7 @@ class ActProcessor:
         self.votes_calculator = votes_calculator or VotesCalculator()
         self.act_repo = act_repo or ActRepository()
 
-    def process_and_save(self, act_data: Dict[str, Any]) -> bool:
+    def process_and_save(self, act_data: Dict[str, Any]) -> Optional[int]:
         """
         Process a single act through the complete pipeline.
 
@@ -61,14 +61,14 @@ class ActProcessor:
             act_data: Raw act data from API
 
         Returns:
-            True if successful, False otherwise
+            ID of saved act if successful, None otherwise
         """
         eli = act_data.get("ELI")
         title = act_data.get("title", "unknown")
 
         if not eli:
             logger.error(f"No ELI provided for act: {title}")
-            return False
+            return None
 
         logger.info(f"Processing act: {title}")
 
@@ -79,7 +79,7 @@ class ActProcessor:
 
             if not pdf_text:
                 logger.error(f"No text extracted from PDF for: {title}")
-                return False
+                return None
 
             # Step 2: Analyze text with AI
             logger.info("Analyzing text with AI...")
@@ -91,7 +91,7 @@ class ActProcessor:
 
             if not act_details:
                 logger.error(f"Could not fetch details for: {eli}")
-                return False
+                return None
 
             voting_details = self._get_voting_details(act_details)
 
@@ -118,24 +118,19 @@ class ActProcessor:
 
             # Step 6: Save to database
             logger.info("Saving to database...")
-            success = self.act_repo.save_act(act)
-
-            if success:
-                logger.info(f"✅ Successfully processed act: {title}")
-            else:
-                logger.error(f"❌ Failed to save act: {title}")
-
-            return success is not None
+            act_id = self.act_repo.save_act(act)
+            logger.info(f"✅ Successfully processed act: {title} (id={act_id})")
+            return act_id
 
         except PDFProcessingError as e:
             logger.error(f"PDF processing failed for {title}: {e}")
-            return False
+            return None
         except AIServiceError as e:
             logger.error(f"AI analysis failed for {title}: {e}")
-            return False
+            return None
         except Exception as e:
             logger.error(f"Unexpected error processing {title}: {e}")
-            return False
+            return None
 
     def _get_voting_details(self, act_details: ActData) -> Optional[Dict[str, Any]]:
         """
