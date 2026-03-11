@@ -41,13 +41,16 @@ class PipelineOrchestrator:
         self.sejm_api = sejm_api or SejmAPIClient()
         self.file_handler = file_handler or FileHandler()
 
-    def check_for_new_acts(self) -> None:
+    def check_for_new_acts(self) -> list:
         """
         Main entry point: Check for new acts and process them.
+
+        Returns:
+            List of successfully processed act titles.
         """
         if not check_environment():
             logger.error("Missing required environment variables")
-            return
+            return []
 
         logger.info("=" * 50)
         logger.info("Starting act processing pipeline")
@@ -58,14 +61,14 @@ class PipelineOrchestrator:
 
         if not items:
             logger.info("No acts to process")
-            return
+            return []
 
         # Identify new acts
         new_acts = self.fetcher.identify_new_acts(items)
 
         if not new_acts:
             logger.info("No new legal acts found")
-            return
+            return []
 
         logger.info(f"🔔 Found {len(new_acts)} new legal acts!")
 
@@ -76,22 +79,28 @@ class PipelineOrchestrator:
             logger.info(f"Limiting to {MAX_ACTS_TO_PROCESS} acts per run")
 
         # Process acts (oldest first)
-        success_count = 0
+        processed = []
         for act in reversed(acts_to_process):
-            if self.processor.process_and_save(act):
-                success_count += 1
+            act_id = self.processor.process_and_save(act)
+            if act_id:
+                processed.append((act.get("title", act.get("ELI", "?")), act_id))
 
         logger.info(
-            f"Successfully processed {success_count}/{len(acts_to_process)} acts"
+            f"Successfully processed {len(processed)}/{len(acts_to_process)} acts"
         )
 
         # Save last known act
         if new_acts:
             self._save_last_known(new_acts[0])
 
-    def check_old_elis(self) -> None:
+        return processed
+
+    def check_old_elis(self) -> list:
         """
         Check ELIs saved for later (acts without voting data at first check).
+
+        Returns:
+            List of successfully processed ELIs.
         """
         logger.info("=" * 50)
         logger.info("Checking ELIs saved for later")
@@ -101,11 +110,12 @@ class PipelineOrchestrator:
 
         if not elis:
             logger.info("No ELIs to check later")
-            return
+            return []
 
         logger.info(f"🔔 Found {len(elis)} ELIs to check voting details later!")
 
         remaining_elis = []
+        processed = []
 
         for eli in elis:
             logger.info(f"Checking ELI: {eli}")
@@ -123,8 +133,10 @@ class PipelineOrchestrator:
                         "promulgation": act_details.promulgation,
                     }
 
-                    if self.processor.process_and_save(act_data):
+                    act_id = self.processor.process_and_save(act_data)
+                    if act_id:
                         logger.info(f"✅ Successfully processed delayed act: {eli}")
+                        processed.append((act_details.title or eli, act_id))
                         continue
 
                 logger.error(f"❌ Failed to process delayed act: {eli}")
@@ -145,6 +157,8 @@ class PipelineOrchestrator:
                 os.remove(ELI_FOR_LATER)
             logger.info("All delayed ELIs processed successfully!")
 
+        return processed
+
     def _save_last_known(self, act: Dict[str, Any]) -> None:
         """
         Save last known act to file.
@@ -159,13 +173,13 @@ class PipelineOrchestrator:
             logger.error(f"Error saving last known act: {e}")
 
 
-def check_for_new_acts() -> None:
+def check_for_new_acts() -> list:
     """Public entry point for checking new acts."""
     orchestrator = PipelineOrchestrator()
-    orchestrator.check_for_new_acts()
+    return orchestrator.check_for_new_acts()
 
 
-def check_old_elis() -> None:
+def check_old_elis() -> list:
     """Public entry point for checking old ELIs."""
     orchestrator = PipelineOrchestrator()
-    orchestrator.check_old_elis()
+    return orchestrator.check_old_elis()

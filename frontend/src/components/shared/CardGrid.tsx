@@ -6,6 +6,7 @@ import React, {
   useRef,
   useLayoutEffect,
   useCallback,
+  useEffect,
 } from 'react';
 import dynamic from 'next/dynamic';
 import Masonry from 'react-masonry-css';
@@ -21,7 +22,12 @@ import { CONFIDENCE_THRESHOLD } from '@/lib/config';
 // Dynamic imports for modals - loaded only when needed
 const DialogModal = dynamic(() => import('./DialogModal'), { ssr: false });
 
-const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
+const CardGrid = ({
+  searchQuery,
+  selectedTypes,
+  data,
+  initialOpenId,
+}: CardGridProps) => {
   const [selectedCard, setSelectedCard] = useState<Act | null>(null);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [isFilterOptionsOpen, setIsFilterOptionsOpen] = useState(false);
@@ -76,9 +82,8 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
 
       const confidenceCheck =
         isAdmin ||
-        card.confidence_score === null ||
-        card.confidence_score === undefined ||
-        card.confidence_score >= CONFIDENCE_THRESHOLD;
+        (card.confidence_score != null &&
+          card.confidence_score >= CONFIDENCE_THRESHOLD);
 
       return matchesQuery && matchesType && confidenceCheck;
     });
@@ -127,11 +132,19 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
 
   const openModal = useCallback((card: Act) => {
     setSelectedCard(card);
+    window.history.replaceState(null, '', `/${card.id}`);
   }, []);
 
   const closeModal = useCallback(() => {
     setSelectedCard(null);
+    window.history.replaceState(null, '', '/');
   }, []);
+
+  useEffect(() => {
+    if (!initialOpenId || !data?.acts) return;
+    const act = data.acts.find(a => a.id === initialOpenId);
+    if (act) setSelectedCard(act);
+  }, [initialOpenId, data?.acts]);
 
   const handleCardDelete = useCallback((id: string | number) => {
     setDeletedIds(prev => new Set(prev).add(id));
@@ -420,6 +433,7 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
                     0
                   }
                   confidenceScore={card.confidence_score}
+                  createdAt={card.created_at}
                   onClick={() => openModal(card)}
                   onDelete={handleCardDelete}
                 />

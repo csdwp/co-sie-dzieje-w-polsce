@@ -7,7 +7,13 @@ import { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import type { ActsAndKeywordsResponse } from '@/types';
 
-const ClientWrapper = ({ data }: { data: ActsAndKeywordsResponse }) => {
+const ClientWrapper = ({
+  data,
+  initialOpenId,
+}: {
+  data: ActsAndKeywordsResponse;
+  initialOpenId?: number;
+}) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTypes, setSelectedTypes] = useState<string[]>([
     'Ustawa',
@@ -117,6 +123,7 @@ const ClientWrapper = ({ data }: { data: ActsAndKeywordsResponse }) => {
             data={data}
             searchQuery={searchQuery}
             selectedTypes={selectedTypes}
+            initialOpenId={initialOpenId}
           />
         </main>
       </div>

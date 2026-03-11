@@ -1,7 +1,7 @@
 """Repository for acts table operations."""
 
 import json
-from typing import Optional
+from typing import Optional, cast
 
 from ..core.exceptions import DatabaseError
 from ..core.logging import get_logger
@@ -14,7 +14,7 @@ logger = get_logger(__name__)
 class ActRepository(BaseRepository):
     """Repository for acts data access."""
 
-    def save_act(self, act: Act) -> bool:
+    def save_act(self, act: Act) -> Optional[int]:
         """
         Save an act to the database.
 
@@ -22,7 +22,7 @@ class ActRepository(BaseRepository):
             act: Act entity to save
 
         Returns:
-            True if successful, False otherwise
+            ID of the saved act if successful, None otherwise
         """
         insert_query = """
         INSERT INTO acts (
@@ -30,6 +30,7 @@ class ActRepository(BaseRepository):
             announcement_date, change_date, promulgation, item_status, comments,
             keywords, file, votes, category, created_at, updated_at
         ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
+        RETURNING id
         """
 
         try:
@@ -59,10 +60,11 @@ class ActRepository(BaseRepository):
 
             with self.get_connection() as (conn, cursor):
                 cursor.execute(insert_query, data_tuple)
+                act_id = cast(int, cursor.fetchone()[0])
                 conn.commit()
 
             logger.info(f"Successfully saved act: {act.title}")
-            return True
+            return act_id
 
         except Exception as e:
             logger.error(f"Error saving act to database: {e}")
