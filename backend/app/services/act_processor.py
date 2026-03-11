@@ -95,7 +95,9 @@ class ActProcessor:
             needs_reprocess: bool = True
             try:
                 logger.info("Validating summary...")
-                plain_summary = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", analysis.content_html)).strip()
+                plain_summary = re.sub(
+                    r"\s+", " ", re.sub(r"<[^>]+>", " ", analysis.content_html)
+                ).strip()
                 validation = self.text_validator.validate(result.chunks, plain_summary)
                 confidence_score = validation.overall_confidence
                 needs_reprocess = validation.verdict == "unreliable"
@@ -107,7 +109,9 @@ class ActProcessor:
                 if validation.hallucinations:
                     logger.warning(f"Unsupported claims: {validation.hallucinations}")
             except Exception as e:
-                logger.error(f"Validation failed for {title}, saving with needs_reprocess=True: {e}")
+                logger.error(
+                    f"Validation failed for {title}, saving with needs_reprocess=True: {e}"
+                )
 
             # Step 3: Fetch act details and voting
             logger.info("Fetching act details and voting data...")

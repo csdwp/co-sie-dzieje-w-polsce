@@ -21,7 +21,6 @@ class AnalysisResult:
     chunks: List[str]
 
 
-
 @dataclass
 class ActData:
     """Raw act data from API before processing."""
