@@ -3,12 +3,15 @@
 from datetime import datetime
 from typing import Any, Dict, Optional, Tuple
 
+import re
+
 from ..core.exceptions import AIServiceError, PDFProcessingError
 from ..core.logging import get_logger
 from ..models.act import Act, ActData
 from ..repositories.act_repository import ActRepository
 from .ai.categorizer import Categorizer
 from .ai.text_analyzer import TextAnalyzer
+from .ai.text_validator import TextValidator
 from .external.pdf_processor import PDFProcessor
 from .external.sejm_api import SejmAPIClient
 from .votes_calculator import VotesCalculator
@@ -24,6 +27,7 @@ class ActProcessor:
         sejm_api: Optional[SejmAPIClient] = None,
         pdf_processor: Optional[PDFProcessor] = None,
         text_analyzer: Optional[TextAnalyzer] = None,
+        text_validator: Optional[TextValidator] = None,
         categorizer: Optional[Categorizer] = None,
         votes_calculator: Optional[VotesCalculator] = None,
         act_repo: Optional[ActRepository] = None,
@@ -42,6 +46,7 @@ class ActProcessor:
         self.sejm_api = sejm_api or SejmAPIClient()
         self.pdf_processor = pdf_processor or PDFProcessor()
         self.text_analyzer = text_analyzer or TextAnalyzer()
+        self.text_validator = text_validator or TextValidator()
         self.categorizer = categorizer or Categorizer()
         self.votes_calculator = votes_calculator or VotesCalculator()
         self.act_repo = act_repo or ActRepository()
@@ -86,6 +91,18 @@ class ActProcessor:
             result = self.text_analyzer.analyze_full_text(pdf_text)
             analysis = result.analysis
 
+            # Step 2b: Validate summary against source chunks
+            logger.info("Validating summary...")
+            plain_summary = re.sub(r"<[^>]+>", " ", analysis.content_html).strip()
+            validation = self.text_validator.validate(result.chunks, plain_summary)
+            logger.info(
+                f"Validation: confidence={validation.overall_confidence}, "
+                f"verdict={validation.verdict}, "
+                f"hallucinations={len(validation.hallucinations)}/{len(validation.claims)} claims"
+            )
+            if validation.hallucinations:
+                logger.warning(f"Unsupported claims: {validation.hallucinations}")
+
             # Step 3: Fetch act details and voting
             logger.info("Fetching act details and voting data...")
             act_details = self.sejm_api.fetch_act_details(eli)
@@ -115,6 +132,8 @@ class ActProcessor:
                 voting_details=voting_details,
                 category=category,
                 pdf_url=pdf_url,
+                confidence_score=validation.overall_confidence,
+                needs_reprocess=validation.verdict == "unreliable",
             )
 
             # Step 6: Save to database
@@ -208,6 +227,8 @@ class ActProcessor:
         voting_details: Optional[Dict[str, Any]],
         category: Optional[str],
         pdf_url: str,
+        confidence_score: Optional[float] = None,
+        needs_reprocess: bool = False,
     ) -> Act:
         """
         Build Act entity from processed data.
@@ -246,6 +267,8 @@ class ActProcessor:
             file=pdf_url,
             votes=voting_details,
             category=category,
+            confidence_score=confidence_score,
+            needs_reprocess=needs_reprocess,
         )
 
     def _parse_date(self, date_str: Optional[str]) -> Optional[datetime]:

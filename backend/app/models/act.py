@@ -87,6 +87,8 @@ class Act:
     file: str
     votes: Optional[Dict[str, Any]]
     category: Optional[str]
+    confidence_score: Optional[float] = None
+    needs_reprocess: bool = False
 
     def to_db_tuple(self) -> tuple:
         """Convert to tuple for database insertion."""

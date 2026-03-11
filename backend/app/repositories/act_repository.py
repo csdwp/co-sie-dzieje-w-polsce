@@ -28,8 +28,9 @@ class ActRepository(BaseRepository):
         INSERT INTO acts (
             title, act_number, simple_title, content, refs, texts, item_type,
             announcement_date, change_date, promulgation, item_status, comments,
-            keywords, file, votes, category, created_at, updated_at
-        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
+            keywords, file, votes, category, confidence_score, needs_reprocess,
+            created_at, updated_at
+        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
         RETURNING id
         """
 
@@ -56,6 +57,8 @@ class ActRepository(BaseRepository):
                 act.file,
                 votes,
                 act.category,
+                act.confidence_score,
+                act.needs_reprocess,
             )
 
             with self.get_connection() as (conn, cursor):
