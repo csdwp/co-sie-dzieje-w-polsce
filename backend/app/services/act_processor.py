@@ -125,7 +125,7 @@ class ActProcessor:
             else:
                 logger.error(f"❌ Failed to save act: {title}")
 
-            return success
+            return success is not None
 
         except PDFProcessingError as e:
             logger.error(f"PDF processing failed for {title}: {e}")

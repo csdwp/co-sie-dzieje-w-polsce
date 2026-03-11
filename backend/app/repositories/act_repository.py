@@ -1,7 +1,7 @@
 """Repository for acts table operations."""
 
 import json
-from typing import Optional
+from typing import Optional, cast
 
 from ..core.exceptions import DatabaseError
 from ..core.logging import get_logger
@@ -60,7 +60,7 @@ class ActRepository(BaseRepository):
 
             with self.get_connection() as (conn, cursor):
                 cursor.execute(insert_query, data_tuple)
-                act_id = cursor.fetchone()[0]
+                act_id = cast(int, cursor.fetchone()[0])
                 conn.commit()
 
             logger.info(f"Successfully saved act: {act.title}")
