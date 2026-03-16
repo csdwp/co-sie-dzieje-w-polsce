@@ -9,14 +9,10 @@ const Menu = ({
 }: MenuProps) => {
   const toggleType = (type: string) => {
     setSelectedTypes(prev => {
-      const includesType = prev.includes(type);
-      const shouldRemove = includesType && prev.length > 1;
-
-      return shouldRemove
-        ? prev.filter(t => t !== type)
-        : includesType
-          ? prev
-          : [...prev, type];
+      if (prev.length === 1 && prev[0] === type) {
+        return ['Ustawa', 'Rozporządzenie'];
+      }
+      return [type];
     });
   };
 

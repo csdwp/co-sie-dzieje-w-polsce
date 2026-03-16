@@ -178,7 +178,6 @@ body::before {
 }
 
 [data-slot='dialog-content'] {
-  padding: 2rem;
   border: 1px solid rgba(0, 0, 0, 0.08);
   box-shadow:
     0 4px 24px -4px rgba(0, 0, 0, 0.1),
@@ -189,11 +188,6 @@ body::before {
   box-shadow:
     0 4px 32px -4px rgba(0, 0, 0, 0.5),
     0 2px 12px -2px rgba(0, 0, 0, 0.3);
-}
-@media (min-width: 640px) {
-  [data-slot='dialog-content'] {
-    padding: 2.5rem;
-  }
 }
 
 @keyframes gloss {
@@ -258,21 +252,63 @@ body::before {
 }
 
 @keyframes text-shimmer {
-  0%, 100% { background-position: 100% 0; }
-  50% { background-position: 50% 0; }
+  0%,
+  100% {
+    background-position: 100% 0;
+  }
+  50% {
+    background-position: 50% 0;
+  }
+}
+
+@keyframes slide-from-right {
+  from {
+    transform: translateX(250px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+@keyframes slide-from-left {
+  from {
+    transform: translateX(-250px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+.slide-from-right {
+  animation: slide-from-right 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.slide-from-left {
+  animation: slide-from-left 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes breathe {
-  0%, 100% { color: oklch(0.60 0 0); }
-  50% { color: oklch(0.25 0 0); }
+  0%,
+  100% {
+    color: oklch(0.45 0 0);
+  }
+  50% {
+    color: oklch(0.25 0 0);
+  }
 }
 .dark .animate-breathe,
 .dark .animate-breathe {
   animation: breathe-dark 4s ease-in-out infinite;
 }
 @keyframes breathe-dark {
-  0%, 100% { color: oklch(0.55 0 0); }
-  50% { color: oklch(0.93 0 0); }
+  0%,
+  100% {
+    color: oklch(0.72 0 0);
+  }
+  50% {
+    color: oklch(0.93 0 0);
+  }
 }
 
 .animate-breathe {

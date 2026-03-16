@@ -110,6 +110,10 @@ export interface CardProps {
 export interface DialogModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onNext: () => void;
+  onPrev: () => void;
+  hasNext: boolean;
+  hasPrev: boolean;
   card: {
     id: string | number;
     title: string;

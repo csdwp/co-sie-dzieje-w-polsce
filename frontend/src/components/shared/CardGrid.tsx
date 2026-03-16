@@ -123,8 +123,8 @@ const CardGrid = ({
       });
     } else {
       return filtered.sort((a: Act, b: Act) => {
-        const dateA = new Date(a.announcement_date).getTime();
-        const dateB = new Date(b.announcement_date).getTime();
+        const dateA = new Date(a.created_at ?? a.announcement_date).getTime();
+        const dateB = new Date(b.created_at ?? b.announcement_date).getTime();
         return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
       });
     }
@@ -169,37 +169,26 @@ const CardGrid = ({
 
   useLayoutEffect(() => {
     if (cardsContainerRef.current && !hasAnimated.current) {
-      const animationTimeout = setTimeout(() => {
-        if (cardsContainerRef.current) {
-          const cards =
-            cardsContainerRef.current.querySelectorAll('[data-card]');
+      const cards = cardsContainerRef.current.querySelectorAll('[data-card]');
 
-          if (cards.length > 0) {
-            gsap.fromTo(
-              cards,
-              {
-                opacity: 0,
-                y: 50,
-              },
-              {
-                opacity: 1,
-                y: 0,
-                duration: 1.6,
-                ease: 'power3.out',
-                stagger: {
-                  amount: 0.8,
-                  from: 'start',
-                  each: 0.08,
-                },
-                delay: 0.6,
-              }
-            );
-            hasAnimated.current = true;
-          }
-        }
-      }, 100);
+      if (cards.length > 0) {
+        // Set cards to start position before browser paints
+        gsap.set(cards, { opacity: 0, y: 50 });
+        hasAnimated.current = true;
 
-      return () => clearTimeout(animationTimeout);
+        gsap.to(cards, {
+          opacity: 1,
+          y: 0,
+          duration: 1.6,
+          ease: 'power3.out',
+          stagger: {
+            amount: 0.8,
+            from: 'start',
+            each: 0.08,
+          },
+          delay: 0.6,
+        });
+      }
     }
   }, []);
 
@@ -449,24 +438,45 @@ const CardGrid = ({
         </Masonry>
       </div>
 
-      {selectedCard && (
-        <DialogModal
-          isOpen={selectedCard !== null}
-          onClose={closeModal}
-          card={{
-            id: selectedCard.id,
-            title: selectedCard.title,
-            content: selectedCard.content ?? '',
-            announcement_date: selectedCard.announcement_date,
-            promulgation: (selectedCard as Act).promulgation ?? '',
-            item_type: selectedCard.item_type,
-            categories: selectedCard.category ? [selectedCard.category] : [],
-            votes: (selectedCard as Act).votes ?? {},
-            url: (selectedCard as Act).file ?? '',
-            confidence_score: selectedCard.confidence_score,
-          }}
-        />
-      )}
+      {selectedCard &&
+        (() => {
+          const visibleCards = filteredAndSortedCards.filter(
+            (c: Act) => !deletedIds.has(c.id)
+          );
+          const currentIndex = visibleCards.findIndex(
+            (c: Act) => c.id === selectedCard.id
+          );
+          return (
+            <DialogModal
+              isOpen={selectedCard !== null}
+              onClose={closeModal}
+              onNext={() => {
+                const next = visibleCards[currentIndex + 1];
+                if (next) setSelectedCard(next);
+              }}
+              onPrev={() => {
+                const prev = visibleCards[currentIndex - 1];
+                if (prev) setSelectedCard(prev);
+              }}
+              hasNext={currentIndex < visibleCards.length - 1}
+              hasPrev={currentIndex > 0}
+              card={{
+                id: selectedCard.id,
+                title: selectedCard.title,
+                content: selectedCard.content ?? '',
+                announcement_date: selectedCard.announcement_date,
+                promulgation: (selectedCard as Act).promulgation ?? '',
+                item_type: selectedCard.item_type,
+                categories: selectedCard.category
+                  ? [selectedCard.category]
+                  : [],
+                votes: (selectedCard as Act).votes ?? {},
+                url: (selectedCard as Act).file ?? '',
+                confidence_score: selectedCard.confidence_score,
+              }}
+            />
+          );
+        })()}
     </div>
   );
 };
