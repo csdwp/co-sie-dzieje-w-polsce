@@ -295,7 +295,10 @@ const DialogModal = ({
               →
             </button>
           </div>
-          <div ref={contentRef} className="overflow-auto flex-1 flex flex-col gap-8 pt-8">
+          <div
+            ref={contentRef}
+            className="overflow-auto flex-1 flex flex-col gap-8 pt-8"
+          >
             <DialogHeader className="h-fit">
               <div className="flex items-start gap-3 mb-3">
                 <DialogTitle className="text-2xl font-medium tracking-tight leading-tight text-left flex-1 max-w-11/12">
