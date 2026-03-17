@@ -41,7 +41,7 @@ class PipelineQueueRepository(BaseRepository):
         """
         query = "SELECT eli FROM pipeline_queue ORDER BY added_at ASC"
         try:
-            with self.get_connection() as (conn, cursor):
+            with self.get_connection() as (_, cursor):
                 cursor.execute(query)
                 rows = cursor.fetchall()
             return [row[0] for row in rows]
