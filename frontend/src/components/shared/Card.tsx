@@ -1,11 +1,17 @@
 'use client';
 
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useMemo, memo, useCallback } from 'react';
 import { CardProps } from '@/types';
 import { Badge } from '@/components/ui/badge';
 import { useIsAdmin, isLowConfidence } from '@/lib/authHelpers';
 import { Trash2 } from 'lucide-react';
 import { getActStatus, getStatusColor } from '@/lib/statusHelpers';
+
+// Memoized helper functions
+const stripHtml = (html: string) => html.replace(/<[^>]*>/g, '');
+
+const stripDateFromTitle = (title: string) =>
+  title.replace(/z dnia \d{1,2} \w+ \d{4}\s*r\.\s*/i, '').trim();
 
 const Card = ({
   id,
@@ -20,6 +26,7 @@ const Card = ({
   governmentPercentage,
   confidenceScore,
   onDelete,
+  createdAt,
 }: CardProps) => {
   const status = getActStatus(date, promulgation);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -37,8 +44,10 @@ const Card = ({
       setTotalDots(Math.max(10, N));
     };
 
+    let rafId: ReturnType<typeof requestAnimationFrame>;
     const resizeObserver = new ResizeObserver(() => {
-      updateTotalDots();
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(updateTotalDots);
     });
 
     resizeObserver.observe(containerRef.current);
@@ -47,28 +56,52 @@ const Card = ({
 
     return () => {
       resizeObserver.disconnect();
+      cancelAnimationFrame(rafId);
     };
   }, []);
 
   const governmentDots = Math.round((governmentPercentage / 100) * totalDots);
   const oppositionDots = totalDots - governmentDots;
 
-  const formattedDate = new Date(date).toLocaleDateString('pl-PL', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  });
+  const formattedDate = useMemo(
+    () =>
+      new Date(date).toLocaleDateString('pl-PL', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      }),
+    [date]
+  );
 
-  const stripHtml = (html: string) => {
-    return html.replace(/<[^>]*>/g, '');
-  };
+  const formattedCreatedAt = useMemo(
+    () =>
+      createdAt
+        ? new Date(createdAt).toLocaleDateString('pl-PL', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+          })
+        : null,
+    [createdAt]
+  );
 
-  const stripDateFromTitle = (title: string) => {
-    const titleWithoutDate = title
-      .replace(/z dnia \d{1,2} \w+ \d{4}\s*r\.\s*/i, '')
-      .trim();
-    return titleWithoutDate;
-  };
+  const processedTitle = useMemo(() => stripDateFromTitle(title), [title]);
+  const processedContent = useMemo(
+    () => (content ? stripHtml(content) : ''),
+    [content]
+  );
+
+  const handleMouseLeave = useCallback((e: React.MouseEvent<HTMLElement>) => {
+    e.currentTarget.style.setProperty('--shine-x', '100%');
+  }, []);
+
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    // maps cursor 0→1 to background-position 75%→25% (keeps shine on bright gradient spot)
+    const pos = 75 - x * 50;
+    e.currentTarget.style.setProperty('--shine-x', `${pos}%`);
+  }, []);
 
   const isAdmin = useIsAdmin();
   const needsVerification = isLowConfidence(confidenceScore);
@@ -109,23 +142,26 @@ const Card = ({
   };
 
   return (
-    <div
+    <article
       onClick={onClick}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
       data-testid="act-card"
-      className={`bg-neutral-700/10 dark:bg-neutral-800/40 mx-auto max-w-11/12 sm:max-w-80 flex flex-col gap-3 p-5 rounded-3xl shadow-xl cursor-pointer group hover:translate-y-[-2px]
-      transition-transform duration-300 h-fit w-full
-      ${isImportant && 'border-2 border-red-500/70 shadow-red-500/10'}
+      aria-labelledby={`act-title-${id}`}
+      className={`bg-white/[0.02] dark:bg-white/[0.03] backdrop-blur-sm mx-auto max-w-11/12 sm:max-w-80 flex flex-col gap-4 p-6 rounded-2xl premium-shadow premium-border cursor-pointer group
+      transition-all duration-500 ease-out h-fit w-full hover:bg-white/[0.04] dark:hover:bg-white/[0.05]
+      ${isImportant && 'border-l-2 border-l-red-500/60'}
       ${isDeleting && 'opacity-50 pointer-events-none animate-pulse'}`}
     >
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="dark:text-neutral-600 text-neutral-500 dark:group-hover:text-neutral-100 group-hover:text-neutral-900 transition-colors duration-400 text-xs">
-            {formattedDate}
+        <div className="flex items-center gap-2.5">
+          <div className="text-neutral-400 dark:text-neutral-400 group-hover:text-neutral-600 dark:group-hover:text-neutral-300 transition-colors duration-500 text-xs tracking-wide uppercase">
+            {formattedCreatedAt ?? formattedDate}
           </div>
           {status !== 'Nieznany' && (
             <Badge
               variant="outline"
-              className={`text-[10px] px-1.5 py-0 ${getStatusColor(status)}`}
+              className={`text-[10px] px-2 py-0.5 font-medium tracking-wide ${getStatusColor(status)}`}
             >
               {status}
             </Badge>
@@ -135,18 +171,18 @@ const Card = ({
           {isAdmin && needsVerification && (
             <Badge
               variant="outline"
-              className="bg-yellow-500/20 text-yellow-700 dark:text-yellow-400 border-yellow-500/50 text-[10px] px-1.5 py-0"
+              className="bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30 text-[10px] px-2 py-0.5 font-medium"
             >
-              ⚠️ Wymaga weryfikacji
+              Wymaga weryfikacji
             </Badge>
           )}
           {isAdmin && (
             <button
               onClick={handleDelete}
               disabled={isDeleting}
-              className="p-1.5 rounded-lg hover:bg-red-500/20 transition-colors
+              className="p-1.5 rounded-lg hover:bg-red-500/10 transition-all duration-300
                          disabled:opacity-50 disabled:cursor-not-allowed
-                         text-red-500 hover:text-red-600 dark:text-red-400 cursor-pointer"
+                         text-neutral-400 hover:text-red-500 dark:text-neutral-400 dark:hover:text-red-400 cursor-pointer"
               aria-label="Usuń akt"
               title="Usuń akt"
             >
@@ -155,62 +191,65 @@ const Card = ({
           )}
         </div>
       </div>
-      <h3
+      <h2
+        id={`act-title-${id}`}
         data-testid="act-title"
-        className="text-lg leading-snug font-semibold line-clamp-3 -mt-2.5"
+        className="text-lg leading-snug font-medium tracking-tight line-clamp-3"
       >
-        {stripDateFromTitle(title)}
-      </h3>
-      <div className="dark:text-neutral-600 text-neutral-500 dark:group-hover:text-neutral-100 group-hover:text-neutral-900 transition-colors duration-400 text-xs">
-        W skrócie
-      </div>
-      <div className="text-base text-muted-foreground leading-snug line-clamp-4 text-gradient-gloss font-medium -mt-2.5">
-        &quot;{summary}&quot;
+        {processedTitle}
+      </h2>
+      <div className="space-y-1.5">
+        <div className="text-neutral-400 dark:text-neutral-400 text-[11px] tracking-widest uppercase group-hover:text-neutral-600 dark:group-hover:text-neutral-300 transition-colors duration-500">
+          W skrócie
+        </div>
+        <div className="text-base leading-relaxed line-clamp-4 text-gradient-gloss font-normal">
+          {summary}
+        </div>
       </div>
       {categories.length > 0 && (
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-wrap gap-2">
           {categories.slice(0, 4).map((category, index) => (
             <span
               key={index}
-              className="dark:bg-neutral-700/50 bg-neutral-600/10 px-2 py-1 text-xs font-medium text-neutral-900 dark:text-neutral-100 rounded-full w-max overflow-ellipsis overflow-hidden max-w-full whitespace-nowrap"
+              className="bg-black/[0.05] dark:bg-white/[0.06] px-2.5 py-1 text-[11px] font-medium text-neutral-500 dark:text-neutral-300 rounded-full w-max overflow-ellipsis overflow-hidden max-w-full whitespace-nowrap tracking-wide"
             >
               {category}
             </span>
           ))}
         </div>
       )}
-      <p className="line-clamp-7 font-light text-sm">
-        {content && stripHtml(content)}
+      <p className="line-clamp-7 text-sm text-neutral-500 dark:text-neutral-400 leading-relaxed group-hover:text-neutral-600 dark:group-hover:text-neutral-300 transition-colors duration-500">
+        {processedContent}
       </p>
       {governmentPercentage > 0 && (
-        <>
-          <div className="dark:text-neutral-600 text-neutral-500 dark:group-hover:text-neutral-100 group-hover:text-neutral-900 transition-colors duration-400 text-xs">
-            Rozkład głosów &quot;za&quot;
+        <div className="pt-2 border-t border-white/[0.04] space-y-3">
+          <div className="text-neutral-400 dark:text-neutral-400 text-[11px] tracking-widest uppercase group-hover:text-neutral-600 dark:group-hover:text-neutral-300 transition-colors duration-500">
+            Rozkład głosów &bdquo;za&rdquo;
           </div>
-          <div className="flex flex-col items-center gap-1 -mt-1.5">
+          <div className="flex flex-col items-center gap-2">
             <div ref={containerRef} className="flex justify-between w-full">
               {[...Array(governmentDots)].map((_, index) => (
                 <div
                   key={`gov-${index}`}
-                  className="w-2 h-2 bg-neutral-100 rounded-full"
+                  className="w-2 h-2 bg-neutral-200 dark:bg-neutral-300 rounded-full transition-colors duration-300"
                 ></div>
               ))}
               {[...Array(oppositionDots)].map((_, index) => (
                 <div
                   key={`opp-${index}`}
-                  className="w-2 h-2 bg-red-500/70 rounded-full"
+                  className="w-2 h-2 bg-red-500/60 dark:bg-red-500/50 rounded-full transition-colors duration-300"
                 ></div>
               ))}
             </div>
-            <div className="flex justify-between w-full dark:text-neutral-600 text-neutral-500 dark:group-hover:text-neutral-100 group-hover:text-neutral-900 transition-colors duration-400 text-xs">
-              <span>Rządz.</span>
-              <span>Opoz.</span>
+            <div className="flex justify-between w-full text-[11px] text-neutral-400 dark:text-neutral-400 tracking-wide group-hover:text-neutral-600 dark:group-hover:text-neutral-300 transition-colors duration-500">
+              <span>Koalicja</span>
+              <span>Opozycja</span>
             </div>
           </div>
-        </>
+        </div>
       )}
-    </div>
+    </article>
   );
 };
 
-export default Card;
+export default memo(Card);

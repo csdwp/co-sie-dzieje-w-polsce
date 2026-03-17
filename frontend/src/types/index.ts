@@ -22,6 +22,7 @@ export interface Act {
   votes?: Votes | null;
   category?: string | null;
   confidence_score?: number | null;
+  created_at?: string;
 }
 
 export interface ActReferences {
@@ -103,11 +104,16 @@ export interface CardProps {
   governmentPercentage: number;
   confidenceScore?: number | null;
   onDelete?: (id: string | number) => void;
+  createdAt?: string;
 }
 
 export interface DialogModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onNext: () => void;
+  onPrev: () => void;
+  hasNext: boolean;
+  hasPrev: boolean;
   card: {
     id: string | number;
     title: string;
@@ -126,6 +132,7 @@ export interface CardGridProps {
   searchQuery: string;
   selectedTypes: string[];
   data: ActsAndKeywordsResponse;
+  initialOpenId?: number;
 }
 
 export interface SearchBarProps {

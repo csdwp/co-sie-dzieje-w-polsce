@@ -5,6 +5,7 @@ on:
       - main
     paths:
       - 'backend/app/**'
+  workflow_dispatch:
 jobs:
   ftp-deploy:
     runs-on: ubuntu-latest
@@ -20,3 +21,5 @@ jobs:
           local-dir: backend/app/
           server-dir: /public_html/csdwp/
           dangerous-clean-slate: false
+          timeout: 60000
+          retries: 3

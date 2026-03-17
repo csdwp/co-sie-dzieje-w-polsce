@@ -14,6 +14,14 @@ class ActAnalysis:
 
 
 @dataclass
+class AnalysisResult:
+    """Full result of text analysis including source chunks for validation."""
+
+    analysis: ActAnalysis
+    chunks: List[str]
+
+
+@dataclass
 class ActData:
     """Raw act data from API before processing."""
 
@@ -59,6 +67,9 @@ class Act:
     file: str
     votes: Optional[Dict[str, Any]]
     category: Optional[str]
+    confidence_score: Optional[float] = None
+    needs_reprocess: bool = False
+    idempotency_key: Optional[str] = None
 
     def to_db_tuple(self) -> tuple:
         """Convert to tuple for database insertion."""

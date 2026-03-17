@@ -3,7 +3,9 @@ import { test, expect } from '@playwright/test';
 test.describe('Daily reading limit', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
-    await page.evaluate(() => localStorage.clear());
+    await page.evaluate(() => {
+      document.cookie = 'modalOpens=; path=/; max-age=0';
+    });
     await page.reload();
   });
 

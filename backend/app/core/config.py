@@ -14,9 +14,7 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 CURRENT_YEAR = datetime.now().year
 
-LAST_KNOWN_FILE = Path(__file__).parent.parent / "data" / "last_known.json"
 ACT_CONTENT_FILE = Path(__file__).parent.parent / "data" / "act_content.txt"
-ELI_FOR_LATER = Path(__file__).parent.parent / "data" / "eli_for_later.json"
 ACT_ANALYSIS_FILE = Path(__file__).parent.parent / "data" / "act_analysis.json"
 
 MAX_ACTS_TO_PROCESS = 10
