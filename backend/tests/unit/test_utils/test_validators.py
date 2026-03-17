@@ -10,8 +10,8 @@ class TestValidateEliFormat:
         """Test that validate_eli_format returns True for valid ELI."""
         # Arrange - test representative valid cases
         valid_elis = [
-            "/pl/act/dz/2024/123",           # basic format
-            "/pl/act/dz/2024/456/extra",     # with extra segments
+            "DU/2024/123",   # basic format
+            "DU/2024/456",   # different number
         ]
 
         # Act & Assert
@@ -50,7 +50,7 @@ class TestValidateActData:
         """Test that validate_act_data returns True for complete valid data."""
         # Arrange
         valid_data = {
-            "ELI": "/pl/act/dz/2024/123",
+            "ELI": "DU/2024/123",
             "title": "Ustawa testowa",
             "type": "Ustawa"
         }
@@ -117,7 +117,7 @@ class TestValidateActData:
 
         for act_type in valid_types:
             data = {
-                "ELI": "/pl/act/dz/2024/123",
+                "ELI": "DU/2024/123",
                 "title": "Ustawa testowa",
                 "type": act_type
             }

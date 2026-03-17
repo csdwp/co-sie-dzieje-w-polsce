@@ -144,6 +144,7 @@ class ActProcessor:
                 pdf_url=pdf_url,
                 confidence_score=confidence_score,
                 needs_reprocess=needs_reprocess,
+                idempotency_key=eli,
             )
 
             # Step 6: Save to database
@@ -239,6 +240,7 @@ class ActProcessor:
         pdf_url: str,
         confidence_score: Optional[float] = None,
         needs_reprocess: bool = False,
+        idempotency_key: Optional[str] = None,
     ) -> Act:
         """
         Build Act entity from processed data.
@@ -279,6 +281,7 @@ class ActProcessor:
             category=category,
             confidence_score=confidence_score,
             needs_reprocess=needs_reprocess,
+            idempotency_key=idempotency_key,
         )
 
     def _parse_date(self, date_str: Optional[str]) -> Optional[datetime]:

@@ -69,6 +69,7 @@ class Act:
     category: Optional[str]
     confidence_score: Optional[float] = None
     needs_reprocess: bool = False
+    idempotency_key: Optional[str] = None
 
     def to_db_tuple(self) -> tuple:
         """Convert to tuple for database insertion."""
