@@ -1,7 +1,7 @@
 """Repository for acts table operations."""
 
 import json
-from typing import Optional, cast
+from typing import Optional, Set, cast
 
 from ..core.exceptions import DatabaseError
 from ..core.logging import get_logger
@@ -29,8 +29,8 @@ class ActRepository(BaseRepository):
             title, act_number, simple_title, content, refs, texts, item_type,
             announcement_date, change_date, promulgation, item_status, comments,
             keywords, file, votes, category, confidence_score, needs_reprocess,
-            created_at, updated_at
-        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
+            idempotency_key, created_at, updated_at
+        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
         RETURNING id
         """
 
@@ -59,6 +59,7 @@ class ActRepository(BaseRepository):
                 act.category,
                 act.confidence_score,
                 act.needs_reprocess,
+                act.idempotency_key,
             )
 
             with self.get_connection() as (conn, cursor):
@@ -120,3 +121,20 @@ class ActRepository(BaseRepository):
         except Exception as e:
             logger.error(f"Error fetching act: {e}")
             raise DatabaseError(f"Failed to fetch act: {e}")
+
+    def get_existing_elis(self) -> Set[str]:
+        """
+        Get all idempotency keys (ELIs) already in the database.
+
+        Returns:
+            Set of ELI strings
+        """
+        query = "SELECT idempotency_key FROM acts WHERE idempotency_key IS NOT NULL"
+        try:
+            with self.get_connection() as (conn, cursor):
+                cursor.execute(query)
+                rows = cursor.fetchall()
+            return {row[0] for row in rows}
+        except Exception as e:
+            logger.error(f"Error fetching existing ELIs: {e}")
+            raise DatabaseError(f"Failed to fetch existing ELIs: {e}")

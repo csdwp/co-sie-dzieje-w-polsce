@@ -1,17 +1,12 @@
 """Main pipeline orchestrator."""
 
-from typing import Any, Dict, Optional
+from typing import Optional
 
-from ..core.config import (
-    ELI_FOR_LATER,
-    LAST_KNOWN_FILE,
-    MAX_ACTS_TO_PROCESS,
-    check_environment,
-)
+from ..core.config import MAX_ACTS_TO_PROCESS, check_environment
 from ..core.logging import get_logger
+from ..repositories.pipeline_queue_repository import PipelineQueueRepository
 from ..services.act_processor import ActProcessor
 from ..services.external.sejm_api import SejmAPIClient
-from ..utils.file_handler import FileHandler
 from .act_fetcher import ActFetcher
 
 logger = get_logger(__name__)
@@ -25,7 +20,7 @@ class PipelineOrchestrator:
         fetcher: Optional[ActFetcher] = None,
         processor: Optional[ActProcessor] = None,
         sejm_api: Optional[SejmAPIClient] = None,
-        file_handler: Optional[FileHandler] = None,
+        queue_repo: Optional[PipelineQueueRepository] = None,
     ):
         """
         Initialize pipeline orchestrator.
@@ -34,12 +29,12 @@ class PipelineOrchestrator:
             fetcher: Act fetcher
             processor: Act processor
             sejm_api: Sejm API client
-            file_handler: File handler
+            queue_repo: Pipeline queue repository
         """
         self.fetcher = fetcher or ActFetcher()
         self.processor = processor or ActProcessor()
         self.sejm_api = sejm_api or SejmAPIClient()
-        self.file_handler = file_handler or FileHandler()
+        self.queue_repo = queue_repo or PipelineQueueRepository()
 
     def check_for_new_acts(self) -> list:
         """
@@ -89,15 +84,11 @@ class PipelineOrchestrator:
             f"Successfully processed {len(processed)}/{len(acts_to_process)} acts"
         )
 
-        # Save last known act
-        if new_acts:
-            self._save_last_known(new_acts[0])
-
         return processed
 
     def check_old_elis(self) -> list:
         """
-        Check ELIs saved for later (acts without voting data at first check).
+        Check ELIs queued for later (acts without voting data at first check).
 
         Returns:
             List of successfully processed ELIs.
@@ -114,7 +105,6 @@ class PipelineOrchestrator:
 
         logger.info(f"🔔 Found {len(elis)} ELIs to check voting details later!")
 
-        remaining_elis = []
         processed = []
 
         for eli in elis:
@@ -125,7 +115,6 @@ class PipelineOrchestrator:
                 act_details = self.sejm_api.fetch_act_details(eli)
 
                 if act_details:
-                    # Convert to format expected by processor
                     act_data = {
                         "ELI": act_details.eli,
                         "title": act_details.title,
@@ -137,40 +126,20 @@ class PipelineOrchestrator:
                     if act_id:
                         logger.info(f"✅ Successfully processed delayed act: {eli}")
                         processed.append((act_details.title or eli, act_id))
+                        self.queue_repo.remove(eli)
                         continue
 
                 logger.error(f"❌ Failed to process delayed act: {eli}")
-                remaining_elis.append(eli)
             else:
                 logger.info(f"Voting still not available for: {eli}")
-                remaining_elis.append(eli)
 
-        # Update the file with remaining ELIs
-        if remaining_elis:
-            self.file_handler.write_lines(ELI_FOR_LATER, remaining_elis)
-            logger.info(f"{len(remaining_elis)} ELIs still waiting for voting data")
+        remaining = len(self.queue_repo.get_all())
+        if remaining:
+            logger.info(f"{remaining} ELIs still waiting for voting data")
         else:
-            # Remove file if all ELIs processed
-            import os
-
-            if os.path.exists(ELI_FOR_LATER):
-                os.remove(ELI_FOR_LATER)
             logger.info("All delayed ELIs processed successfully!")
 
         return processed
-
-    def _save_last_known(self, act: Dict[str, Any]) -> None:
-        """
-        Save last known act to file.
-
-        Args:
-            act: Act data to save
-        """
-        try:
-            self.file_handler.write_json(LAST_KNOWN_FILE, act)
-            logger.info(f"Saved last known act: {act.get('ELI')}")
-        except Exception as e:
-            logger.error(f"Error saving last known act: {e}")
 
 
 def check_for_new_acts() -> list:
