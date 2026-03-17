@@ -2,6 +2,7 @@
 
 from typing import List
 
+from ..core.exceptions import DatabaseError
 from ..core.logging import get_logger
 from .base_repository import BaseRepository
 
@@ -22,10 +23,14 @@ class PipelineQueueRepository(BaseRepository):
         INSERT INTO pipeline_queue (eli) VALUES (%s)
         ON CONFLICT (eli) DO NOTHING
         """
-        with self.get_connection() as (conn, cursor):
-            cursor.execute(query, (eli,))
-            conn.commit()
-        logger.info(f"Queued ELI for later: {eli}")
+        try:
+            with self.get_connection() as (conn, cursor):
+                cursor.execute(query, (eli,))
+                conn.commit()
+            logger.info(f"Queued ELI for later: {eli}")
+        except Exception as e:
+            logger.error(f"Error queuing ELI: {e}")
+            raise DatabaseError(f"Failed to queue ELI: {e}")
 
     def get_all(self) -> List[str]:
         """
@@ -35,10 +40,14 @@ class PipelineQueueRepository(BaseRepository):
             List of ELIs ordered by added_at
         """
         query = "SELECT eli FROM pipeline_queue ORDER BY added_at ASC"
-        with self.get_connection() as (conn, cursor):
-            cursor.execute(query)
-            rows = cursor.fetchall()
-        return [row[0] for row in rows]
+        try:
+            with self.get_connection() as (conn, cursor):
+                cursor.execute(query)
+                rows = cursor.fetchall()
+            return [row[0] for row in rows]
+        except Exception as e:
+            logger.error(f"Error fetching queue: {e}")
+            raise DatabaseError(f"Failed to fetch queue: {e}")
 
     def remove(self, eli: str) -> None:
         """
@@ -48,7 +57,11 @@ class PipelineQueueRepository(BaseRepository):
             eli: ELI to remove
         """
         query = "DELETE FROM pipeline_queue WHERE eli = %s"
-        with self.get_connection() as (conn, cursor):
-            cursor.execute(query, (eli,))
-            conn.commit()
-        logger.info(f"Removed ELI from queue: {eli}")
+        try:
+            with self.get_connection() as (conn, cursor):
+                cursor.execute(query, (eli,))
+                conn.commit()
+            logger.info(f"Removed ELI from queue: {eli}")
+        except Exception as e:
+            logger.error(f"Error removing ELI from queue: {e}")
+            raise DatabaseError(f"Failed to remove ELI: {e}")

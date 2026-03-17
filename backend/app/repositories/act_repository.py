@@ -34,6 +34,11 @@ class ActRepository(BaseRepository):
         RETURNING id
         """
 
+        if act.idempotency_key is None:
+            logger.warning(
+                f"Saving act '{act.title}' without idempotency_key — it will not be visible to deduplication checks"
+            )
+
         try:
             # Serialize JSON fields
             refs = json.dumps(act.refs) if act.refs is not None else None

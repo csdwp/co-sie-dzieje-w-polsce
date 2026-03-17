@@ -129,8 +129,10 @@ class PipelineOrchestrator:
                         self.queue_repo.remove(eli)
                         continue
 
+                # ELI celowo NIE jest usuwany z kolejki — zostanie ponowiony przy następnym uruchomieniu
                 logger.error(f"❌ Failed to process delayed act: {eli}")
             else:
+                # ELI celowo NIE jest usuwany z kolejki — głosowanie jeszcze niedostępne
                 logger.info(f"Voting still not available for: {eli}")
 
         remaining = len(self.queue_repo.get_all())
