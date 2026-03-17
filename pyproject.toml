@@ -38,3 +38,18 @@ warn_redundant_casts = true
 warn_unused_ignores = true
 warn_no_return = true
 strict_optional = true
+
+[[tool.mypy.overrides]]
+module = [
+    "fitz",
+    "dotenv",
+    "openai",
+    "openai.*",
+    "tenacity",
+    "langchain_text_splitters",
+    "python_logging_loki",
+    "requests",
+    "psycopg2",
+    "psycopg2.*",
+]
+ignore_missing_imports = true

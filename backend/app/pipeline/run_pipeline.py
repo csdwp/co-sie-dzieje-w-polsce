@@ -10,14 +10,16 @@ logger = get_logger(__name__)
 if __name__ == "__main__":
     logger.info("Starting CO-SIE-DZIEJE-W-POLSCE backend pipeline")
 
-    try:
-        # Check for new acts
-        check_for_new_acts()
+    new_acts = check_for_new_acts()
+    delayed_acts = check_old_elis()
 
-        # Check old ELIs (acts waiting for voting data)
-        check_old_elis()
+    logger.info("Pipeline execution completed")
 
-        logger.info("Pipeline execution completed")
-    except InsufficientQuotaError as e:
-        logger.error(f"Pipeline stopped due to insufficient OpenAI quota: {e}")
-        sys.exit(1)
+    all_processed = new_acts + delayed_acts
+    if all_processed:
+        print(f"\nAdded {len(all_processed)} act(s):")
+        for title, act_id in all_processed:
+            print(f"  - {title}")
+            print(f"    https://coprzeszlo.pl/{act_id}")
+    else:
+        print("\nNo new acts added.")

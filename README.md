@@ -143,3 +143,5 @@ użytku produkcyjnego.
 
 Ten projekt jest objęty licencją MIT. Więcej szczegółów znajdziesz w pliku
 `LICENSE`.
+
+.

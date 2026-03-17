@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useEffect, useMemo, memo } from 'react';
+import { useRef, useState, useEffect, useMemo, memo, useCallback } from 'react';
 import { CardProps } from '@/types';
 import { Badge } from '@/components/ui/badge';
 import { useIsAdmin, isLowConfidence } from '@/lib/authHelpers';
@@ -26,6 +26,7 @@ const Card = ({
   governmentPercentage,
   confidenceScore,
   onDelete,
+  createdAt,
 }: CardProps) => {
   const status = getActStatus(date, promulgation);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -43,8 +44,10 @@ const Card = ({
       setTotalDots(Math.max(10, N));
     };
 
+    let rafId: ReturnType<typeof requestAnimationFrame>;
     const resizeObserver = new ResizeObserver(() => {
-      updateTotalDots();
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(updateTotalDots);
     });
 
     resizeObserver.observe(containerRef.current);
@@ -53,6 +56,7 @@ const Card = ({
 
     return () => {
       resizeObserver.disconnect();
+      cancelAnimationFrame(rafId);
     };
   }, []);
 
@@ -69,11 +73,35 @@ const Card = ({
     [date]
   );
 
+  const formattedCreatedAt = useMemo(
+    () =>
+      createdAt
+        ? new Date(createdAt).toLocaleDateString('pl-PL', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+          })
+        : null,
+    [createdAt]
+  );
+
   const processedTitle = useMemo(() => stripDateFromTitle(title), [title]);
   const processedContent = useMemo(
     () => (content ? stripHtml(content) : ''),
     [content]
   );
+
+  const handleMouseLeave = useCallback((e: React.MouseEvent<HTMLElement>) => {
+    e.currentTarget.style.setProperty('--shine-x', '100%');
+  }, []);
+
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    // maps cursor 0→1 to background-position 75%→25% (keeps shine on bright gradient spot)
+    const pos = 75 - x * 50;
+    e.currentTarget.style.setProperty('--shine-x', `${pos}%`);
+  }, []);
 
   const isAdmin = useIsAdmin();
   const needsVerification = isLowConfidence(confidenceScore);
@@ -116,6 +144,8 @@ const Card = ({
   return (
     <article
       onClick={onClick}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
       data-testid="act-card"
       aria-labelledby={`act-title-${id}`}
       className={`bg-white/[0.02] dark:bg-white/[0.03] backdrop-blur-sm mx-auto max-w-11/12 sm:max-w-80 flex flex-col gap-4 p-6 rounded-2xl premium-shadow premium-border cursor-pointer group
@@ -125,8 +155,8 @@ const Card = ({
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <div className="text-neutral-400 dark:text-neutral-500 group-hover:text-neutral-600 dark:group-hover:text-neutral-300 transition-colors duration-500 text-xs tracking-wide uppercase">
-            {formattedDate}
+          <div className="text-neutral-400 dark:text-neutral-400 group-hover:text-neutral-600 dark:group-hover:text-neutral-300 transition-colors duration-500 text-xs tracking-wide uppercase">
+            {formattedCreatedAt ?? formattedDate}
           </div>
           {status !== 'Nieznany' && (
             <Badge
@@ -152,7 +182,7 @@ const Card = ({
               disabled={isDeleting}
               className="p-1.5 rounded-lg hover:bg-red-500/10 transition-all duration-300
                          disabled:opacity-50 disabled:cursor-not-allowed
-                         text-neutral-400 hover:text-red-500 dark:text-neutral-500 dark:hover:text-red-400 cursor-pointer"
+                         text-neutral-400 hover:text-red-500 dark:text-neutral-400 dark:hover:text-red-400 cursor-pointer"
               aria-label="Usuń akt"
               title="Usuń akt"
             >
@@ -169,7 +199,7 @@ const Card = ({
         {processedTitle}
       </h2>
       <div className="space-y-1.5">
-        <div className="text-neutral-400 dark:text-neutral-500 text-[11px] tracking-widest uppercase group-hover:text-neutral-600 dark:group-hover:text-neutral-300 transition-colors duration-500">
+        <div className="text-neutral-400 dark:text-neutral-400 text-[11px] tracking-widest uppercase group-hover:text-neutral-600 dark:group-hover:text-neutral-300 transition-colors duration-500">
           W skrócie
         </div>
         <div className="text-base leading-relaxed line-clamp-4 text-gradient-gloss font-normal">
@@ -193,7 +223,7 @@ const Card = ({
       </p>
       {governmentPercentage > 0 && (
         <div className="pt-2 border-t border-white/[0.04] space-y-3">
-          <div className="text-neutral-400 dark:text-neutral-500 text-[11px] tracking-widest uppercase group-hover:text-neutral-600 dark:group-hover:text-neutral-300 transition-colors duration-500">
+          <div className="text-neutral-400 dark:text-neutral-400 text-[11px] tracking-widest uppercase group-hover:text-neutral-600 dark:group-hover:text-neutral-300 transition-colors duration-500">
             Rozkład głosów &bdquo;za&rdquo;
           </div>
           <div className="flex flex-col items-center gap-2">
@@ -211,7 +241,7 @@ const Card = ({
                 ></div>
               ))}
             </div>
-            <div className="flex justify-between w-full text-[11px] text-neutral-400 dark:text-neutral-500 tracking-wide group-hover:text-neutral-600 dark:group-hover:text-neutral-300 transition-colors duration-500">
+            <div className="flex justify-between w-full text-[11px] text-neutral-400 dark:text-neutral-400 tracking-wide group-hover:text-neutral-600 dark:group-hover:text-neutral-300 transition-colors duration-500">
               <span>Koalicja</span>
               <span>Opozycja</span>
             </div>

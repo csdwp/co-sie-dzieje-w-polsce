@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -132,10 +132,71 @@ const CustomPieTooltip = ({
   return null;
 };
 
-const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
+const DialogModal = ({
+  isOpen,
+  onClose,
+  onNext,
+  onPrev,
+  hasNext,
+  hasPrev,
+  card,
+}: DialogModalProps) => {
   const votes = card?.votes;
   const parties = votes?.parties;
   const [showDetailedAnalysis, setShowDetailedAnalysis] = useState(false);
+  const touchStartX = useRef<number | null>(null);
+
+  // Use refs so keyboard/touch handlers always see latest props
+  const onNextRef = useRef(onNext);
+  const onPrevRef = useRef(onPrev);
+  const hasNextRef = useRef(hasNext);
+  const hasPrevRef = useRef(hasPrev);
+  useEffect(() => {
+    onNextRef.current = onNext;
+    onPrevRef.current = onPrev;
+    hasNextRef.current = hasNext;
+    hasPrevRef.current = hasPrev;
+  });
+
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  const triggerSlide = useCallback((direction: 'left' | 'right') => {
+    const el = contentRef.current;
+    if (!el) return;
+    el.classList.remove('slide-from-right', 'slide-from-left');
+    void el.offsetWidth;
+    el.classList.add(
+      direction === 'right' ? 'slide-from-right' : 'slide-from-left'
+    );
+  }, []);
+
+  const handleNext = useCallback(() => {
+    if (!hasNextRef.current) return;
+    triggerSlide('right');
+    onNextRef.current();
+  }, [triggerSlide]);
+
+  const handlePrev = useCallback(() => {
+    if (!hasPrevRef.current) return;
+    triggerSlide('left');
+    onPrevRef.current();
+  }, [triggerSlide]);
+
+  // Reset detailed analysis when card changes
+  useEffect(() => {
+    setShowDetailedAnalysis(false);
+  }, [card?.id]);
+
+  // Keyboard navigation
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowRight') handleNext();
+      if (e.key === 'ArrowLeft') handlePrev();
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [isOpen, handleNext, handlePrev]);
 
   // Get status information
   const currentStatus = getActStatus(
@@ -205,455 +266,490 @@ const DialogModal = ({ isOpen, onClose, card }: DialogModalProps) => {
   const needsVerification = isLowConfidence(card?.confidence_score);
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent
-        data-testid="act-modal"
-        className={`overflow-auto w-11/12 h-11/12 sm:w-4/5 sm:h-4/5 !max-w-[1000px] !max-h-[800px] !rounded-2xl flex flex-col gap-8 border-none`}
-      >
-        <>
-          <DialogHeader className="h-fit">
-            <div className="flex items-start gap-3 mb-3">
-              <DialogTitle className="text-2xl font-medium tracking-tight leading-tight text-left flex-1 max-w-11/12">
-                {card?.title}
-              </DialogTitle>
-              {isAdmin && needsVerification && (
-                <Badge
-                  variant="outline"
-                  className="bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20 shrink-0 mt-1"
-                >
-                  Wymaga weryfikacji
-                </Badge>
-              )}
-            </div>
-            <DialogDescription asChild>
-              <div className="text-neutral-500 dark:text-neutral-400 leading-relaxed">
-                <InlineEditableContent
-                  content={card?.content ?? ''}
-                  field="content"
-                  actId={card?.id ?? ''}
-                  isAdmin={isAdmin}
-                />
+    <>
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent
+          className="w-11/12 h-11/12 sm:w-4/5 sm:h-4/5 !max-w-[1000px] !max-h-[800px] !rounded-2xl flex flex-col border-none overflow-hidden"
+          onTouchStart={e => {
+            touchStartX.current = e.touches[0].clientX;
+          }}
+          onTouchEnd={e => {
+            if (touchStartX.current === null) return;
+            const diff = touchStartX.current - e.changedTouches[0].clientX;
+            if (diff > 50) handleNext();
+            else if (diff < -50) handlePrev();
+            touchStartX.current = null;
+          }}
+        >
+          <div className="absolute top-5 left-5 sm:top-6 sm:left-10 z-10 text-lg flex flex-row items-center gap-4 font-sans antialiased">
+            <button
+              onClick={handlePrev}
+              className="cursor-pointer focus:outline-none focus:border-none transition-all duration-500 text-neutral-400 dark:text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 dark:[text-shadow:0_0_0px_rgba(255,255,255,0)] dark:hover:[text-shadow:0_0_8px_rgba(255,255,255,0.5)]"
+            >
+              ←
+            </button>
+            <button
+              onClick={handleNext}
+              className="cursor-pointer focus:outline-none focus:border-none transition-all duration-500 text-neutral-400 dark:text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 dark:[text-shadow:0_0_0px_rgba(255,255,255,0)] dark:hover:[text-shadow:0_0_8px_rgba(255,255,255,0.5)]"
+            >
+              →
+            </button>
+          </div>
+          <div
+            ref={contentRef}
+            className="overflow-auto flex-1 flex flex-col gap-8 pt-8"
+          >
+            <DialogHeader className="h-fit">
+              <div className="flex items-start gap-3 mb-3">
+                <DialogTitle className="text-2xl font-medium tracking-tight leading-tight text-left flex-1 max-w-11/12">
+                  {card?.title}
+                </DialogTitle>
+                {isAdmin && needsVerification && (
+                  <Badge
+                    variant="outline"
+                    className="bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20 shrink-0 mt-1"
+                  >
+                    Wymaga weryfikacji
+                  </Badge>
+                )}
               </div>
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex flex-col space-y-2">
-            <div className="text-[11px] tracking-widest uppercase text-neutral-400 dark:text-neutral-500">
-              Odnośnik do pełnej treści aktu
-            </div>
-            <a
-              href={card?.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="cursor-pointer inline-flex items-center gap-2 text-sm font-normal
+              <DialogDescription asChild>
+                <div className="text-neutral-500 dark:text-neutral-400 leading-relaxed">
+                  <InlineEditableContent
+                    content={card?.content ?? ''}
+                    field="content"
+                    actId={card?.id ?? ''}
+                    isAdmin={isAdmin}
+                  />
+                </div>
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex flex-col space-y-2">
+              <div className="text-[11px] tracking-widest uppercase text-neutral-400 dark:text-neutral-400">
+                Odnośnik do pełnej treści aktu
+              </div>
+              <a
+                href={card?.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="cursor-pointer inline-flex items-center gap-2 text-sm font-normal
                 transition-all duration-300 focus-visible:outline-none
                 justify-start w-fit max-w-full truncate relative mask-alpha mask-r-from-black mask-r-from-97% mask-r-to-transparent
                 text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 hover:dark:text-neutral-200 underline underline-offset-2"
-            >
-              {card?.title}
-            </a>
-          </div>
-          {card?.categories && card.categories.length > 0 && (
-            <div className="flex flex-col space-y-3">
-              <div className="text-[11px] tracking-widest uppercase text-neutral-400 dark:text-neutral-500">
-                Akt dotyczy
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {card.categories.map((category: string, index: number) => (
-                  <span
-                    key={index}
-                    className="bg-black/[0.04] dark:bg-white/[0.06] px-3 py-1.5 text-[11px] font-medium tracking-wide text-neutral-600 dark:text-neutral-300 rounded-full cursor-default"
-                  >
-                    {category}
-                  </span>
-                ))}
-              </div>
+              >
+                {card?.title}
+              </a>
             </div>
-          )}
-          <div className="flex flex-col md:flex-row gap-8 md:gap-12">
-            <div className="flex flex-col space-y-1.5">
-              <div className="text-[11px] tracking-widest uppercase text-neutral-400 dark:text-neutral-500">
-                Data ogłoszenia
-              </div>
-              <span className="text-sm text-neutral-700 dark:text-neutral-300">
-                {formattedDate}
-              </span>
-            </div>
-            <div className="flex flex-col space-y-1.5">
-              <div className="text-[11px] tracking-widest uppercase text-neutral-400 dark:text-neutral-500">
-                Data wejścia w życie
-              </div>
-              <span className="text-sm text-neutral-700 dark:text-neutral-300">
-                {formattedPromulgationDate}
-              </span>
-            </div>
-          </div>
-          {currentStatus !== 'Nieznany' && (
-            <div className="flex flex-col space-y-4">
-              <div className="text-[11px] tracking-widest uppercase text-neutral-400 dark:text-neutral-500">
-                Status aktu
-              </div>
-              <div className="flex flex-col gap-3">
-                {statusList.map(status => (
-                  <div
-                    key={status.name}
-                    className="flex items-center gap-3 text-sm"
-                  >
-                    <div
-                      className={`w-2 h-2 rounded-full transition-colors duration-300 ${
-                        status.isActive
-                          ? 'bg-red-500/80'
-                          : 'bg-neutral-300 dark:bg-neutral-600'
-                      }`}
-                    />
-                    <span
-                      className={`transition-colors duration-300 ${
-                        status.isActive
-                          ? 'font-medium text-neutral-800 dark:text-neutral-100'
-                          : 'text-neutral-400 dark:text-neutral-500'
-                      }`}
-                    >
-                      {status.name}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-          {votes?.government && totalVotes > 0 && (
-            <>
-              {/* Vote Summary Box */}
-              <div className="flex flex-col space-y-4">
-                <div className="text-[11px] tracking-widest uppercase text-neutral-400 dark:text-neutral-500">
-                  Wynik głosowania
+            {card?.categories && card.categories.length > 0 && (
+              <div className="flex flex-col space-y-3">
+                <div className="text-[11px] tracking-widest uppercase text-neutral-400 dark:text-neutral-400">
+                  Akt dotyczy
                 </div>
-                <div className="flex flex-col gap-4 p-5 rounded-xl bg-black/[0.02] dark:bg-white/[0.03] premium-border">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
+                <div className="flex flex-wrap gap-2">
+                  {card.categories.map((category: string, index: number) => (
+                    <span
+                      key={index}
+                      className="bg-black/[0.04] dark:bg-white/[0.06] px-3 py-1.5 text-[11px] font-medium tracking-wide text-neutral-600 dark:text-neutral-300 rounded-full cursor-default"
+                    >
+                      {category}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+            <div className="flex flex-col md:flex-row gap-8 md:gap-12">
+              <div className="flex flex-col space-y-1.5">
+                <div className="text-[11px] tracking-widest uppercase text-neutral-400 dark:text-neutral-400">
+                  Data ogłoszenia
+                </div>
+                <span className="text-sm text-neutral-700 dark:text-neutral-300">
+                  {formattedDate}
+                </span>
+              </div>
+              <div className="flex flex-col space-y-1.5">
+                <div className="text-[11px] tracking-widest uppercase text-neutral-400 dark:text-neutral-400">
+                  Data wejścia w życie
+                </div>
+                <span className="text-sm text-neutral-700 dark:text-neutral-300">
+                  {formattedPromulgationDate}
+                </span>
+              </div>
+            </div>
+            {currentStatus !== 'Nieznany' && (
+              <div className="flex flex-col space-y-4">
+                <div className="text-[11px] tracking-widest uppercase text-neutral-400 dark:text-neutral-400">
+                  Status aktu
+                </div>
+                <div className="flex flex-col gap-3">
+                  {statusList.map(status => (
+                    <div
+                      key={status.name}
+                      className="flex items-center gap-3 text-sm"
+                    >
                       <div
-                        className={`px-3 py-1.5 rounded-lg font-medium text-xs tracking-wide ${
-                          percentYes > 50
-                            ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
-                            : 'bg-red-500/10 text-red-600 dark:text-red-400'
+                        className={`w-2 h-2 rounded-full transition-colors duration-300 ${
+                          status.isActive
+                            ? 'bg-red-500/80'
+                            : 'bg-neutral-300 dark:bg-neutral-600'
+                        }`}
+                      />
+                      <span
+                        className={`transition-colors duration-300 ${
+                          status.isActive
+                            ? 'font-medium text-neutral-800 dark:text-neutral-100'
+                            : 'text-neutral-400 dark:text-neutral-400'
                         }`}
                       >
-                        {percentYes > 50 ? 'PRZYJĘTO' : 'ODRZUCONO'}
-                      </div>
-                      <span className="text-sm text-neutral-500 dark:text-neutral-400">
-                        Różnica: {Math.abs(totalYes - totalNo)} głosów
+                        {status.name}
                       </span>
                     </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            {card?.item_type?.toLowerCase().includes('ustawa') &&
+              (!votes?.government || totalVotes === 0) && (
+                <div className="text-sm text-neutral-500 dark:text-neutral-400 py-2">
+                  Aktualnie brak danych o głosowaniu
+                </div>
+              )}
+            {votes?.government && totalVotes > 0 && (
+              <>
+                {/* Vote Summary Box */}
+                <div className="flex flex-col space-y-4">
+                  <div className="text-[11px] tracking-widest uppercase text-neutral-400 dark:text-neutral-400">
+                    Wynik głosowania
                   </div>
-                  <div className="grid grid-cols-2 gap-6 pt-2">
-                    <div className="flex flex-col space-y-1">
-                      <span className="text-[10px] tracking-widest uppercase text-neutral-400 dark:text-neutral-500">
-                        Głosy za
-                      </span>
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-2xl font-medium text-neutral-800 dark:text-neutral-100">
-                          {totalYes}
-                        </span>
+                  <div className="flex flex-col gap-4 p-5 rounded-xl bg-black/[0.05] dark:bg-white/[0.03] premium-border">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div
+                          className={`px-3 py-1.5 rounded-lg font-medium text-xs tracking-wide ${
+                            percentYes > 50
+                              ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+                              : 'bg-red-500/10 text-red-600 dark:text-red-400'
+                          }`}
+                        >
+                          {percentYes > 50 ? 'PRZYJĘTO' : 'ODRZUCONO'}
+                        </div>
                         <span className="text-sm text-neutral-500 dark:text-neutral-400">
-                          ({percentYes.toFixed(1)}%)
+                          Różnica: {Math.abs(totalYes - totalNo)} głosów
                         </span>
                       </div>
                     </div>
-                    <div className="flex flex-col space-y-1">
-                      <span className="text-[10px] tracking-widest uppercase text-neutral-400 dark:text-neutral-500">
-                        Głosy przeciw
-                      </span>
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-2xl font-medium text-neutral-800 dark:text-neutral-100">
-                          {totalNo}
+                    <div className="grid grid-cols-2 gap-6 pt-2">
+                      <div className="flex flex-col space-y-1">
+                        <span className="text-[10px] tracking-widest uppercase text-neutral-400 dark:text-neutral-400">
+                          Głosy za
                         </span>
-                        <span className="text-sm text-neutral-500 dark:text-neutral-400">
-                          ({percentNo.toFixed(1)}%)
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-2xl font-medium text-neutral-800 dark:text-neutral-100">
+                            {totalYes}
+                          </span>
+                          <span className="text-sm text-neutral-500 dark:text-neutral-400">
+                            ({percentYes.toFixed(1)}%)
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex flex-col space-y-1">
+                        <span className="text-[10px] tracking-widest uppercase text-neutral-400 dark:text-neutral-400">
+                          Głosy przeciw
                         </span>
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-2xl font-medium text-neutral-800 dark:text-neutral-100">
+                            {totalNo}
+                          </span>
+                          <span className="text-sm text-neutral-500 dark:text-neutral-400">
+                            ({percentNo.toFixed(1)}%)
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Toggle Button for Detailed Analysis */}
-              <button
-                onClick={() => setShowDetailedAnalysis(!showDetailedAnalysis)}
-                className="w-full px-4 py-3 rounded-xl bg-black/[0.02] dark:bg-white/[0.02] hover:bg-black/[0.04] dark:hover:bg-white/[0.04] text-neutral-600 dark:text-neutral-300 border-none outline-none text-sm font-medium tracking-wide transition-all duration-500 flex items-center justify-center gap-2"
-              >
-                {showDetailedAnalysis
-                  ? 'Ukryj szczegółową analizę'
-                  : 'Pokaż szczegółową analizę'}
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className={`transition-transform duration-500 ${
-                    showDetailedAnalysis ? 'rotate-180' : ''
-                  }`}
+                {/* Toggle Button for Detailed Analysis */}
+                <button
+                  onClick={() => setShowDetailedAnalysis(!showDetailedAnalysis)}
+                  className="w-full px-4 py-3 rounded-xl bg-black/[0.05] dark:bg-white/[0.02] hover:bg-black/[0.08] dark:hover:bg-white/[0.04] text-neutral-600 dark:text-neutral-300 border-none outline-none text-sm font-medium tracking-wide transition-all duration-500 flex items-center justify-center gap-2"
                 >
-                  <polyline points="6 9 12 15 18 9" />
-                </svg>
-              </button>
+                  {showDetailedAnalysis
+                    ? 'Ukryj szczegółową analizę'
+                    : 'Pokaż szczegółową analizę'}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className={`transition-transform duration-500 ${
+                      showDetailedAnalysis ? 'rotate-180' : ''
+                    }`}
+                  >
+                    <polyline points="6 9 12 15 18 9" />
+                  </svg>
+                </button>
 
-              {showDetailedAnalysis && (
-                <>
-                  {/* Government vs Opposition Comparison */}
-                  <div className="flex flex-col space-y-4">
-                    <div>
-                      <div className="text-[11px] tracking-widest uppercase text-neutral-400 dark:text-neutral-500 mb-1.5">
-                        Koalicja vs Opozycja
-                      </div>
-                      <div className="text-sm text-neutral-500 dark:text-neutral-400">
-                        Jak głosowały partie rządzące i opozycyjne
-                      </div>
-                    </div>
-                    <div className="flex flex-col gap-4">
-                      {/* Government bar */}
-                      <div className="flex flex-col gap-2">
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="font-medium text-neutral-700 dark:text-neutral-200">
-                            Koalicja rządząca
-                          </span>
-                          <span className="text-neutral-500 dark:text-neutral-400 text-xs">
-                            {votes?.votesSupportByGroup?.government?.yesVotes ||
-                              0}{' '}
-                            głosów za ({yesPercentageGov.toFixed(1)}%)
-                          </span>
-                        </div>
-                        <div className="w-full bg-black/[0.06] dark:bg-white/[0.06] rounded-full h-2 overflow-hidden">
-                          <div
-                            className="h-full rounded-full transition-all duration-700 ease-out"
-                            style={{
-                              width: `${yesPercentageGov}%`,
-                              backgroundColor: 'rgba(248, 211, 212, 0.8)',
-                            }}
-                          />
-                        </div>
-                      </div>
-                      {/* Opposition bar */}
-                      <div className="flex flex-col gap-2">
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="font-medium text-neutral-700 dark:text-neutral-200">
-                            Opozycja
-                          </span>
-                          <span className="text-neutral-500 dark:text-neutral-400 text-xs">
-                            {votes?.votesSupportByGroup?.opposition?.yesVotes ||
-                              0}{' '}
-                            głosów za ({(100 - yesPercentageGov).toFixed(1)}%)
-                          </span>
-                        </div>
-                        <div className="w-full bg-black/[0.06] dark:bg-white/[0.06] rounded-full h-2 overflow-hidden">
-                          <div
-                            className="h-full rounded-full transition-all duration-700 ease-out"
-                            style={{
-                              width: `${100 - yesPercentageGov}%`,
-                              backgroundColor: 'rgba(249, 109, 110, 0.7)',
-                            }}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Participation Rate */}
-                  {votes?.summary && (
+                {showDetailedAnalysis && (
+                  <>
+                    {/* Government vs Opposition Comparison */}
                     <div className="flex flex-col space-y-4">
                       <div>
-                        <div className="text-[11px] tracking-widest uppercase text-neutral-400 dark:text-neutral-500 mb-1.5">
-                          Frekwencja głosowania
+                        <div className="text-[11px] tracking-widest uppercase text-neutral-400 dark:text-neutral-400 mb-1.5">
+                          Koalicja vs Opozycja
                         </div>
                         <div className="text-sm text-neutral-500 dark:text-neutral-400">
-                          Liczba posłów, którzy wzięli udział w głosowaniu
+                          Jak głosowały partie rządzące i opozycyjne
                         </div>
                       </div>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                        <div className="flex flex-col gap-1.5 p-4 rounded-xl bg-black/[0.02] dark:bg-white/[0.03] premium-border">
-                          <span className="text-[10px] tracking-widest uppercase text-neutral-400 dark:text-neutral-500">
-                            Głosowało
-                          </span>
-                          <div className="flex items-baseline gap-1.5">
-                            <span className="text-xl font-medium text-neutral-800 dark:text-neutral-100">
-                              {votes.summary.yes + votes.summary.no}
+                      <div className="flex flex-col gap-4">
+                        {/* Government bar */}
+                        <div className="flex flex-col gap-2">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="font-medium text-neutral-700 dark:text-neutral-200">
+                              Koalicja rządząca
                             </span>
-                            <span className="text-xs text-neutral-500 dark:text-neutral-400">
-                              / {votes.summary.total}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="flex flex-col gap-1.5 p-4 rounded-xl bg-black/[0.02] dark:bg-white/[0.03] premium-border">
-                          <span className="text-[10px] tracking-widest uppercase text-neutral-400 dark:text-neutral-500">
-                            Wstrzymało się
-                          </span>
-                          <div className="flex items-baseline gap-1.5">
-                            <span className="text-xl font-medium text-neutral-800 dark:text-neutral-100">
-                              {votes.summary.abstain}
-                            </span>
-                            <span className="text-xs text-neutral-500 dark:text-neutral-400">
-                              {(
-                                (votes.summary.abstain / votes.summary.total) *
-                                100
-                              ).toFixed(1)}
-                              %
+                            <span className="text-neutral-500 dark:text-neutral-400 text-xs">
+                              {votes?.votesSupportByGroup?.government
+                                ?.yesVotes || 0}{' '}
+                              głosów za ({yesPercentageGov.toFixed(1)}%)
                             </span>
                           </div>
-                        </div>
-                        <div className="flex flex-col gap-1.5 p-4 rounded-xl bg-black/[0.02] dark:bg-white/[0.03] premium-border">
-                          <span className="text-[10px] tracking-widest uppercase text-neutral-400 dark:text-neutral-500">
-                            Nieobecnych
-                          </span>
-                          <div className="flex items-baseline gap-1.5">
-                            <span className="text-xl font-medium text-neutral-800 dark:text-neutral-100">
-                              {votes.summary.absent}
-                            </span>
-                            <span className="text-xs text-neutral-500 dark:text-neutral-400">
-                              {(
-                                (votes.summary.absent / votes.summary.total) *
-                                100
-                              ).toFixed(1)}
-                              %
-                            </span>
-                          </div>
-                        </div>
-                        <div className="flex flex-col gap-1.5 p-4 rounded-xl bg-black/[0.02] dark:bg-white/[0.03] premium-border">
-                          <span className="text-[10px] tracking-widest uppercase text-neutral-400 dark:text-neutral-500">
-                            Frekwencja
-                          </span>
-                          <div className="flex items-baseline gap-1.5">
-                            <span className="text-xl font-medium text-neutral-800 dark:text-neutral-100">
-                              {(
-                                ((votes.summary.yes + votes.summary.no) /
-                                  votes.summary.total) *
-                                100
-                              ).toFixed(1)}
-                              %
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="flex flex-col space-y-4">
-                    <div>
-                      <div className="text-[11px] tracking-widest uppercase text-neutral-400 dark:text-neutral-500 mb-1.5">
-                        Szczegółowy rozkład głosów
-                      </div>
-                      <div className="text-sm text-neutral-500 dark:text-neutral-400">
-                        Wykres słupkowy pokazuje liczbę głosów za oraz przeciw
-                        dla każdej partii. Wykres kołowy przedstawia ogólny
-                        rozkład wszystkich głosów.
-                      </div>
-                    </div>
-                    {/* Wykresy "za" i "przeciw" */}
-                    <div className="flex flex-col md:flex-row gap-5 w-full h-auto md:max-h-80">
-                      <ChartContainer
-                        config={combinedChartConfig}
-                        className="md:w-1/2"
-                      >
-                        <BarChart
-                          accessibilityLayer
-                          data={combinedData}
-                          margin={{
-                            top: 20,
-                            right: 12,
-                            left: 12,
-                            bottom: 5,
-                          }}
-                        >
-                          <CartesianGrid vertical={false} />
-                          <XAxis
-                            dataKey="party"
-                            tickLine={false}
-                            axisLine={false}
-                            tickMargin={8}
-                            tickFormatter={truncatePartyName}
-                          />
-                          <ChartTooltip content={<CustomTooltip />} />
-                          <Bar
-                            dataKey="yes"
-                            fill="var(--color-yes)"
-                            radius={4}
-                            minPointSize={2}
-                          />
-                          <Bar
-                            dataKey="no"
-                            fill="var(--color-no)"
-                            radius={4}
-                            minPointSize={2}
-                          />
-                        </BarChart>
-                      </ChartContainer>
-                      <ChartContainer
-                        config={chartConfig}
-                        className="md:w-1/2 aspect-square"
-                      >
-                        <PieChart>
-                          <ChartTooltip
-                            cursor={false}
-                            content={
-                              <CustomPieTooltip
-                                totalYes={totalYes}
-                                totalNo={totalNo}
-                              />
-                            }
-                          />
-                          <Pie
-                            data={pieYesNoData}
-                            dataKey="value"
-                            nameKey="name"
-                            innerRadius={60}
-                            strokeWidth={5}
-                          >
-                            <Label
-                              content={({ viewBox }) => {
-                                if (
-                                  viewBox &&
-                                  'cx' in viewBox &&
-                                  'cy' in viewBox
-                                ) {
-                                  return (
-                                    <text
-                                      x={viewBox.cx}
-                                      y={viewBox.cy}
-                                      textAnchor="middle"
-                                      dominantBaseline="middle"
-                                    >
-                                      <tspan
-                                        x={viewBox.cx}
-                                        y={viewBox.cy}
-                                        className="fill-foreground text-3xl font-bold"
-                                      >
-                                        {percentYes.toFixed(1)}%
-                                      </tspan>
-                                      <tspan
-                                        x={viewBox.cx}
-                                        y={(viewBox.cy || 0) + 24}
-                                        className="fill-muted-foreground text-sm"
-                                      >
-                                        Za
-                                      </tspan>
-                                    </text>
-                                  );
-                                }
+                          <div className="w-full bg-black/[0.06] dark:bg-white/[0.06] rounded-full h-2 overflow-hidden">
+                            <div
+                              className="h-full rounded-full transition-all duration-700 ease-out"
+                              style={{
+                                width: `${yesPercentageGov}%`,
+                                backgroundColor: 'rgba(248, 211, 212, 0.8)',
                               }}
                             />
-                          </Pie>
-                        </PieChart>
-                      </ChartContainer>
+                          </div>
+                        </div>
+                        {/* Opposition bar */}
+                        <div className="flex flex-col gap-2">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="font-medium text-neutral-700 dark:text-neutral-200">
+                              Opozycja
+                            </span>
+                            <span className="text-neutral-500 dark:text-neutral-400 text-xs">
+                              {votes?.votesSupportByGroup?.opposition
+                                ?.yesVotes || 0}{' '}
+                              głosów za ({(100 - yesPercentageGov).toFixed(1)}%)
+                            </span>
+                          </div>
+                          <div className="w-full bg-black/[0.06] dark:bg-white/[0.06] rounded-full h-2 overflow-hidden">
+                            <div
+                              className="h-full rounded-full transition-all duration-700 ease-out"
+                              style={{
+                                width: `${100 - yesPercentageGov}%`,
+                                backgroundColor: 'rgba(249, 109, 110, 0.7)',
+                              }}
+                            />
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </>
-              )}
-            </>
-          )}
-        </>
-      </DialogContent>
-    </Dialog>
+
+                    {/* Participation Rate */}
+                    {votes?.summary && (
+                      <div className="flex flex-col space-y-4">
+                        <div>
+                          <div className="text-[11px] tracking-widest uppercase text-neutral-400 dark:text-neutral-400 mb-1.5">
+                            Frekwencja głosowania
+                          </div>
+                          <div className="text-sm text-neutral-500 dark:text-neutral-400">
+                            Liczba posłów, którzy wzięli udział w głosowaniu
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                          <div className="flex flex-col gap-1.5 p-4 rounded-xl bg-black/[0.05] dark:bg-white/[0.03] premium-border">
+                            <span className="text-[10px] tracking-widest uppercase text-neutral-400 dark:text-neutral-400">
+                              Głosowało
+                            </span>
+                            <div className="flex items-baseline gap-1.5">
+                              <span className="text-xl font-medium text-neutral-800 dark:text-neutral-100">
+                                {votes.summary.yes + votes.summary.no}
+                              </span>
+                              <span className="text-xs text-neutral-500 dark:text-neutral-400">
+                                / {votes.summary.total}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex flex-col gap-1.5 p-4 rounded-xl bg-black/[0.05] dark:bg-white/[0.03] premium-border">
+                            <span className="text-[10px] tracking-widest uppercase text-neutral-400 dark:text-neutral-400">
+                              Wstrzymało się
+                            </span>
+                            <div className="flex items-baseline gap-1.5">
+                              <span className="text-xl font-medium text-neutral-800 dark:text-neutral-100">
+                                {votes.summary.abstain}
+                              </span>
+                              <span className="text-xs text-neutral-500 dark:text-neutral-400">
+                                {(
+                                  (votes.summary.abstain /
+                                    votes.summary.total) *
+                                  100
+                                ).toFixed(1)}
+                                %
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex flex-col gap-1.5 p-4 rounded-xl bg-black/[0.05] dark:bg-white/[0.03] premium-border">
+                            <span className="text-[10px] tracking-widest uppercase text-neutral-400 dark:text-neutral-400">
+                              Nieobecnych
+                            </span>
+                            <div className="flex items-baseline gap-1.5">
+                              <span className="text-xl font-medium text-neutral-800 dark:text-neutral-100">
+                                {votes.summary.absent}
+                              </span>
+                              <span className="text-xs text-neutral-500 dark:text-neutral-400">
+                                {(
+                                  (votes.summary.absent / votes.summary.total) *
+                                  100
+                                ).toFixed(1)}
+                                %
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex flex-col gap-1.5 p-4 rounded-xl bg-black/[0.05] dark:bg-white/[0.03] premium-border">
+                            <span className="text-[10px] tracking-widest uppercase text-neutral-400 dark:text-neutral-400">
+                              Frekwencja
+                            </span>
+                            <div className="flex items-baseline gap-1.5">
+                              <span className="text-xl font-medium text-neutral-800 dark:text-neutral-100">
+                                {(
+                                  ((votes.summary.yes + votes.summary.no) /
+                                    votes.summary.total) *
+                                  100
+                                ).toFixed(1)}
+                                %
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="flex flex-col space-y-4">
+                      <div>
+                        <div className="text-[11px] tracking-widest uppercase text-neutral-400 dark:text-neutral-400 mb-1.5">
+                          Szczegółowy rozkład głosów
+                        </div>
+                        <div className="text-sm text-neutral-500 dark:text-neutral-400">
+                          Wykres słupkowy pokazuje liczbę głosów za oraz przeciw
+                          dla każdej partii. Wykres kołowy przedstawia ogólny
+                          rozkład wszystkich głosów.
+                        </div>
+                      </div>
+                      {/* Wykresy "za" i "przeciw" */}
+                      <div className="flex flex-col md:flex-row gap-5 w-full h-auto md:max-h-80">
+                        <ChartContainer
+                          config={combinedChartConfig}
+                          className="md:w-1/2"
+                        >
+                          <BarChart
+                            accessibilityLayer
+                            data={combinedData}
+                            margin={{
+                              top: 20,
+                              right: 12,
+                              left: 12,
+                              bottom: 5,
+                            }}
+                          >
+                            <CartesianGrid vertical={false} />
+                            <XAxis
+                              dataKey="party"
+                              tickLine={false}
+                              axisLine={false}
+                              tickMargin={8}
+                              tickFormatter={truncatePartyName}
+                            />
+                            <ChartTooltip content={<CustomTooltip />} />
+                            <Bar
+                              dataKey="yes"
+                              fill="var(--color-yes)"
+                              radius={4}
+                              minPointSize={2}
+                            />
+                            <Bar
+                              dataKey="no"
+                              fill="var(--color-no)"
+                              radius={4}
+                              minPointSize={2}
+                            />
+                          </BarChart>
+                        </ChartContainer>
+                        <ChartContainer
+                          config={chartConfig}
+                          className="md:w-1/2 aspect-square"
+                        >
+                          <PieChart>
+                            <ChartTooltip
+                              cursor={false}
+                              content={
+                                <CustomPieTooltip
+                                  totalYes={totalYes}
+                                  totalNo={totalNo}
+                                />
+                              }
+                            />
+                            <Pie
+                              data={pieYesNoData}
+                              dataKey="value"
+                              nameKey="name"
+                              innerRadius={60}
+                              strokeWidth={5}
+                            >
+                              <Label
+                                content={({ viewBox }) => {
+                                  if (
+                                    viewBox &&
+                                    'cx' in viewBox &&
+                                    'cy' in viewBox
+                                  ) {
+                                    return (
+                                      <text
+                                        x={viewBox.cx}
+                                        y={viewBox.cy}
+                                        textAnchor="middle"
+                                        dominantBaseline="middle"
+                                      >
+                                        <tspan
+                                          x={viewBox.cx}
+                                          y={viewBox.cy}
+                                          className="fill-foreground text-3xl font-bold"
+                                        >
+                                          {percentYes.toFixed(1)}%
+                                        </tspan>
+                                        <tspan
+                                          x={viewBox.cx}
+                                          y={(viewBox.cy || 0) + 24}
+                                          className="fill-muted-foreground text-sm"
+                                        >
+                                          Za
+                                        </tspan>
+                                      </text>
+                                    );
+                                  }
+                                }}
+                              />
+                            </Pie>
+                          </PieChart>
+                        </ChartContainer>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 

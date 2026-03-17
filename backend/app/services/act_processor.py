@@ -1,5 +1,6 @@
 """Act processing orchestrator service."""
 
+import re
 from datetime import datetime
 from typing import Any, Dict, Optional, Tuple
 
@@ -9,6 +10,7 @@ from ..models.act import Act, ActData
 from ..repositories.act_repository import ActRepository
 from .ai.categorizer import Categorizer
 from .ai.text_analyzer import TextAnalyzer
+from .ai.text_validator import TextValidator
 from .external.pdf_processor import PDFProcessor
 from .external.sejm_api import SejmAPIClient
 from .votes_calculator import VotesCalculator
@@ -24,6 +26,7 @@ class ActProcessor:
         sejm_api: Optional[SejmAPIClient] = None,
         pdf_processor: Optional[PDFProcessor] = None,
         text_analyzer: Optional[TextAnalyzer] = None,
+        text_validator: Optional[TextValidator] = None,
         categorizer: Optional[Categorizer] = None,
         votes_calculator: Optional[VotesCalculator] = None,
         act_repo: Optional[ActRepository] = None,
@@ -42,11 +45,12 @@ class ActProcessor:
         self.sejm_api = sejm_api or SejmAPIClient()
         self.pdf_processor = pdf_processor or PDFProcessor()
         self.text_analyzer = text_analyzer or TextAnalyzer()
+        self.text_validator = text_validator or TextValidator()
         self.categorizer = categorizer or Categorizer()
         self.votes_calculator = votes_calculator or VotesCalculator()
         self.act_repo = act_repo or ActRepository()
 
-    def process_and_save(self, act_data: Dict[str, Any]) -> bool:
+    def process_and_save(self, act_data: Dict[str, Any]) -> Optional[int]:
         """
         Process a single act through the complete pipeline.
 
@@ -61,14 +65,14 @@ class ActProcessor:
             act_data: Raw act data from API
 
         Returns:
-            True if successful, False otherwise
+            ID of saved act if successful, None otherwise
         """
         eli = act_data.get("ELI")
         title = act_data.get("title", "unknown")
 
         if not eli:
             logger.error(f"No ELI provided for act: {title}")
-            return False
+            return None
 
         logger.info(f"Processing act: {title}")
 
@@ -79,11 +83,35 @@ class ActProcessor:
 
             if not pdf_text:
                 logger.error(f"No text extracted from PDF for: {title}")
-                return False
+                return None
 
             # Step 2: Analyze text with AI
             logger.info("Analyzing text with AI...")
-            analysis = self.text_analyzer.analyze_full_text(pdf_text)
+            result = self.text_analyzer.analyze_full_text(pdf_text)
+            analysis = result.analysis
+
+            # Step 2b: Validate summary against source chunks
+            confidence_score: Optional[float] = None
+            needs_reprocess: bool = True
+            try:
+                logger.info("Validating summary...")
+                plain_summary = re.sub(
+                    r"\s+", " ", re.sub(r"<[^>]+>", " ", analysis.content_html)
+                ).strip()
+                validation = self.text_validator.validate(result.chunks, plain_summary)
+                confidence_score = validation.overall_confidence
+                needs_reprocess = validation.verdict == "unreliable"
+                logger.info(
+                    f"Validation: confidence={confidence_score}, "
+                    f"verdict={validation.verdict}, "
+                    f"hallucinations={len(validation.hallucinations)}/{len(validation.claims)} claims"
+                )
+                if validation.hallucinations:
+                    logger.warning(f"Unsupported claims: {validation.hallucinations}")
+            except Exception as e:
+                logger.error(
+                    f"Validation failed for {title}, saving with needs_reprocess=True: {e}"
+                )
 
             # Step 3: Fetch act details and voting
             logger.info("Fetching act details and voting data...")
@@ -91,7 +119,7 @@ class ActProcessor:
 
             if not act_details:
                 logger.error(f"Could not fetch details for: {eli}")
-                return False
+                return None
 
             voting_details = self._get_voting_details(act_details)
 
@@ -114,31 +142,29 @@ class ActProcessor:
                 voting_details=voting_details,
                 category=category,
                 pdf_url=pdf_url,
+                confidence_score=confidence_score,
+                needs_reprocess=needs_reprocess,
+                idempotency_key=eli,
             )
 
             # Step 6: Save to database
             logger.info("Saving to database...")
-            success = self.act_repo.save_act(act)
-
-            if success:
-                logger.info(f"✅ Successfully processed act: {title}")
-            else:
-                logger.error(f"❌ Failed to save act: {title}")
-
-            return success
+            act_id = self.act_repo.save_act(act)
+            logger.info(f"✅ Successfully processed act: {title} (id={act_id})")
+            return act_id
 
         except InsufficientQuotaError:
             # Quota exceeded - don't catch, let pipeline orchestrator handle it
             raise
         except PDFProcessingError as e:
             logger.error(f"PDF processing failed for {title}: {e}")
-            return False
+            return None
         except AIServiceError as e:
             logger.error(f"AI analysis failed for {title}: {e}")
-            return False
+            return None
         except Exception as e:
             logger.error(f"Unexpected error processing {title}: {e}")
-            return False
+            return None
 
     def _get_voting_details(self, act_details: ActData) -> Optional[Dict[str, Any]]:
         """
@@ -215,6 +241,9 @@ class ActProcessor:
         voting_details: Optional[Dict[str, Any]],
         category: Optional[str],
         pdf_url: str,
+        confidence_score: Optional[float] = None,
+        needs_reprocess: bool = False,
+        idempotency_key: Optional[str] = None,
     ) -> Act:
         """
         Build Act entity from processed data.
@@ -253,6 +282,9 @@ class ActProcessor:
             file=pdf_url,
             votes=voting_details,
             category=category,
+            confidence_score=confidence_score,
+            needs_reprocess=needs_reprocess,
+            idempotency_key=idempotency_key,
         )
 
     def _parse_date(self, date_str: Optional[str]) -> Optional[datetime]:

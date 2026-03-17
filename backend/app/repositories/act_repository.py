@@ -1,7 +1,7 @@
 """Repository for acts table operations."""
 
 import json
-from typing import Optional
+from typing import Optional, Set, cast
 
 from ..core.exceptions import DatabaseError
 from ..core.logging import get_logger
@@ -14,7 +14,7 @@ logger = get_logger(__name__)
 class ActRepository(BaseRepository):
     """Repository for acts data access."""
 
-    def save_act(self, act: Act) -> bool:
+    def save_act(self, act: Act) -> Optional[int]:
         """
         Save an act to the database.
 
@@ -22,15 +22,22 @@ class ActRepository(BaseRepository):
             act: Act entity to save
 
         Returns:
-            True if successful, False otherwise
+            ID of the saved act if successful, None otherwise
         """
         insert_query = """
         INSERT INTO acts (
             title, act_number, simple_title, content, refs, texts, item_type,
             announcement_date, change_date, promulgation, item_status, comments,
-            keywords, file, votes, category, created_at, updated_at
-        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
+            keywords, file, votes, category, confidence_score, needs_reprocess,
+            idempotency_key, created_at, updated_at
+        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
+        RETURNING id
         """
+
+        if act.idempotency_key is None:
+            logger.warning(
+                f"Saving act '{act.title}' without idempotency_key — it will not be visible to deduplication checks"
+            )
 
         try:
             # Serialize JSON fields
@@ -55,14 +62,18 @@ class ActRepository(BaseRepository):
                 act.file,
                 votes,
                 act.category,
+                act.confidence_score,
+                act.needs_reprocess,
+                act.idempotency_key,
             )
 
             with self.get_connection() as (conn, cursor):
                 cursor.execute(insert_query, data_tuple)
+                act_id = cast(int, cursor.fetchone()[0])
                 conn.commit()
 
             logger.info(f"Successfully saved act: {act.title}")
-            return True
+            return act_id
 
         except Exception as e:
             logger.error(f"Error saving act to database: {e}")
@@ -115,3 +126,20 @@ class ActRepository(BaseRepository):
         except Exception as e:
             logger.error(f"Error fetching act: {e}")
             raise DatabaseError(f"Failed to fetch act: {e}")
+
+    def get_existing_elis(self) -> Set[str]:
+        """
+        Get all idempotency keys (ELIs) already in the database.
+
+        Returns:
+            Set of ELI strings
+        """
+        query = "SELECT idempotency_key FROM acts WHERE idempotency_key IS NOT NULL"
+        try:
+            with self.get_connection() as (conn, cursor):
+                cursor.execute(query)
+                rows = cursor.fetchall()
+            return {row[0] for row in rows}
+        except Exception as e:
+            logger.error(f"Error fetching existing ELIs: {e}")
+            raise DatabaseError(f"Failed to fetch existing ELIs: {e}")

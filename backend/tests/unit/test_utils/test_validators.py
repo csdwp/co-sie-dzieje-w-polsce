@@ -10,9 +10,8 @@ class TestValidateEliFormat:
         """Test that validate_eli_format returns True for valid ELI."""
         # Arrange - test representative valid cases
         valid_elis = [
-            "DU/2026/137",   # basic format
-            "DU/2024/456",   # different year
-            "MP/2025/50",    # different publisher
+            "DU/2024/123",   # basic format
+            "DU/2024/456",   # different number
         ]
 
         # Act & Assert

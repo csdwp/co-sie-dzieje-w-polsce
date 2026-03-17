@@ -6,6 +6,7 @@ import React, {
   useRef,
   useLayoutEffect,
   useCallback,
+  useEffect,
 } from 'react';
 import dynamic from 'next/dynamic';
 import Masonry from 'react-masonry-css';
@@ -21,7 +22,12 @@ import { CONFIDENCE_THRESHOLD } from '@/lib/config';
 // Dynamic imports for modals - loaded only when needed
 const DialogModal = dynamic(() => import('./DialogModal'), { ssr: false });
 
-const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
+const CardGrid = ({
+  searchQuery,
+  selectedTypes,
+  data,
+  initialOpenId,
+}: CardGridProps) => {
   const [selectedCard, setSelectedCard] = useState<Act | null>(null);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [isFilterOptionsOpen, setIsFilterOptionsOpen] = useState(false);
@@ -30,6 +36,7 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
   const [deletedIds, setDeletedIds] = useState<Set<string | number>>(new Set());
   const { user } = useUser();
   const cardsContainerRef = useRef<HTMLDivElement>(null);
+  const tagsContainerRef = useRef<HTMLDivElement>(null);
   const hasAnimated = useRef(false);
 
   const { acts } = data || {};
@@ -75,9 +82,8 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
 
       const confidenceCheck =
         isAdmin ||
-        card.confidence_score === null ||
-        card.confidence_score === undefined ||
-        card.confidence_score >= CONFIDENCE_THRESHOLD;
+        (card.confidence_score != null &&
+          card.confidence_score >= CONFIDENCE_THRESHOLD);
 
       return matchesQuery && matchesType && confidenceCheck;
     });
@@ -117,8 +123,8 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
       });
     } else {
       return filtered.sort((a: Act, b: Act) => {
-        const dateA = new Date(a.announcement_date).getTime();
-        const dateB = new Date(b.announcement_date).getTime();
+        const dateA = new Date(a.created_at ?? a.announcement_date).getTime();
+        const dateB = new Date(b.created_at ?? b.announcement_date).getTime();
         return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
       });
     }
@@ -126,61 +132,79 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
 
   const openModal = useCallback((card: Act) => {
     setSelectedCard(card);
+    window.history.replaceState(null, '', `/${card.id}`);
   }, []);
 
   const closeModal = useCallback(() => {
     setSelectedCard(null);
+    window.history.replaceState(null, '', '/');
   }, []);
+
+  useEffect(() => {
+    if (!initialOpenId || !data?.acts) return;
+    const act = data.acts.find(a => a.id === initialOpenId);
+    if (act) setSelectedCard(act);
+  }, [initialOpenId, data?.acts]);
 
   const handleCardDelete = useCallback((id: string | number) => {
     setDeletedIds(prev => new Set(prev).add(id));
   }, []);
 
   useLayoutEffect(() => {
-    if (cardsContainerRef.current && !hasAnimated.current) {
-      const animationTimeout = setTimeout(() => {
-        if (cardsContainerRef.current) {
-          const cards =
-            cardsContainerRef.current.querySelectorAll('[data-card]');
-
-          if (cards.length > 0) {
-            gsap.fromTo(
-              cards,
-              {
-                opacity: 0,
-                y: 50,
-              },
-              {
-                opacity: 1,
-                y: 0,
-                duration: 1.6,
-                ease: 'power3.out',
-                stagger: {
-                  amount: 0.8,
-                  from: 'start',
-                  each: 0.08,
-                },
-                delay: 0.6,
-              }
-            );
-            hasAnimated.current = true;
-          }
+    if (tagsContainerRef.current) {
+      gsap.fromTo(
+        tagsContainerRef.current,
+        { opacity: 0, y: -20, scale: 0.97 },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.7,
+          ease: 'power3.out',
+          delay: 0.4,
         }
-      }, 100);
+      );
+    }
+  }, []);
 
-      return () => clearTimeout(animationTimeout);
+  useLayoutEffect(() => {
+    if (cardsContainerRef.current && !hasAnimated.current) {
+      const cards = cardsContainerRef.current.querySelectorAll('[data-card]');
+
+      if (cards.length > 0) {
+        // Set cards to start position before browser paints
+        gsap.set(cards, { opacity: 0, y: 50 });
+        hasAnimated.current = true;
+
+        gsap.to(cards, {
+          opacity: 1,
+          y: 0,
+          duration: 1.6,
+          ease: 'power3.out',
+          stagger: {
+            amount: 0.8,
+            from: 'start',
+            each: 0.08,
+          },
+          delay: 0.6,
+        });
+      }
     }
   }, []);
 
   return (
     <div className="w-full max-w-screen-xl mx-auto">
       {availableCategories && availableCategories.length > 0 && (
-        <div className="w-full mx-auto max-[640px]:max-w-11/12 max-[700px]:max-w-[320px] max-[950px]:max-w-[660px] max-[1200px]:max-w-[1000px] max-w-[1260px]">
+        <div
+          ref={tagsContainerRef}
+          style={{ opacity: 0 }}
+          className="w-full mx-auto max-[640px]:max-w-11/12 max-[700px]:max-w-[320px] max-[950px]:max-w-[660px] max-[1200px]:max-w-[1000px] max-w-[1260px]"
+        >
           <div className="text-lg relative flex flex-row items-center justify-between mb-1 gap-4 w-max">
-            <button className="swiper-button-prev-custom cursor-pointer transition-all duration-500 text-neutral-400 dark:text-neutral-500 hover:text-neutral-600 dark:hover:text-neutral-300 dark:[text-shadow:0_0_0px_rgba(255,255,255,0)] dark:hover:[text-shadow:0_0_8px_rgba(255,255,255,0.5)]">
+            <button className="swiper-button-prev-custom cursor-pointer transition-all duration-500 text-neutral-400 dark:text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 dark:[text-shadow:0_0_0px_rgba(255,255,255,0)] dark:hover:[text-shadow:0_0_8px_rgba(255,255,255,0.5)]">
               ←
             </button>
-            <button className="swiper-button-next-custom cursor-pointer transition-all duration-500 text-neutral-400 dark:text-neutral-500 hover:text-neutral-600 dark:hover:text-neutral-300 dark:[text-shadow:0_0_0px_rgba(255,255,255,0)] dark:hover:[text-shadow:0_0_8px_rgba(255,255,255,0.5)]">
+            <button className="swiper-button-next-custom cursor-pointer transition-all duration-500 text-neutral-400 dark:text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 dark:[text-shadow:0_0_0px_rgba(255,255,255,0)] dark:hover:[text-shadow:0_0_8px_rgba(255,255,255,0.5)]">
               →
             </button>
           </div>
@@ -206,7 +230,7 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
                   ${
                     selectedCategories.length === 0
                       ? 'bg-black/[0.06] dark:bg-white/[0.08] text-neutral-700 dark:text-neutral-200'
-                      : 'text-neutral-400 dark:text-neutral-500 hover:text-neutral-600 dark:hover:text-neutral-300'
+                      : 'text-neutral-400 dark:text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300'
                   }
                 `}
                 >
@@ -229,7 +253,7 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
                     ${
                       selectedCategories.includes(category)
                         ? 'bg-black/[0.06] dark:bg-white/[0.08] text-neutral-700 dark:text-neutral-200'
-                        : 'text-neutral-400 dark:text-neutral-500 hover:text-neutral-600 dark:hover:text-neutral-300'
+                        : 'text-neutral-400 dark:text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300'
                     }
                   `}
                   >
@@ -245,7 +269,7 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
                 className={`p-2 cursor-pointer transition-all duration-500 ${
                   isFilterOptionsOpen
                     ? 'text-neutral-700 dark:text-neutral-200 dark:[filter:drop-shadow(0_0_8px_rgba(255,255,255,0.5))]'
-                    : 'text-neutral-400 dark:text-neutral-500 hover:text-neutral-500 dark:hover:text-neutral-400 dark:[filter:drop-shadow(0_0_0px_rgba(255,255,255,0))]'
+                    : 'text-neutral-400 dark:text-neutral-400 hover:text-neutral-500 dark:hover:text-neutral-300 dark:[filter:drop-shadow(0_0_0px_rgba(255,255,255,0))]'
                 }`}
               >
                 <svg
@@ -276,7 +300,7 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
                   ${
                     sortOrder === 'asc'
                       ? 'text-neutral-700 dark:text-neutral-200 dark:[filter:drop-shadow(0_0_8px_rgba(255,255,255,0.5))]'
-                      : 'text-neutral-400 dark:text-neutral-500 hover:text-neutral-500 dark:hover:text-neutral-400 dark:[filter:drop-shadow(0_0_0px_rgba(255,255,255,0))]'
+                      : 'text-neutral-400 dark:text-neutral-400 hover:text-neutral-500 dark:hover:text-neutral-300 dark:[filter:drop-shadow(0_0_0px_rgba(255,255,255,0))]'
                   }
                 `}
                 >
@@ -332,7 +356,7 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
                   ${
                     sortByTitle !== null
                       ? 'text-neutral-700 dark:text-neutral-200 dark:[filter:drop-shadow(0_0_8px_rgba(255,255,255,0.5))]'
-                      : 'text-neutral-400 dark:text-neutral-500 hover:text-neutral-500 dark:hover:text-neutral-400 dark:[filter:drop-shadow(0_0_0px_rgba(255,255,255,0))]'
+                      : 'text-neutral-400 dark:text-neutral-400 hover:text-neutral-500 dark:hover:text-neutral-300 dark:[filter:drop-shadow(0_0_0px_rgba(255,255,255,0))]'
                   }
                 `}
                 >
@@ -398,6 +422,7 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
                     0
                   }
                   confidenceScore={card.confidence_score}
+                  createdAt={card.created_at}
                   onClick={() => openModal(card)}
                   onDelete={handleCardDelete}
                 />
@@ -413,24 +438,45 @@ const CardGrid = ({ searchQuery, selectedTypes, data }: CardGridProps) => {
         </Masonry>
       </div>
 
-      {selectedCard && (
-        <DialogModal
-          isOpen={selectedCard !== null}
-          onClose={closeModal}
-          card={{
-            id: selectedCard.id,
-            title: selectedCard.title,
-            content: selectedCard.content ?? '',
-            announcement_date: selectedCard.announcement_date,
-            promulgation: (selectedCard as Act).promulgation ?? '',
-            item_type: selectedCard.item_type,
-            categories: selectedCard.category ? [selectedCard.category] : [],
-            votes: (selectedCard as Act).votes ?? {},
-            url: (selectedCard as Act).file ?? '',
-            confidence_score: selectedCard.confidence_score,
-          }}
-        />
-      )}
+      {selectedCard &&
+        (() => {
+          const visibleCards = filteredAndSortedCards.filter(
+            (c: Act) => !deletedIds.has(c.id)
+          );
+          const currentIndex = visibleCards.findIndex(
+            (c: Act) => c.id === selectedCard.id
+          );
+          return (
+            <DialogModal
+              isOpen={selectedCard !== null}
+              onClose={closeModal}
+              onNext={() => {
+                const next = visibleCards[currentIndex + 1];
+                if (next) setSelectedCard(next);
+              }}
+              onPrev={() => {
+                const prev = visibleCards[currentIndex - 1];
+                if (prev) setSelectedCard(prev);
+              }}
+              hasNext={currentIndex < visibleCards.length - 1}
+              hasPrev={currentIndex > 0}
+              card={{
+                id: selectedCard.id,
+                title: selectedCard.title,
+                content: selectedCard.content ?? '',
+                announcement_date: selectedCard.announcement_date,
+                promulgation: (selectedCard as Act).promulgation ?? '',
+                item_type: selectedCard.item_type,
+                categories: selectedCard.category
+                  ? [selectedCard.category]
+                  : [],
+                votes: (selectedCard as Act).votes ?? {},
+                url: (selectedCard as Act).file ?? '',
+                confidence_score: selectedCard.confidence_score,
+              }}
+            />
+          );
+        })()}
     </div>
   );
 };

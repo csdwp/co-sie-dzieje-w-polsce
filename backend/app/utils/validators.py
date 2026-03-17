@@ -21,8 +21,8 @@ def validate_eli_format(eli: str) -> bool:
     if not eli or not isinstance(eli, str):
         return False
 
-    # ELI format from Sejm API: DU/2026/137 (Publisher/Year/Number)
-    pattern = r"^[A-Z]{2,}/\d{4}/\d+$"
+    # ELI format from Sejm API: DU/2026/123
+    pattern = r"^[A-Z]+/\d{4}/\d+$"
     return bool(re.match(pattern, eli))
 
 

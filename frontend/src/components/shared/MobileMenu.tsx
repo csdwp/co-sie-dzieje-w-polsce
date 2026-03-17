@@ -62,7 +62,7 @@ const MobileMenu = ({
         className={`cursor-pointer absolute top-2 left-3 z-50 p-2 rounded-xl transition-all duration-500 ${
           isOpen
             ? 'text-neutral-200]'
-            : 'text-neutral-400 dark:text-neutral-500'
+            : 'text-neutral-400 dark:text-neutral-400'
         }`}
         onClick={toggleMenu}
       >
