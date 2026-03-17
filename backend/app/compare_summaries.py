@@ -20,8 +20,8 @@ try:
 except ImportError:
     from langchain.text_splitter import RecursiveCharacterTextSplitter  # type: ignore[no-redef]
 
-from app.services.external.openai_client import OpenAIClient
-from app.services.external.pdf_processor import PDFProcessor
+from app.services.external.openai_client import OpenAIClient  # noqa: E402
+from app.services.external.pdf_processor import PDFProcessor  # noqa: E402
 
 SEP = "─" * 72
 

@@ -1,6 +1,3 @@
-import sys
-
-from ..core.exceptions import InsufficientQuotaError
 from ..core.logging import get_logger
 from .orchestrator import check_for_new_acts, check_old_elis
 
