@@ -82,9 +82,7 @@ class ActFetcher:
             logger.info("No acts in database yet — processing all available acts...")
             new_acts = items
         else:
-            new_acts = [
-                act for act in items if act.get("ELI") not in existing_elis
-            ]
+            new_acts = [act for act in items if act.get("ELI") not in existing_elis]
 
         if not new_acts:
             return []
