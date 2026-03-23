@@ -151,7 +151,7 @@ const CardGrid = ({
   }, []);
 
   useLayoutEffect(() => {
-    if (tagsContainerRef.current) {
+    if (tagsContainerRef.current && availableCategories.length > 0) {
       gsap.fromTo(
         tagsContainerRef.current,
         { opacity: 0, y: -20, scale: 0.97 },
@@ -165,7 +165,7 @@ const CardGrid = ({
         }
       );
     }
-  }, []);
+  }, [availableCategories.length === 0]);
 
   useLayoutEffect(() => {
     if (cardsContainerRef.current && !hasAnimated.current) {
