@@ -91,7 +91,7 @@ const Menu = ({
           <div className="flex flex-col gap-3 px-1">
             <button
               onClick={() => toggleType('Ustawa')}
-              className={`text-left text-[15px] tracking-wide transition-all duration-500 ${
+              className={`text-left text-[15px] tracking-wide transition-all duration-500 cursor-pointer ${
                 selectedTypes.includes('Ustawa')
                   ? 'text-neutral-800 dark:text-neutral-200 dark:[text-shadow:0_0_8px_rgba(255,255,255,0.6)]'
                   : 'text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'
@@ -101,7 +101,7 @@ const Menu = ({
             </button>
             <button
               onClick={() => toggleType('Rozporządzenie')}
-              className={`text-left text-[15px] tracking-wide transition-all duration-500 ${
+              className={`text-left text-[15px] tracking-wide transition-all duration-500 cursor-pointer ${
                 selectedTypes.includes('Rozporządzenie')
                   ? 'text-neutral-800 dark:text-neutral-200 dark:[text-shadow:0_0_8px_rgba(255,255,255,0.6)]'
                   : 'text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'
