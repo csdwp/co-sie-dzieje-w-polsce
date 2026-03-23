@@ -70,7 +70,7 @@ interface CustomTooltipProps {
 const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-white/95 dark:bg-white/[0.06] backdrop-blur-xl text-neutral-800 dark:text-neutral-100 px-4 py-3 rounded-xl shadow-2xl border border-black/[0.06] dark:border-white/[0.06]">
+      <div className="bg-gray-900/95 dark:bg-black/95 backdrop-blur-md text-neutral-800 dark:text-neutral-100 px-4 py-3 rounded-xl shadow-2xl border border-black/[0.06] dark:border-white/[0.06]">
         <p className="font-medium mb-1.5 text-neutral-700 dark:text-neutral-200">
           {payload[0].payload.party}
         </p>
@@ -116,7 +116,7 @@ const CustomPieTooltip = ({
     const isYes = entry.name === 'Za';
     const votes = isYes ? totalYes : totalNo;
     return (
-      <div className="bg-white/95 dark:bg-white/[0.06] backdrop-blur-xl text-neutral-800 dark:text-neutral-100 px-4 py-3 rounded-xl shadow-2xl border border-black/[0.06] dark:border-white/[0.06]">
+      <div className="bg-gray-900/95 dark:bg-black/95 backdrop-blur-md text-neutral-800 dark:text-neutral-100 px-4 py-3 rounded-xl shadow-2xl border border-black/[0.06] dark:border-white/[0.06]">
         <p className="font-medium mb-1.5 text-neutral-700 dark:text-neutral-200">
           {entry.name}
         </p>
@@ -145,6 +145,7 @@ const DialogModal = ({
   const parties = votes?.parties;
   const [showDetailedAnalysis, setShowDetailedAnalysis] = useState(false);
   const touchStartX = useRef<number | null>(null);
+  const analysisRef = useRef<HTMLDivElement>(null);
 
   // Use refs so keyboard/touch handlers always see latest props
   const onNextRef = useRef(onNext);
@@ -159,6 +160,14 @@ const DialogModal = ({
   });
 
   const contentRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (showDetailedAnalysis && analysisRef.current)
+      analysisRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+  }, [showDetailedAnalysis]);
 
   const triggerSlide = useCallback((direction: 'left' | 'right') => {
     const el = contentRef.current;
@@ -281,23 +290,31 @@ const DialogModal = ({
             touchStartX.current = null;
           }}
         >
-          <div className="absolute top-5 left-5 sm:top-6 sm:left-10 z-10 text-lg flex flex-row items-center gap-4 font-sans antialiased">
+          <div className="absolute top-5 left-5 sm:top-6 sm:left-10 z-10 flex flex-row items-center gap-6 font-sans antialiased">
             <button
               onClick={handlePrev}
-              className="cursor-pointer focus:outline-none focus:border-none transition-all duration-500 text-neutral-400 dark:text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 dark:[text-shadow:0_0_0px_rgba(255,255,255,0)] dark:hover:[text-shadow:0_0_8px_rgba(255,255,255,0.5)]"
+              disabled={!hasPrev}
+              className="flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity duration-200 hover:opacity-70 cursor-pointer focus:outline-none"
             >
-              ←
+              <span className="text-lg -translate-y-0.5">←</span>
+              <span className="text-[11px] sm:text-xs font-medium text-neutral-600 dark:text-neutral-300">
+                <span className="hidden sm:inline">Poprzedni</span>
+              </span>
             </button>
             <button
               onClick={handleNext}
-              className="cursor-pointer focus:outline-none focus:border-none transition-all duration-500 text-neutral-400 dark:text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 dark:[text-shadow:0_0_0px_rgba(255,255,255,0)] dark:hover:[text-shadow:0_0_8px_rgba(255,255,255,0.5)]"
+              disabled={!hasNext}
+              className="flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity duration-200 hover:opacity-70 cursor-pointer focus:outline-none"
             >
-              →
+              <span className="text-[11px] sm:text-xs font-medium text-neutral-600 dark:text-neutral-300">
+                <span className="hidden sm:inline">Następny</span>
+              </span>
+              <span className="text-lg -translate-y-0.5">→</span>
             </button>
           </div>
           <div
             ref={contentRef}
-            className="overflow-auto flex-1 flex flex-col gap-8 pt-8"
+            className="overflow-auto flex-1 flex flex-col gap-8"
           >
             <DialogHeader className="h-fit">
               <div className="flex items-start gap-3 mb-3">
@@ -495,7 +512,7 @@ const DialogModal = ({
                 </button>
 
                 {showDetailedAnalysis && (
-                  <>
+                  <div ref={analysisRef}>
                     {/* Government vs Opposition Comparison */}
                     <div className="flex flex-col space-y-4">
                       <div>
@@ -644,11 +661,10 @@ const DialogModal = ({
                           rozkład wszystkich głosów.
                         </div>
                       </div>
-                      {/* Wykresy "za" i "przeciw" */}
                       <div className="flex flex-col md:flex-row gap-5 w-full h-auto md:max-h-80">
                         <ChartContainer
                           config={combinedChartConfig}
-                          className="md:w-1/2"
+                          className="md:w-2/3"
                         >
                           <BarChart
                             accessibilityLayer
@@ -671,12 +687,14 @@ const DialogModal = ({
                             <ChartTooltip content={<CustomTooltip />} />
                             <Bar
                               dataKey="yes"
+                              name="Za"
                               fill="var(--color-yes)"
                               radius={4}
                               minPointSize={2}
                             />
                             <Bar
                               dataKey="no"
+                              name="Przeciw"
                               fill="var(--color-no)"
                               radius={4}
                               minPointSize={2}
@@ -685,7 +703,7 @@ const DialogModal = ({
                         </ChartContainer>
                         <ChartContainer
                           config={chartConfig}
-                          className="md:w-1/2 aspect-square"
+                          className="md:w-1/3 aspect-square"
                         >
                           <PieChart>
                             <ChartTooltip
@@ -742,7 +760,7 @@ const DialogModal = ({
                         </ChartContainer>
                       </div>
                     </div>
-                  </>
+                  </div>
                 )}
               </>
             )}

@@ -58,13 +58,13 @@ const CookieConsent = ({ onAccept }: CookieConsentProps) => {
           <div className="flex gap-2 w-full sm:w-auto">
             <button
               onClick={handleReject}
-              className="flex-1 sm:flex-none px-4 py-2 text-sm font-medium text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 transition-all duration-300 rounded-lg"
+              className="flex-1 sm:flex-none px-4 py-2 text-sm font-medium text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 transition-all duration-300 rounded-lg cursor-pointer"
             >
               Odrzuć
             </button>
             <button
               onClick={handleAccept}
-              className="flex-1 sm:flex-none px-4 py-2 text-sm font-medium bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-lg hover:bg-neutral-800 dark:hover:bg-neutral-100 transition-all duration-300"
+              className="flex-1 sm:flex-none px-4 py-2 text-sm font-medium bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-lg hover:bg-neutral-800 dark:hover:bg-neutral-100 transition-all duration-300 cursor-pointer"
             >
               Akceptuję
             </button>

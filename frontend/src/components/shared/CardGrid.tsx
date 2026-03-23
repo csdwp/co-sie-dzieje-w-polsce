@@ -151,7 +151,7 @@ const CardGrid = ({
   }, []);
 
   useLayoutEffect(() => {
-    if (tagsContainerRef.current) {
+    if (tagsContainerRef.current && availableCategories.length > 0) {
       gsap.fromTo(
         tagsContainerRef.current,
         { opacity: 0, y: -20, scale: 0.97 },
@@ -165,7 +165,7 @@ const CardGrid = ({
         }
       );
     }
-  }, []);
+  }, [availableCategories.length === 0]);
 
   useLayoutEffect(() => {
     if (cardsContainerRef.current && !hasAnimated.current) {
@@ -422,7 +422,7 @@ const CardGrid = ({
                     0
                   }
                   confidenceScore={card.confidence_score}
-                  createdAt={card.created_at}
+                  createdAt={card.change_date}
                   onClick={() => openModal(card)}
                   onDelete={handleCardDelete}
                 />
@@ -452,11 +452,17 @@ const CardGrid = ({
               onClose={closeModal}
               onNext={() => {
                 const next = visibleCards[currentIndex + 1];
-                if (next) setSelectedCard(next);
+                if (next) {
+                  setSelectedCard(next);
+                  window.history.replaceState(null, '', `/${next.id}`);
+                }
               }}
               onPrev={() => {
                 const prev = visibleCards[currentIndex - 1];
-                if (prev) setSelectedCard(prev);
+                if (prev) {
+                  setSelectedCard(prev);
+                  window.history.replaceState(null, '', `/${prev.id}`);
+                }
               }}
               hasNext={currentIndex < visibleCards.length - 1}
               hasPrev={currentIndex > 0}
