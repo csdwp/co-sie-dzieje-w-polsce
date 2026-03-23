@@ -70,7 +70,7 @@ interface CustomTooltipProps {
 const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-white/95 dark:bg-white/[0.06] backdrop-blur-xl text-neutral-800 dark:text-neutral-100 px-4 py-3 rounded-xl shadow-2xl border border-black/[0.06] dark:border-white/[0.06]">
+      <div className="bg-gray-900/95 dark:bg-black/95 backdrop-blur-md text-neutral-800 dark:text-neutral-100 px-4 py-3 rounded-xl shadow-2xl border border-black/[0.06] dark:border-white/[0.06]">
         <p className="font-medium mb-1.5 text-neutral-700 dark:text-neutral-200">
           {payload[0].payload.party}
         </p>
@@ -116,7 +116,7 @@ const CustomPieTooltip = ({
     const isYes = entry.name === 'Za';
     const votes = isYes ? totalYes : totalNo;
     return (
-      <div className="bg-white/95 dark:bg-white/[0.06] backdrop-blur-xl text-neutral-800 dark:text-neutral-100 px-4 py-3 rounded-xl shadow-2xl border border-black/[0.06] dark:border-white/[0.06]">
+      <div className="bg-gray-900/95 dark:bg-black/95 backdrop-blur-md text-neutral-800 dark:text-neutral-100 px-4 py-3 rounded-xl shadow-2xl border border-black/[0.06] dark:border-white/[0.06]">
         <p className="font-medium mb-1.5 text-neutral-700 dark:text-neutral-200">
           {entry.name}
         </p>
@@ -644,11 +644,10 @@ const DialogModal = ({
                           rozkład wszystkich głosów.
                         </div>
                       </div>
-                      {/* Wykresy "za" i "przeciw" */}
                       <div className="flex flex-col md:flex-row gap-5 w-full h-auto md:max-h-80">
                         <ChartContainer
                           config={combinedChartConfig}
-                          className="md:w-1/2"
+                          className="md:w-2/3"
                         >
                           <BarChart
                             accessibilityLayer
@@ -671,12 +670,14 @@ const DialogModal = ({
                             <ChartTooltip content={<CustomTooltip />} />
                             <Bar
                               dataKey="yes"
+                              name="Za"
                               fill="var(--color-yes)"
                               radius={4}
                               minPointSize={2}
                             />
                             <Bar
                               dataKey="no"
+                              name="Przeciw"
                               fill="var(--color-no)"
                               radius={4}
                               minPointSize={2}
@@ -685,7 +686,7 @@ const DialogModal = ({
                         </ChartContainer>
                         <ChartContainer
                           config={chartConfig}
-                          className="md:w-1/2 aspect-square"
+                          className="md:w-1/3 aspect-square"
                         >
                           <PieChart>
                             <ChartTooltip
