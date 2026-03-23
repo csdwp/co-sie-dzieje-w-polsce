@@ -1,6 +1,8 @@
 @import 'tailwindcss';
+@plugin "tailwindcss-animate";
 
 @custom-variant dark (&:is(.dark *));
+
 
 /* Prevent horizontal scroll on mobile */
 html,
