@@ -165,7 +165,7 @@ const CardGrid = ({
         }
       );
     }
-  }, [availableCategories.length === 0]);
+  }, [availableCategories.length]);
 
   useLayoutEffect(() => {
     if (cardsContainerRef.current && !hasAnimated.current) {

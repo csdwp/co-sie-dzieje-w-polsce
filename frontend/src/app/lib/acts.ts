@@ -61,11 +61,7 @@ export const getActsAndKeywords =
           },
           select: actSelect,
         }),
-        prisma.category.findMany({
-          select: {
-            category: true,
-          },
-        }),
+        prisma.category.findMany({ select: { category: true } }),
       ]);
 
       const acts = prismaActs.map(mapPrismaActToAct);
