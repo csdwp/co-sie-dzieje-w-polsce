@@ -123,8 +123,8 @@ const CardGrid = ({
       });
     } else {
       return filtered.sort((a: Act, b: Act) => {
-        const dateA = new Date(a.created_at ?? a.announcement_date).getTime();
-        const dateB = new Date(b.created_at ?? b.announcement_date).getTime();
+        const dateA = new Date(a.change_date ?? a.created_at ?? a.announcement_date).getTime();
+        const dateB = new Date(b.change_date ?? b.created_at ?? b.announcement_date).getTime();
         return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
       });
     }

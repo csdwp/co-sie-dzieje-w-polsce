@@ -17,6 +17,7 @@ const actSelect = {
   category: true,
   confidence_score: true,
   created_at: true,
+  change_date: true,
 } as const;
 
 type PrismaAct = Prisma.actsGetPayload<{ select: typeof actSelect }>;
@@ -40,6 +41,7 @@ const mapPrismaActToAct = (prismaAct: PrismaAct): Act => {
       ? Number(prismaAct.confidence_score)
       : null,
     created_at: prismaAct.created_at.toISOString(),
+    change_date: prismaAct.change_date?.toISOString() ?? undefined,
   };
 };
 
