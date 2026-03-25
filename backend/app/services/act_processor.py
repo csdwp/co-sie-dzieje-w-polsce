@@ -50,7 +50,7 @@ class ActProcessor:
         self.votes_calculator = votes_calculator or VotesCalculator()
         self.act_repo = act_repo or ActRepository()
 
-    def process_and_save(self, act_data: Dict[str, Any]) -> Optional[int]:
+    def process_and_save(self, act_data: Dict[str, Any]) -> Optional[Tuple[int, Act]]:
         """
         Process a single act through the complete pipeline.
 
@@ -65,7 +65,7 @@ class ActProcessor:
             act_data: Raw act data from API
 
         Returns:
-            ID of saved act if successful, None otherwise
+            Tuple of (act_id, Act) if successful, None otherwise
         """
         eli = act_data.get("ELI")
         title = act_data.get("title", "unknown")
@@ -150,8 +150,10 @@ class ActProcessor:
             # Step 6: Save to database
             logger.info("Saving to database...")
             act_id = self.act_repo.save_act(act)
+            if act_id is None:
+                return None
             logger.info(f"✅ Successfully processed act: {title} (id={act_id})")
-            return act_id
+            return (act_id, act)
 
         except PDFProcessingError as e:
             logger.error(f"PDF processing failed for {title}: {e}")
