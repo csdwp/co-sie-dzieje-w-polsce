@@ -2,7 +2,7 @@
 
 from typing import Optional
 
-import tweepy
+import tweepy  # type: ignore[import-untyped]
 
 from ...core.config import (
     TWITTER_ACCESS_TOKEN,
@@ -60,7 +60,7 @@ class TwitterClient:
 
         try:
             response = self._client.create_tweet(text=text)
-            tweet_id = response.data["id"]
+            tweet_id: str = response.data["id"]
             logger.info(f"Tweet posted successfully: {tweet_id}")
             return tweet_id
         except tweepy.TweepyException as e:
