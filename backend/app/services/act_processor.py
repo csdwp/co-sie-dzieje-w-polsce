@@ -50,9 +50,7 @@ class ActProcessor:
         self.votes_calculator = votes_calculator or VotesCalculator()
         self.act_repo = act_repo or ActRepository()
 
-    def process_and_save(
-        self, act_data: Dict[str, Any]
-    ) -> Optional[Tuple[int, Act]]:
+    def process_and_save(self, act_data: Dict[str, Any]) -> Optional[Tuple[int, Act]]:
         """
         Process a single act through the complete pipeline.
 

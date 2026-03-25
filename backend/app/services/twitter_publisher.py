@@ -67,8 +67,11 @@ class TwitterPublisher:
 
         # Fixed: title + footer + newlines between sections
         # URL counts as 23 chars via t.co
-        footer_len = len("Czytaj więcej: ") + TCO_URL_LENGTH + 1 + len(
-            "#CoSięDziejeWPolsce #prawo"
+        footer_len = (
+            len("Czytaj więcej: ")
+            + TCO_URL_LENGTH
+            + 1
+            + len("#CoSięDziejeWPolsce #prawo")
         )
         fixed_len = len(title) + footer_len + 4  # 4 newlines separating sections
 

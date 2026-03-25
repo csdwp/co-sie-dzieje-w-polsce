@@ -37,9 +37,7 @@ class TwitterClient:
                 access_token_secret=TWITTER_ACCESS_TOKEN_SECRET,
             )
         else:
-            logger.warning(
-                "Twitter API credentials not configured — posting disabled"
-            )
+            logger.warning("Twitter API credentials not configured — posting disabled")
 
     @property
     def is_configured(self) -> bool:
