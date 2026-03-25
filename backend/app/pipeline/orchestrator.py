@@ -7,6 +7,7 @@ from ..core.logging import get_logger
 from ..repositories.pipeline_queue_repository import PipelineQueueRepository
 from ..services.act_processor import ActProcessor
 from ..services.external.sejm_api import SejmAPIClient
+from ..services.twitter_publisher import TwitterPublisher
 from .act_fetcher import ActFetcher
 
 logger = get_logger(__name__)
@@ -21,6 +22,7 @@ class PipelineOrchestrator:
         processor: Optional[ActProcessor] = None,
         sejm_api: Optional[SejmAPIClient] = None,
         queue_repo: Optional[PipelineQueueRepository] = None,
+        twitter_publisher: Optional[TwitterPublisher] = None,
     ):
         """
         Initialize pipeline orchestrator.
@@ -30,11 +32,13 @@ class PipelineOrchestrator:
             processor: Act processor
             sejm_api: Sejm API client
             queue_repo: Pipeline queue repository
+            twitter_publisher: Twitter publisher for posting new acts
         """
         self.fetcher = fetcher or ActFetcher()
         self.processor = processor or ActProcessor()
         self.sejm_api = sejm_api or SejmAPIClient()
         self.queue_repo = queue_repo or PipelineQueueRepository()
+        self.twitter_publisher = twitter_publisher or TwitterPublisher()
 
     def check_for_new_acts(self) -> list:
         """
@@ -76,9 +80,11 @@ class PipelineOrchestrator:
         # Process acts (oldest first)
         processed = []
         for act in reversed(acts_to_process):
-            act_id = self.processor.process_and_save(act)
-            if act_id:
+            result = self.processor.process_and_save(act)
+            if result:
+                act_id, processed_act = result
                 processed.append((act.get("title", act.get("ELI", "?")), act_id))
+                self.twitter_publisher.publish_act(processed_act, act_id)
 
         logger.info(
             f"Successfully processed {len(processed)}/{len(acts_to_process)} acts"
@@ -122,10 +128,12 @@ class PipelineOrchestrator:
                         "promulgation": act_details.promulgation,
                     }
 
-                    act_id = self.processor.process_and_save(act_data)
-                    if act_id:
+                    result = self.processor.process_and_save(act_data)
+                    if result:
+                        act_id, processed_act = result
                         logger.info(f"✅ Successfully processed delayed act: {eli}")
                         processed.append((act_details.title or eli, act_id))
+                        self.twitter_publisher.publish_act(processed_act, act_id)
                         self.queue_repo.remove(eli)
                         continue
 
