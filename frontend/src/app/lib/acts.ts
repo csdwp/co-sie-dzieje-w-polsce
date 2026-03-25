@@ -53,8 +53,10 @@ const mapPrismaCategoryToCategory = (
   };
 };
 
-export const getActsAndKeywords =
-  async (): Promise<ActsAndKeywordsResponse> => {
+export const getActsAndKeywords = async (
+  retries = 3
+): Promise<ActsAndKeywordsResponse> => {
+  for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       const [prismaActs, prismaCategories] = await Promise.all([
         prisma.acts.findMany({
@@ -71,7 +73,12 @@ export const getActsAndKeywords =
 
       return { acts, categories };
     } catch (error) {
-      console.error('Error while downloading data:', error);
-      throw new Error('Failed to download data');
+      console.error(`Attempt ${attempt}/${retries} failed:`, error);
+      if (attempt === retries) {
+        throw new Error('Failed to download data');
+      }
+      await new Promise((r) => setTimeout(r, 1000 * attempt));
     }
-  };
+  }
+  throw new Error('Failed to download data');
+};
