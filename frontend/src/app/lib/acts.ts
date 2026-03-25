@@ -77,7 +77,7 @@ export const getActsAndKeywords = async (
       if (attempt === retries) {
         throw new Error('Failed to download data');
       }
-      await new Promise((r) => setTimeout(r, 1000 * attempt));
+      await new Promise(r => setTimeout(r, 1000 * attempt));
     }
   }
   throw new Error('Failed to download data');
