@@ -2,8 +2,7 @@ import ClientWrapper from '@/components/ClientWrapper';
 import { getActsAndKeywords } from '@/app/lib/acts';
 import type { ActsAndKeywordsResponse } from '@/types';
 
-export const dynamicParams = true;
-export const revalidate = 3600;
+export const dynamic = 'force-dynamic';
 
 const ActPage = async ({ params }: { params: Promise<{ id: string }> }) => {
   const { id } = await params;
