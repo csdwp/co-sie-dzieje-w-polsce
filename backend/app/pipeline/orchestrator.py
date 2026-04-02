@@ -1,8 +1,15 @@
 """Main pipeline orchestrator."""
 
+import time
+import urllib.request
 from typing import Optional
 
-from ..core.config import MAX_ACTS_TO_PROCESS, check_environment
+from ..core.config import (
+    MAX_ACTS_TO_PROCESS,
+    TWITTER_POST_DELAY_MINUTES,
+    VERCEL_DEPLOY_HOOK_URL,
+    check_environment,
+)
 from ..core.logging import get_logger
 from ..repositories.pipeline_queue_repository import PipelineQueueRepository
 from ..services.act_processor import ActProcessor
@@ -79,16 +86,23 @@ class PipelineOrchestrator:
 
         # Process acts (oldest first)
         processed = []
-        for act in reversed(acts_to_process):
+        for i, act in enumerate(reversed(acts_to_process)):
             result = self.processor.process_and_save(act)
             if result:
                 act_id, processed_act = result
                 processed.append((act.get("title", act.get("ELI", "?")), act_id))
+
+                if i > 0 and TWITTER_POST_DELAY_MINUTES > 0:
+                    logger.info(f"Waiting {TWITTER_POST_DELAY_MINUTES}m before next tweet")
+                    time.sleep(TWITTER_POST_DELAY_MINUTES * 60)
+
                 self.twitter_publisher.publish_act(processed_act, act_id)
 
         logger.info(
             f"Successfully processed {len(processed)}/{len(acts_to_process)} acts"
         )
+
+        self._trigger_vercel_deploy()
 
         return processed
 
@@ -149,7 +163,25 @@ class PipelineOrchestrator:
         else:
             logger.info("All delayed ELIs processed successfully!")
 
+        if processed:
+            self._trigger_vercel_deploy()
+
         return processed
+
+    def _trigger_vercel_deploy(self) -> None:
+        """Trigger Vercel deploy hook to rebuild the frontend."""
+        if not VERCEL_DEPLOY_HOOK_URL:
+            logger.debug("VERCEL_DEPLOY_HOOK_URL not set, skipping deploy trigger")
+            return
+
+        try:
+            req = urllib.request.Request(
+                VERCEL_DEPLOY_HOOK_URL, method="POST", data=b""
+            )
+            with urllib.request.urlopen(req, timeout=10) as response:
+                logger.info(f"Vercel deploy triggered (status {response.status})")
+        except Exception as e:
+            logger.error(f"Failed to trigger Vercel deploy: {e}")
 
 
 def check_for_new_acts() -> list:

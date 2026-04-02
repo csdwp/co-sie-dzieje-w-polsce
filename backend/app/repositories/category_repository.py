@@ -137,6 +137,14 @@ class CategoryRepository(BaseRepository):
 
             with self.get_connection() as (conn, cursor):
                 cursor.execute(
+                    "SELECT 1 FROM category WHERE lower(category) = lower(%s)",
+                    (category_name,),
+                )
+                if cursor.fetchone():
+                    logger.info(f"Category '{category_name}' already exists, skipping create")
+                    return category_name
+
+                cursor.execute(
                     "INSERT INTO category (category, keywords) VALUES (%s, %s)",
                     (category_name, json.dumps(unique_keywords)),
                 )
