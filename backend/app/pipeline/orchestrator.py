@@ -1,8 +1,9 @@
 """Main pipeline orchestrator."""
 
 import time
-import urllib.request
 from typing import Optional
+
+import requests
 
 from ..core.config import (
     MAX_ACTS_TO_PROCESS,
@@ -175,11 +176,8 @@ class PipelineOrchestrator:
             return
 
         try:
-            req = urllib.request.Request(
-                VERCEL_DEPLOY_HOOK_URL, method="POST", data=b""
-            )
-            with urllib.request.urlopen(req, timeout=10) as response:
-                logger.info(f"Vercel deploy triggered (status {response.status})")
+            response = requests.post(VERCEL_DEPLOY_HOOK_URL, timeout=10)
+            logger.info(f"Vercel deploy triggered (status {response.status_code})")
         except Exception as e:
             logger.error(f"Failed to trigger Vercel deploy: {e}")
 
