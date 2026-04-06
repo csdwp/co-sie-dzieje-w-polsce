@@ -5,10 +5,8 @@
 
 
 /* Prevent horizontal scroll on mobile */
-html,
-body {
-  overflow-x: hidden;
-}
+/* NOTE: overflow-x: hidden on html/body breaks backdrop-filter on position:fixed
+   elements in iOS Safari. Use overflow-x: hidden on wrapper divs instead. */
 
 /* Promote background glow to its own GPU layer so it doesn't trigger repaints */
 body::before {

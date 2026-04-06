@@ -409,7 +409,11 @@ const CardGrid = ({
           {filteredAndSortedCards
             .filter((card: Act) => !deletedIds.has(card.id))
             .map((card: Act) => (
-              <div key={card.id} data-card>
+              <div
+                key={card.id}
+                data-card
+                style={{ opacity: 0, willChange: 'transform, opacity' }}
+              >
                 <Card
                   id={card.id}
                   title={card.title}
