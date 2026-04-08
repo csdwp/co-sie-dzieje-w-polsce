@@ -35,7 +35,6 @@ const CardGrid = ({
   const [sortByTitle, setSortByTitle] = useState<'asc' | 'desc' | null>(null);
   const [deletedIds, setDeletedIds] = useState<Set<string | number>>(new Set());
   const [debouncedQuery, setDebouncedQuery] = useState(searchQuery);
-  const [animationComplete, setAnimationComplete] = useState(false);
   const { user } = useUser();
   const cardsContainerRef = useRef<HTMLDivElement>(null);
   const tagsContainerRef = useRef<HTMLDivElement>(null);
@@ -169,42 +168,31 @@ const CardGrid = ({
       !hasTagsAnimated.current
     ) {
       hasTagsAnimated.current = true;
-      gsap.fromTo(
-        tagsContainerRef.current,
-        { opacity: 0, y: -20, scale: 0.97 },
-        {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          duration: 0.7,
-          ease: 'power3.out',
-          delay: 0.4,
-        }
-      );
+      gsap.set(tagsContainerRef.current, { opacity: 0, y: -20, scale: 0.97 });
+      gsap.to(tagsContainerRef.current, {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        duration: 0.7,
+        ease: 'power3.out',
+        delay: 0.4,
+      });
     }
   }, [availableCategories.length]);
 
   useLayoutEffect(() => {
     if (cardsContainerRef.current && !hasAnimated.current) {
+      hasAnimated.current = true;
       const cards = cardsContainerRef.current.querySelectorAll('[data-card]');
-
       if (cards.length > 0) {
-        // Set cards to start position before browser paints
         gsap.set(cards, { opacity: 0, y: 50 });
-        hasAnimated.current = true;
-
         gsap.to(cards, {
           opacity: 1,
           y: 0,
-          duration: 1.6,
+          duration: 0.6,
           ease: 'power3.out',
-          stagger: {
-            amount: 0.8,
-            from: 'start',
-            each: 0.08,
-          },
-          delay: 0.6,
-          onComplete: () => setAnimationComplete(true),
+          stagger: { amount: 0.3, from: 'start' },
+          delay: 0.1,
         });
       }
     }
@@ -215,7 +203,6 @@ const CardGrid = ({
       {availableCategories && availableCategories.length > 0 && (
         <div
           ref={tagsContainerRef}
-          style={hasTagsAnimated.current ? undefined : { opacity: 0 }}
           className="w-full mx-auto max-[640px]:max-w-11/12 max-[700px]:max-w-[320px] max-[950px]:max-w-[660px] max-[1200px]:max-w-[1000px] max-w-[1260px]"
         >
           <div className="text-lg relative flex flex-row items-center justify-between mb-1 gap-4 w-max">
@@ -426,11 +413,7 @@ const CardGrid = ({
               <div
                 key={card.id}
                 data-card
-                style={
-                  animationComplete
-                    ? undefined
-                    : { opacity: 0, willChange: 'transform, opacity' }
-                }
+                style={{ willChange: 'transform, opacity' }}
               >
                 <Card
                   id={card.id}

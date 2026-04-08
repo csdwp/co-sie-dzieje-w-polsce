@@ -33,19 +33,16 @@ const ClientWrapper = ({
   useLayoutEffect(() => {
     if (!heroRef.current) return;
     const lines = heroRef.current.querySelectorAll('[data-hero-line]');
-    gsap.fromTo(
-      lines,
-      { opacity: 0, y: 16, scale: 0.97 },
-      {
-        opacity: 1,
-        y: 0,
-        scale: 1,
-        duration: 1.1,
-        ease: 'power3.out',
-        stagger: 0.13,
-        delay: 0.05,
-      }
-    );
+    gsap.set(lines, { opacity: 0, y: 16, scale: 0.97 });
+    gsap.to(lines, {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      duration: 1.1,
+      ease: 'power3.out',
+      stagger: 0.13,
+      delay: 0.05,
+    });
   }, []);
 
   return (
@@ -54,7 +51,7 @@ const ClientWrapper = ({
         selectedTypes={selectedTypes}
         setSelectedTypes={setSelectedTypes}
       />
-      <div className="overflow-hidden flex flex-col gap-8 items-center justify-items-center w-full min-h-screen pt-[90px] py-8 pb-20 font-[family-name:var(--font-geist-sans)]">
+      <div className="flex flex-col gap-8 items-center justify-items-center w-full min-h-screen pt-[90px] py-8 pb-20 font-[family-name:var(--font-geist-sans)]">
         <h1 className="sr-only">
           Co przeszło - Akty prawne w Polsce w prostym języku
         </h1>
@@ -65,7 +62,6 @@ const ClientWrapper = ({
               <span
                 data-hero-line
                 style={{
-                  opacity: 0,
                   display: 'block',
                   willChange: 'transform, opacity',
                 }}
@@ -75,7 +71,6 @@ const ClientWrapper = ({
               <span
                 data-hero-line
                 style={{
-                  opacity: 0,
                   display: 'block',
                   willChange: 'transform, opacity',
                 }}
@@ -87,7 +82,6 @@ const ClientWrapper = ({
               <span
                 data-hero-line
                 style={{
-                  opacity: 0,
                   display: 'block',
                   willChange: 'transform, opacity',
                 }}
@@ -97,7 +91,6 @@ const ClientWrapper = ({
               <span
                 data-hero-line
                 style={{
-                  opacity: 0,
                   display: 'block',
                   willChange: 'transform, opacity',
                 }}
