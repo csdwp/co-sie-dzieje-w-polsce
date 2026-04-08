@@ -34,10 +34,18 @@ const CardGrid = ({
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [sortByTitle, setSortByTitle] = useState<'asc' | 'desc' | null>(null);
   const [deletedIds, setDeletedIds] = useState<Set<string | number>>(new Set());
+  const [debouncedQuery, setDebouncedQuery] = useState(searchQuery);
+  const [animationComplete, setAnimationComplete] = useState(false);
   const { user } = useUser();
   const cardsContainerRef = useRef<HTMLDivElement>(null);
   const tagsContainerRef = useRef<HTMLDivElement>(null);
   const hasAnimated = useRef(false);
+  const hasTagsAnimated = useRef(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedQuery(searchQuery), 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   const { acts } = data || {};
 
@@ -72,7 +80,7 @@ const CardGrid = ({
     if (!acts) return [];
 
     return acts.filter((card: Act) => {
-      const query = searchQuery.toLowerCase();
+      const query = debouncedQuery.toLowerCase();
       const matchesQuery =
         card.title.toLowerCase().includes(query) ||
         (card.content && card.content.toLowerCase().includes(query)) ||
@@ -87,7 +95,7 @@ const CardGrid = ({
 
       return matchesQuery && matchesType && confidenceCheck;
     });
-  }, [acts, searchQuery, selectedTypes, isAdmin]);
+  }, [acts, debouncedQuery, selectedTypes, isAdmin]);
 
   const availableCategories = useMemo(() => {
     if (!baseFilteredActs.length) return [];
@@ -155,7 +163,12 @@ const CardGrid = ({
   }, []);
 
   useLayoutEffect(() => {
-    if (tagsContainerRef.current && availableCategories.length > 0) {
+    if (
+      tagsContainerRef.current &&
+      availableCategories.length > 0 &&
+      !hasTagsAnimated.current
+    ) {
+      hasTagsAnimated.current = true;
       gsap.fromTo(
         tagsContainerRef.current,
         { opacity: 0, y: -20, scale: 0.97 },
@@ -191,6 +204,7 @@ const CardGrid = ({
             each: 0.08,
           },
           delay: 0.6,
+          onComplete: () => setAnimationComplete(true),
         });
       }
     }
@@ -201,7 +215,7 @@ const CardGrid = ({
       {availableCategories && availableCategories.length > 0 && (
         <div
           ref={tagsContainerRef}
-          style={{ opacity: 0 }}
+          style={hasTagsAnimated.current ? undefined : { opacity: 0 }}
           className="w-full mx-auto max-[640px]:max-w-11/12 max-[700px]:max-w-[320px] max-[950px]:max-w-[660px] max-[1200px]:max-w-[1000px] max-w-[1260px]"
         >
           <div className="text-lg relative flex flex-row items-center justify-between mb-1 gap-4 w-max">
@@ -412,7 +426,11 @@ const CardGrid = ({
               <div
                 key={card.id}
                 data-card
-                style={{ opacity: 0, willChange: 'transform, opacity' }}
+                style={
+                  animationComplete
+                    ? undefined
+                    : { opacity: 0, willChange: 'transform, opacity' }
+                }
               >
                 <Card
                   id={card.id}
