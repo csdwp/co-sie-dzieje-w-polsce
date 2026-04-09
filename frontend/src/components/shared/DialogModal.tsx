@@ -70,8 +70,8 @@ interface CustomTooltipProps {
 const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-gray-900/95 dark:bg-black/95 backdrop-blur-md text-neutral-800 dark:text-neutral-100 px-4 py-3 rounded-xl shadow-2xl border border-black/[0.06] dark:border-white/[0.06]">
-        <p className="font-medium mb-1.5 text-neutral-700 dark:text-neutral-200">
+      <div className="bg-gray-900/95 dark:bg-black/95 backdrop-blur-md px-4 py-3 rounded-xl shadow-2xl border border-black/[0.06] dark:border-white/[0.06]">
+        <p className="font-medium mb-1.5 text-neutral-100 dark:text-neutral-200">
           {payload[0].payload.party}
         </p>
         {payload.map((entry: TooltipPayloadEntry, index: number) => (
@@ -116,8 +116,8 @@ const CustomPieTooltip = ({
     const isYes = entry.name === 'Za';
     const votes = isYes ? totalYes : totalNo;
     return (
-      <div className="bg-gray-900/95 dark:bg-black/95 backdrop-blur-md text-neutral-800 dark:text-neutral-100 px-4 py-3 rounded-xl shadow-2xl border border-black/[0.06] dark:border-white/[0.06]">
-        <p className="font-medium mb-1.5 text-neutral-700 dark:text-neutral-200">
+      <div className="bg-gray-900/95 dark:bg-black/95 backdrop-blur-md px-4 py-3 rounded-xl shadow-2xl border border-black/[0.06] dark:border-white/[0.06]">
+        <p className="font-medium mb-1.5 text-neutral-100 dark:text-neutral-200">
           {entry.name}
         </p>
         <p
