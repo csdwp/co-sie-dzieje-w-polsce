@@ -165,8 +165,9 @@ const CardGrid = ({
   useLayoutEffect(() => {
     if (!tagsContainerRef.current || hasTagsAnimated.current) return;
     hasTagsAnimated.current = true;
+    const el = tagsContainerRef.current;
     gsap.fromTo(
-      tagsContainerRef.current,
+      el,
       { opacity: 0, y: -20, scale: 0.97 },
       {
         opacity: 1,
@@ -175,6 +176,9 @@ const CardGrid = ({
         duration: 0.7,
         ease: 'power3.out',
         delay: 0.4,
+        onComplete: () => {
+          gsap.set(el, { clearProps: 'transform,willChange' });
+        },
       }
     );
   }, []);
@@ -206,7 +210,10 @@ const CardGrid = ({
       ease: 'power3.out',
       stagger: { amount: 0.3, from: 'start' },
       delay: 0.1,
-      onComplete: () => setAnimationComplete(true),
+      onComplete: () => {
+        gsap.set(visibleCards, { clearProps: 'transform,willChange' });
+        setAnimationComplete(true);
+      },
     });
   }, []);
 
@@ -432,7 +439,7 @@ const CardGrid = ({
                 data-card
                 style={
                   animationComplete
-                    ? { willChange: 'transform, opacity' }
+                    ? undefined
                     : { opacity: 0, willChange: 'transform, opacity' }
                 }
               >

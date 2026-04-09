@@ -44,6 +44,9 @@ const ClientWrapper = ({
         ease: 'power3.out',
         stagger: 0.13,
         delay: 0.05,
+        onComplete: () => {
+          gsap.set(lines, { clearProps: 'transform,willChange' });
+        },
       }
     );
   }, []);
