@@ -3,15 +3,20 @@
 
 @custom-variant dark (&:is(.dark *));
 
-
 /* Prevent horizontal scroll on mobile */
 /* NOTE: overflow-x: hidden on html/body breaks backdrop-filter on position:fixed
    elements in iOS Safari. Use overflow-x: hidden on wrapper divs instead. */
 
 /* Chrome for Android / Safari webkit prefix for backdrop-filter */
-.backdrop-blur-sm { -webkit-backdrop-filter: blur(4px); }
-.backdrop-blur-md { -webkit-backdrop-filter: blur(12px); }
-.backdrop-blur-xl { -webkit-backdrop-filter: blur(24px); }
+.backdrop-blur-sm {
+  -webkit-backdrop-filter: blur(4px);
+}
+.backdrop-blur-md {
+  -webkit-backdrop-filter: blur(12px);
+}
+.backdrop-blur-xl {
+  -webkit-backdrop-filter: blur(24px);
+}
 
 /* Promote background glow to its own GPU layer so it doesn't trigger repaints */
 body::before {

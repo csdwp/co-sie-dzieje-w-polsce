@@ -19,20 +19,24 @@ const SearchBar = ({ searchQuery, setSearchQuery }: SearchBarProps) => {
 
   useLayoutEffect(() => {
     if (!searchBarRef.current) return;
-    gsap.set(searchBarRef.current, { opacity: 0, y: -30, scale: 0.95 });
-    gsap.to(searchBarRef.current, {
-      opacity: 1,
-      y: 0,
-      scale: 1,
-      duration: 0.8,
-      ease: 'power3.out',
-      delay: 0.2,
-    });
+    gsap.fromTo(
+      searchBarRef.current,
+      { opacity: 0, y: -30, scale: 0.95 },
+      {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        duration: 0.8,
+        ease: 'power3.out',
+        delay: 0.2,
+      }
+    );
   }, []);
 
   return (
     <div
       ref={searchBarRef}
+      style={{ opacity: 0 }}
       className="w-11/12 md:w-full max-w-[560px] relative
         focus-within:text-neutral-800 dark:focus-within:text-neutral-100
         text-neutral-400 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-100 duration-500 transition-colors"

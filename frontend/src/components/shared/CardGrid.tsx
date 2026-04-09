@@ -35,6 +35,7 @@ const CardGrid = ({
   const [sortByTitle, setSortByTitle] = useState<'asc' | 'desc' | null>(null);
   const [deletedIds, setDeletedIds] = useState<Set<string | number>>(new Set());
   const [debouncedQuery, setDebouncedQuery] = useState(searchQuery);
+  const [animationComplete, setAnimationComplete] = useState(false);
   const { user } = useUser();
   const cardsContainerRef = useRef<HTMLDivElement>(null);
   const tagsContainerRef = useRef<HTMLDivElement>(null);
@@ -162,70 +163,86 @@ const CardGrid = ({
   }, []);
 
   useLayoutEffect(() => {
-    if (
-      tagsContainerRef.current &&
-      availableCategories.length > 0 &&
-      !hasTagsAnimated.current
-    ) {
-      hasTagsAnimated.current = true;
-      gsap.set(tagsContainerRef.current, { opacity: 0, y: -20, scale: 0.97 });
-      gsap.to(tagsContainerRef.current, {
+    if (!tagsContainerRef.current || hasTagsAnimated.current) return;
+    hasTagsAnimated.current = true;
+    gsap.fromTo(
+      tagsContainerRef.current,
+      { opacity: 0, y: -20, scale: 0.97 },
+      {
         opacity: 1,
         y: 0,
         scale: 1,
         duration: 0.7,
         ease: 'power3.out',
         delay: 0.4,
-      });
-    }
-  }, [availableCategories.length]);
+      }
+    );
+  }, []);
 
   useLayoutEffect(() => {
-    if (cardsContainerRef.current && !hasAnimated.current) {
-      hasAnimated.current = true;
-      const cards = cardsContainerRef.current.querySelectorAll('[data-card]');
-      if (cards.length > 0) {
-        gsap.set(cards, { opacity: 0, y: 50 });
-        gsap.to(cards, {
-          opacity: 1,
-          y: 0,
-          duration: 0.6,
-          ease: 'power3.out',
-          stagger: { amount: 0.3, from: 'start' },
-          delay: 0.1,
-        });
-      }
-    }
+    if (!cardsContainerRef.current || hasAnimated.current) return;
+    hasAnimated.current = true;
+
+    const allCards = Array.from(
+      cardsContainerRef.current.querySelectorAll<HTMLElement>('[data-card]')
+    );
+    if (allCards.length === 0) return;
+
+    // Only animate cards visible in the initial viewport — off-screen cards
+    // stay at natural opacity so fast scrolling never reveals hidden content.
+    const viewportBottom = window.innerHeight;
+    const visibleCards = allCards.filter(card => {
+      const rect = card.getBoundingClientRect();
+      return rect.top < viewportBottom + 100;
+    });
+
+    if (visibleCards.length === 0) return;
+
+    gsap.set(visibleCards, { opacity: 0, y: 50 });
+    gsap.to(visibleCards, {
+      opacity: 1,
+      y: 0,
+      duration: 0.6,
+      ease: 'power3.out',
+      stagger: { amount: 0.3, from: 'start' },
+      delay: 0.1,
+      onComplete: () => setAnimationComplete(true),
+    });
   }, []);
 
   return (
     <div className="w-full max-w-screen-xl mx-auto">
-      {availableCategories && availableCategories.length > 0 && (
-        <div
-          ref={tagsContainerRef}
-          className="w-full mx-auto max-[640px]:max-w-11/12 max-[700px]:max-w-[320px] max-[950px]:max-w-[660px] max-[1200px]:max-w-[1000px] max-w-[1260px]"
-        >
-          <div className="text-lg relative flex flex-row items-center justify-between mb-1 gap-4 w-max">
-            <button className="swiper-button-prev-custom cursor-pointer transition-all duration-500 text-neutral-400 dark:text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 dark:[text-shadow:0_0_0px_rgba(255,255,255,0)] dark:hover:[text-shadow:0_0_8px_rgba(255,255,255,0.5)]">
-              ←
-            </button>
-            <button className="swiper-button-next-custom cursor-pointer transition-all duration-500 text-neutral-400 dark:text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 dark:[text-shadow:0_0_0px_rgba(255,255,255,0)] dark:hover:[text-shadow:0_0_8px_rgba(255,255,255,0.5)]">
-              →
-            </button>
-          </div>
-          <div className="flex items-center gap-1 justify-between">
-            <Swiper
-              modules={[Navigation]}
-              navigation={{
-                nextEl: '.swiper-button-next-custom',
-                prevEl: '.swiper-button-prev-custom',
-              }}
-              spaceBetween={6}
-              slidesPerView="auto"
-              freeMode={true}
-              className="!mx-0 cursor-default relative mask-alpha mask-r-from-black mask-r-from-97% mask-r-to-transparent
+      <div
+        ref={tagsContainerRef}
+        style={{ opacity: 0 }}
+        className="w-full mx-auto max-[640px]:max-w-11/12 max-[700px]:max-w-[320px] max-[950px]:max-w-[660px] max-[1200px]:max-w-[1000px] max-w-[1260px]"
+      >
+        <div className="text-lg relative flex flex-row items-center justify-between mb-1 gap-4 w-max">
+          <button
+            className={`swiper-button-prev-custom cursor-pointer transition-all duration-500 text-neutral-400 dark:text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 dark:[text-shadow:0_0_0px_rgba(255,255,255,0)] dark:hover:[text-shadow:0_0_8px_rgba(255,255,255,0.5)] ${availableCategories.length === 0 ? 'opacity-0 pointer-events-none' : ''}`}
+          >
+            ←
+          </button>
+          <button
+            className={`swiper-button-next-custom cursor-pointer transition-all duration-500 text-neutral-400 dark:text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 dark:[text-shadow:0_0_0px_rgba(255,255,255,0)] dark:hover:[text-shadow:0_0_8px_rgba(255,255,255,0.5)] ${availableCategories.length === 0 ? 'opacity-0 pointer-events-none' : ''}`}
+          >
+            →
+          </button>
+        </div>
+        <div className="flex items-center gap-1 justify-between">
+          <Swiper
+            modules={[Navigation]}
+            navigation={{
+              nextEl: '.swiper-button-next-custom',
+              prevEl: '.swiper-button-prev-custom',
+            }}
+            spaceBetween={6}
+            slidesPerView="auto"
+            freeMode={true}
+            className="!mx-0 cursor-default relative mask-alpha mask-r-from-black mask-r-from-97% mask-r-to-transparent
             mask-l-from-black mask-l-from-97% mask-l-to-transparent !pb-4 w-full flex! items-center h-[45px]"
-            >
+          >
+            {availableCategories.length > 1 && (
               <SwiperSlide key="wszystkie" className="!w-max">
                 <span
                   onClick={() => setSelectedCategories([])}
@@ -242,17 +259,18 @@ const CardGrid = ({
                   wszystkie
                 </span>
               </SwiperSlide>
-              {availableCategories.map((category: string) => (
-                <SwiperSlide key={category} className="!w-max">
-                  <span
-                    onClick={() => {
-                      setSelectedCategories(prev =>
-                        prev.includes(category)
-                          ? prev.filter(c => c !== category)
-                          : [...prev, category]
-                      );
-                    }}
-                    className={`
+            )}
+            {availableCategories.map((category: string) => (
+              <SwiperSlide key={category} className="!w-max">
+                <span
+                  onClick={() => {
+                    setSelectedCategories(prev =>
+                      prev.includes(category)
+                        ? prev.filter(c => c !== category)
+                        : [...prev, category]
+                    );
+                  }}
+                  className={`
                     transition-all duration-500 cursor-pointer min-w-max
                     px-3 py-1.5 text-[11px] font-medium tracking-wide rounded-full
                     ${
@@ -261,42 +279,42 @@ const CardGrid = ({
                         : 'text-neutral-400 dark:text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300'
                     }
                   `}
-                  >
-                    {category}
-                  </span>
-                </SwiperSlide>
-              ))}
-            </Swiper>
-
-            <div className="flex justify-end relative right-0 pb-4">
-              <button
-                onClick={toggleFilterOptions}
-                className={`p-2 cursor-pointer transition-all duration-500 ${
-                  isFilterOptionsOpen
-                    ? 'text-neutral-700 dark:text-neutral-200 dark:[filter:drop-shadow(0_0_8px_rgba(255,255,255,0.5))]'
-                    : 'text-neutral-400 dark:text-neutral-400 hover:text-neutral-500 dark:hover:text-neutral-300 dark:[filter:drop-shadow(0_0_0px_rgba(255,255,255,0))]'
-                }`}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  height="18"
-                  strokeWidth="1.5"
-                  viewBox="0 0 24 24"
-                  width="18"
                 >
-                  <path
-                    d="M3.99961 3H19.9997C20.552 3 20.9997 3.44764 20.9997 3.99987L20.9999 5.58569C21 5.85097 20.8946 6.10538 20.707 6.29295L14.2925 12.7071C14.105 12.8946 13.9996 13.149 13.9996 13.4142L13.9996 19.7192C13.9996 20.3698 13.3882 20.8472 12.7571 20.6894L10.7571 20.1894C10.3119 20.0781 9.99961 19.6781 9.99961 19.2192L9.99961 13.4142C9.99961 13.149 9.89425 12.8946 9.70672 12.7071L3.2925 6.29289C3.10496 6.10536 2.99961 5.851 2.99961 5.58579V4C2.99961 3.44772 3.44732 3 3.99961 3Z"
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
-              <div className="flex gap-2">
-                <button
-                  onClick={toggleSortOrder}
-                  className={`
+                  {category}
+                </span>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+
+          <div className="flex justify-end relative right-0 pb-4">
+            <button
+              onClick={toggleFilterOptions}
+              className={`p-2 cursor-pointer transition-all duration-500 ${
+                isFilterOptionsOpen
+                  ? 'text-neutral-700 dark:text-neutral-200 dark:[filter:drop-shadow(0_0_8px_rgba(255,255,255,0.5))]'
+                  : 'text-neutral-400 dark:text-neutral-400 hover:text-neutral-500 dark:hover:text-neutral-300 dark:[filter:drop-shadow(0_0_0px_rgba(255,255,255,0))]'
+              }`}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                height="18"
+                strokeWidth="1.5"
+                viewBox="0 0 24 24"
+                width="18"
+              >
+                <path
+                  d="M3.99961 3H19.9997C20.552 3 20.9997 3.44764 20.9997 3.99987L20.9999 5.58569C21 5.85097 20.8946 6.10538 20.707 6.29295L14.2925 12.7071C14.105 12.8946 13.9996 13.149 13.9996 13.4142L13.9996 19.7192C13.9996 20.3698 13.3882 20.8472 12.7571 20.6894L10.7571 20.1894C10.3119 20.0781 9.99961 19.6781 9.99961 19.2192L9.99961 13.4142C9.99961 13.149 9.89425 12.8946 9.70672 12.7071L3.2925 6.29289C3.10496 6.10536 2.99961 5.851 2.99961 5.58579V4C2.99961 3.44772 3.44732 3 3.99961 3Z"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={toggleSortOrder}
+                className={`
                   p-2 absolute top-0 right-0 ease-out opacity-0 pointer-events-none transition-all duration-500 cursor-pointer
                   ${
                     isFilterOptionsOpen &&
@@ -308,51 +326,51 @@ const CardGrid = ({
                       : 'text-neutral-400 dark:text-neutral-400 hover:text-neutral-500 dark:hover:text-neutral-300 dark:[filter:drop-shadow(0_0_0px_rgba(255,255,255,0))]'
                   }
                 `}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="22px"
+                  height="22px"
+                  viewBox="0 0 24 24"
+                  fill="none"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="22px"
-                    height="22px"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                  >
-                    <path
-                      d="M10 7L2 7"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                    />
-                    <path
-                      d="M8 12H2"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                    />
-                    <path
-                      d="M10 17H2"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                    />
-                    <circle
-                      cx="17"
-                      cy="12"
-                      r="5"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                    />
-                    <path
-                      d="M17 10V11.8462L18 13"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </button>
-                <button
-                  onClick={toggleSortByTitle}
-                  className={`
+                  <path
+                    d="M10 7L2 7"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                  />
+                  <path
+                    d="M8 12H2"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                  />
+                  <path
+                    d="M10 17H2"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                  />
+                  <circle
+                    cx="17"
+                    cy="12"
+                    r="5"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                  />
+                  <path
+                    d="M17 10V11.8462L18 13"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+              <button
+                onClick={toggleSortByTitle}
+                className={`
                   p-2 absolute top-0 right-0 opacity-0 ease-out pointer-events-none transition-all duration-500 cursor-pointer
                   ${
                     isFilterOptionsOpen &&
@@ -364,43 +382,42 @@ const CardGrid = ({
                       : 'text-neutral-400 dark:text-neutral-400 hover:text-neutral-500 dark:hover:text-neutral-300 dark:[filter:drop-shadow(0_0_0px_rgba(255,255,255,0))]'
                   }
                 `}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="22px"
+                  height="22px"
+                  viewBox="0 0 24 24"
+                  fill="none"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="22px"
-                    height="22px"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                  >
-                    <path
-                      d="M13 7L3 7"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                    />
-                    <path
-                      d="M10 12H3"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                    />
-                    <path
-                      d="M8 17H3"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                    />
-                    <path
-                      d="M11.3161 16.6922C11.1461 17.07 11.3145 17.514 11.6922 17.6839C12.07 17.8539 12.514 17.6855 12.6839 17.3078L11.3161 16.6922ZM16.5 7L17.1839 6.69223C17.0628 6.42309 16.7951 6.25 16.5 6.25C16.2049 6.25 15.9372 6.42309 15.8161 6.69223L16.5 7ZM20.3161 17.3078C20.486 17.6855 20.93 17.8539 21.3078 17.6839C21.6855 17.514 21.8539 17.07 21.6839 16.6922L20.3161 17.3078ZM19.3636 13.3636L20.0476 13.0559L19.3636 13.3636ZM13.6364 12.6136C13.2222 12.6136 12.8864 12.9494 12.8864 13.3636C12.8864 13.7779 13.2222 14.1136 13.6364 14.1136V12.6136ZM12.6839 17.3078L17.1839 7.30777L15.8161 6.69223L11.3161 16.6922L12.6839 17.3078ZM21.6839 16.6922L20.0476 13.0559L18.6797 13.6714L20.3161 17.3078L21.6839 16.6922ZM20.0476 13.0559L17.1839 6.69223L15.8161 7.30777L18.6797 13.6714L20.0476 13.0559ZM19.3636 12.6136H13.6364V14.1136H19.3636V12.6136Z"
-                      fill="currentColor"
-                    />
-                  </svg>
-                </button>
-              </div>
+                  <path
+                    d="M13 7L3 7"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                  />
+                  <path
+                    d="M10 12H3"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                  />
+                  <path
+                    d="M8 17H3"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                  />
+                  <path
+                    d="M11.3161 16.6922C11.1461 17.07 11.3145 17.514 11.6922 17.6839C12.07 17.8539 12.514 17.6855 12.6839 17.3078L11.3161 16.6922ZM16.5 7L17.1839 6.69223C17.0628 6.42309 16.7951 6.25 16.5 6.25C16.2049 6.25 15.9372 6.42309 15.8161 6.69223L16.5 7ZM20.3161 17.3078C20.486 17.6855 20.93 17.8539 21.3078 17.6839C21.6855 17.514 21.8539 17.07 21.6839 16.6922L20.3161 17.3078ZM19.3636 13.3636L20.0476 13.0559L19.3636 13.3636ZM13.6364 12.6136C13.2222 12.6136 12.8864 12.9494 12.8864 13.3636C12.8864 13.7779 13.2222 14.1136 13.6364 14.1136V12.6136ZM12.6839 17.3078L17.1839 7.30777L15.8161 6.69223L11.3161 16.6922L12.6839 17.3078ZM21.6839 16.6922L20.0476 13.0559L18.6797 13.6714L20.3161 17.3078L21.6839 16.6922ZM20.0476 13.0559L17.1839 6.69223L15.8161 7.30777L18.6797 13.6714L20.0476 13.0559ZM19.3636 12.6136H13.6364V14.1136H19.3636V12.6136Z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </button>
             </div>
           </div>
         </div>
-      )}
+      </div>
       <div ref={cardsContainerRef}>
         <Masonry
           breakpointCols={breakpointColumnsObj}
@@ -413,7 +430,11 @@ const CardGrid = ({
               <div
                 key={card.id}
                 data-card
-                style={{ willChange: 'transform, opacity' }}
+                style={
+                  animationComplete
+                    ? { willChange: 'transform, opacity' }
+                    : { opacity: 0, willChange: 'transform, opacity' }
+                }
               >
                 <Card
                   id={card.id}

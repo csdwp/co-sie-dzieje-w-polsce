@@ -33,16 +33,19 @@ const ClientWrapper = ({
   useLayoutEffect(() => {
     if (!heroRef.current) return;
     const lines = heroRef.current.querySelectorAll('[data-hero-line]');
-    gsap.set(lines, { opacity: 0, y: 16, scale: 0.97 });
-    gsap.to(lines, {
-      opacity: 1,
-      y: 0,
-      scale: 1,
-      duration: 1.1,
-      ease: 'power3.out',
-      stagger: 0.13,
-      delay: 0.05,
-    });
+    gsap.fromTo(
+      lines,
+      { opacity: 0, y: 16, scale: 0.97 },
+      {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        duration: 1.1,
+        ease: 'power3.out',
+        stagger: 0.13,
+        delay: 0.05,
+      }
+    );
   }, []);
 
   return (
@@ -62,6 +65,7 @@ const ClientWrapper = ({
               <span
                 data-hero-line
                 style={{
+                  opacity: 0,
                   display: 'block',
                   willChange: 'transform, opacity',
                 }}
@@ -71,6 +75,7 @@ const ClientWrapper = ({
               <span
                 data-hero-line
                 style={{
+                  opacity: 0,
                   display: 'block',
                   willChange: 'transform, opacity',
                 }}
@@ -82,6 +87,7 @@ const ClientWrapper = ({
               <span
                 data-hero-line
                 style={{
+                  opacity: 0,
                   display: 'block',
                   willChange: 'transform, opacity',
                 }}
@@ -91,6 +97,7 @@ const ClientWrapper = ({
               <span
                 data-hero-line
                 style={{
+                  opacity: 0,
                   display: 'block',
                   willChange: 'transform, opacity',
                 }}
