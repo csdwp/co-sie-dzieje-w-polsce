@@ -290,11 +290,11 @@ const DialogModal = ({
             touchStartX.current = null;
           }}
         >
-          <div className="absolute top-5 left-5 sm:top-6 sm:left-10 z-10 flex flex-row items-center gap-6 font-sans antialiased">
+          <div className="absolute top-2 left-5 sm:top-6 sm:left-10 z-10 flex flex-row items-center gap-6 font-sans antialiased">
             <button
               onClick={handlePrev}
               disabled={!hasPrev}
-              className="flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity duration-200 hover:opacity-70 cursor-pointer focus:outline-none"
+              className="flex items-center max-sm:p-1 sm:gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity duration-200 hover:opacity-70 cursor-pointer focus:outline-none"
             >
               <span className="text-lg -translate-y-0.5">←</span>
               <span className="text-[11px] sm:text-xs font-medium text-neutral-600 dark:text-neutral-300">
@@ -304,7 +304,7 @@ const DialogModal = ({
             <button
               onClick={handleNext}
               disabled={!hasNext}
-              className="flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity duration-200 hover:opacity-70 cursor-pointer focus:outline-none"
+              className="flex items-center max-sm:p-1 sm:gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity duration-200 hover:opacity-70 cursor-pointer focus:outline-none"
             >
               <span className="text-[11px] sm:text-xs font-medium text-neutral-600 dark:text-neutral-300">
                 <span className="hidden sm:inline">Następny</span>

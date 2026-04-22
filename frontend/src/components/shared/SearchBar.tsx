@@ -41,7 +41,7 @@ const SearchBar = ({ searchQuery, setSearchQuery }: SearchBarProps) => {
     <div
       ref={searchBarRef}
       style={{ opacity: 0 }}
-      className="w-11/12 md:w-full max-w-[560px] relative
+      className="md:w-11/12 w-full md:max-w-[560px] relative
         focus-within:text-neutral-800 dark:focus-within:text-neutral-100
         text-neutral-400 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-100 duration-500 transition-colors"
     >
